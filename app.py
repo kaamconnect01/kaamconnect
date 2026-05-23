@@ -255,26 +255,19 @@ def submit_payment():
     amount = request.form.get('amount')
     trx_id = request.form.get('trx_id')
     
-    # 1. New request create karo
-    new_req = PaymentRequest(shop_owner_id=current_user.id, amount=amount, trx_id=trx_id, status='Pending')
-    
-    # 2. Database mein add aur commit zaroor karo!
+    # Sirf Request Save karo
+    new_req = PaymentRequest(
+        shop_owner_id=current_user.id, 
+        amount=amount, 
+        trx_id=trx_id, 
+        status='Pending'
+    )
     db.session.add(new_req)
-    db.session.commit() 
+    db.session.commit()
     
-    flash("Request sent to Admin!")
+    flash("Request Admin ko bhej di gayi hai! Approval ke baad balance update hoga.")
     return redirect(url_for('shop_dash'))
 
-@app.route('/buy_credits', methods=['POST'])
-@login_required
-def buy_credits():
-    # Abhi ke liye hum dummy recharge bana rahe hain. 
-    # Real me yahan UPI/Razorpay API lagti hai.
-    amount = int(request.form.get('amount', 0))
-    current_user.wallet_balance += amount
-    db.session.commit()
-    flash(f'Success: {amount} Credits aapke wallet me add ho gaye hain!')
-    return redirect(url_for('shop_dash'))
 
 @app.route('/worker/dashboard', methods=['GET', 'POST'])
 @login_required
