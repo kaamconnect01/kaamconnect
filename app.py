@@ -2,15 +2,18 @@ from flask import Flask, render_template, request, redirect, url_for, flash
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
-import os
+import os  # <--- YEH IMPORT HONA ZAROORI HAI
 
 app = Flask(__name__)
-app.config['SECRET_KEY'] = 'super_secret_key_change_in_production'
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///portal.db'
-db = SQLAlchemy(app)
+app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'super_secret_key_for_local')
 
-with app.app_context():
-    db.create_all()
+# Render/Neon ka Database URL lena
+db_url = os.environ.get('DATABASE_URL', 'sqlite:///portal.db')
+if db_url.startswith("postgres://"):
+    db_url = db_url.replace("postgres://", "postgresql://", 1)
+
+app.config['SQLALCHEMY_DATABASE_URI'] = db_url
+db = SQLAlchemy(app)
 
 login_manager = LoginManager()
 login_manager.init_app(app)
@@ -300,7 +303,8 @@ def edit_user(user_id):
         flash('User details updated successfully!')
     return redirect(url_for('admin_dash'))
 
+with app.app_context():
+    db.create_all()
+
 if __name__ == '__main__':
-    with app.app_context():
-        db.create_all() # First time database create karne ke liye
     app.run(debug=True)
