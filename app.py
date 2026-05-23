@@ -60,6 +60,7 @@ class SiteSettings(db.Model):
     __tablename__ = 'site_settings'
     id = db.Column(db.Integer, primary_key=True)
     maintenance_mode = db.Column(db.Boolean, default=False)
+    admin_upi = db.Column(db.String(100), default='admin@upi')
 
 class Vacancy(db.Model):
     __tablename__ = 'vacancy'
