@@ -268,6 +268,11 @@ def submit_payment():
     flash("Request Admin ko bhej di gayi hai! Approval ke baad balance update hoga.")
     return redirect(url_for('shop_dash'))
 
+@app.route('/buy_credits_page')
+@login_required
+def buy_credits_page():
+    return render_template('buy_credits.html')
+
 
 @app.route('/worker/dashboard', methods=['GET', 'POST'])
 @login_required
