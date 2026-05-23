@@ -25,8 +25,10 @@ login_manager.login_view = 'login'
 
 # ================= DATABASE MODELS =================
 
+# ================= DATABASE MODELS =================
+
 class User(UserMixin, db.Model):
-    __tablename__ = 'users'  # Table name explicitly set to 'users'
+    __tablename__ = 'users'  # Sahi table name
     id = db.Column(db.Integer, primary_key=True)
     role = db.Column(db.String(20), nullable=False)
     name = db.Column(db.String(100), nullable=False)
@@ -34,33 +36,30 @@ class User(UserMixin, db.Model):
     password = db.Column(db.String(200), nullable=False)
     email = db.Column(db.String(100))
     address = db.Column(db.Text)
-    
-    # Shop Owner & Worker Specific
     experience = db.Column(db.String(50))
     expertise = db.Column(db.String(100))
-    
-    # Shop Owner Specific
     wallet_balance = db.Column(db.Integer, default=0)
-    
-    # Worker Specific
     per_day_amount = db.Column(db.Integer)
 
 class Requirement(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    customer_id = db.Column(db.Integer, db.ForeignKey('users.id')) # Fixed reference
-    category = db.Column(db.String(50)) 
+    # Yahan 'users.id' hona chahiye
+    customer_id = db.Column(db.Integer, db.ForeignKey('users.id')) 
+    category = db.Column(db.String(50))
     budget = db.Column(db.Integer)
     deadline = db.Column(db.String(50))
     description = db.Column(db.Text)
     
 class UnlockedLead(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    shop_owner_id = db.Column(db.Integer, db.ForeignKey('users.id')) # Fixed reference
+    # Yahan 'users.id' hona chahiye
+    shop_owner_id = db.Column(db.Integer, db.ForeignKey('users.id'))
     requirement_id = db.Column(db.Integer, db.ForeignKey('requirement.id'))
 
 class Vacancy(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    shop_owner_id = db.Column(db.Integer, db.ForeignKey('users.id')) # Fixed reference
+    # Yahan 'users.id' hona chahiye
+    shop_owner_id = db.Column(db.Integer, db.ForeignKey('users.id'))
     person_need = db.Column(db.String(100))
     address = db.Column(db.Text)
     task_type = db.Column(db.String(100))
@@ -73,7 +72,8 @@ class SiteSettings(db.Model):
 
 class PaymentRequest(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    shop_owner_id = db.Column(db.Integer, db.ForeignKey('users.id')) # Fixed reference
+    # Yahan 'users.id' hona chahiye
+    shop_owner_id = db.Column(db.Integer, db.ForeignKey('users.id'))
     amount = db.Column(db.Integer, nullable=False)
     trx_id = db.Column(db.String(100), nullable=False)
     status = db.Column(db.String(20), default='Pending') 
