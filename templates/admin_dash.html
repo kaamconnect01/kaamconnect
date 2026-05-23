@@ -33,7 +33,7 @@
         <table class="table">
             <thead><tr><th>Shop Owner ID</th><th>Amount</th><th>Trx ID</th><th>Action</th></tr></thead>
             <tbody>
-                {% for req in PaymentRequest.query.filter_by(status='Pending').all() %}
+                {% for req in pending_requests %}
                 <tr>
                     <td>{{ req.shop_owner_id }}</td>
                     <td>₹{{ req.amount }}</td>
