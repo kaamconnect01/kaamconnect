@@ -18,7 +18,7 @@ app.config['SQLALCHEMY_DATABASE_URI'] = db_url
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 
-# 🔥 Fix: Isse session browser refresh ya incognito me drop nahi hoga
+# 櫨 Fix: Isse session browser refresh ya incognito me drop nahi hoga
 app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(days=30) 
 
 db = SQLAlchemy(app)
@@ -26,6 +26,7 @@ db = SQLAlchemy(app)
 # ================= DB MODELS ================= #
 
 class User(db.Model):
+    __tablename__ = 'user'
     user_id = db.Column(db.Integer, primary_key=True)
     role = db.Column(db.String(20), nullable=False) # 'customer', 'shop', 'worker', 'admin'
     mobile = db.Column(db.String(15), unique=True, nullable=False)
@@ -42,7 +43,7 @@ class User(db.Model):
 
 class Requirement(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    customer_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    customer_id = db.Column(db.Integer, db.ForeignKey('user.user_id'), nullable=False)
     category = db.Column(db.String(100), nullable=False)
     budget = db.Column(db.Integer, nullable=False)
     deadline = db.Column(db.String(100), nullable=False)
@@ -50,17 +51,16 @@ class Requirement(db.Model):
     status = db.Column(db.String(20), default="Pending")
     created_at = db.Column(db.DateTime, default=db.func.current_timestamp())
     
-    # Cleaned duplicate relationship line
     customer = db.relationship('User', backref='customer_requirements', foreign_keys=[customer_id])
 
 class UnlockedContact(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    shop_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    shop_id = db.Column(db.Integer, db.ForeignKey('user.user_id'))
     requirement_id = db.Column(db.Integer, db.ForeignKey('requirement.id'))
 
 class Vacancy(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    shop_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    shop_id = db.Column(db.Integer, db.ForeignKey('user.user_id'))
     address = db.Column(db.String(255))
     work_type = db.Column(db.String(100))
     per_day_salary = db.Column(db.Integer)
@@ -72,7 +72,7 @@ class AdminSetting(db.Model):
 
 class CreditRequest(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    shop_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    shop_id = db.Column(db.Integer, db.ForeignKey('user.user_id'))
     amount = db.Column(db.Integer, nullable=False) 
     utr_number = db.Column(db.String(100), unique=True, nullable=False) 
     status = db.Column(db.String(20), default="Pending") 
@@ -82,7 +82,7 @@ class CreditRequest(db.Model):
 
 class JobVacancy(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    shop_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    shop_id = db.Column(db.Integer, db.ForeignKey('user.user_id'), nullable=False)
     work_type = db.Column(db.String(100), nullable=False)
     per_day_salary = db.Column(db.Integer, nullable=False)
     address = db.Column(db.String(255), nullable=False)
@@ -110,8 +110,8 @@ def signup_login():
             
             if user:
                 if user.role == 'customer' or check_password_hash(user.password, password):
-                    session.permanent = True # 🔥 Fix: Session Locked
-                    session['user_id'] = user.id
+                    session.permanent = True
+                    session['user_id'] = user.user_id
                     session['role'] = user.role
                     return redirect(url_for(f'dashboard_{user.role}'))
             flash("Invalid credentials", "danger")
@@ -125,8 +125,8 @@ def signup_login():
                 db.session.add(new_user)
                 db.session.commit()
                 
-                session.permanent = True # 🔥 Fix
-                session['user_id'] = new_user.id
+                session.permanent = True
+                session['user_id'] = new_user.user_id
                 session['role'] = 'customer'
                 return redirect(url_for('dashboard_customer'))
             flash("Mobile already registered", "danger")
@@ -152,8 +152,8 @@ def signup_login():
                 db.session.add(new_user)
                 db.session.commit()
                 
-                session.permanent = True # 🔥 Fix
-                session['user_id'] = new_user.id
+                session.permanent = True
+                session['user_id'] = new_user.user_id
                 session['role'] = role
                 flash("Account Created & Logged in successfully!", "success")
                 return redirect(url_for(f'dashboard_{role}'))
@@ -186,7 +186,7 @@ def dashboard_customer():
             
         elif request.form.get('publish'):
             new_req = Requirement(
-                customer_id=user.id,
+                customer_id=user.user_id,
                 category=request.form.get('category'),
                 budget=request.form.get('budget'),
                 deadline=request.form.get('deadline'),
@@ -196,7 +196,7 @@ def dashboard_customer():
             db.session.commit()
             flash("Requirement Published!", "success")
             
-    my_reqs = Requirement.query.filter_by(customer_id=user.id).all()
+    my_reqs = Requirement.query.filter_by(customer_id=user.user_id).all()
     return render_template('dashboard_customer.html', user=user, reqs=my_reqs)
 
 # --- SHOP OWNER ROUTES ---
@@ -216,7 +216,7 @@ def dashboard_shop():
         address = request.form.get('address')
         description = request.form.get('description')
         
-        new_job = JobVacancy(shop_id=user.id, work_type=work_type, per_day_salary=per_day_salary, address=address, description=description)
+        new_job = JobVacancy(shop_id=user.user_id, work_type=work_type, per_day_salary=per_day_salary, address=address, description=description)
         db.session.add(new_job)
         db.session.commit()
         flash("Job Vacancy successfully live ho gayi hai!", "success")
@@ -225,10 +225,10 @@ def dashboard_shop():
     all_reqs = Requirement.query.order_by(Requirement.id.desc()).all()
     workers = User.query.filter_by(role='worker').all()
     admin_settings = AdminSetting.query.first() 
-    unlocked_records = UnlockedContact.query.filter_by(shop_id=user.id).all()
+    unlocked_records = UnlockedContact.query.filter_by(shop_id=user.user_id).all()
     unlocked = [record.requirement_id for record in unlocked_records]
     
-    my_vacancies = JobVacancy.query.filter_by(shop_id=user.id).order_by(JobVacancy.id.desc()).all()
+    my_vacancies = JobVacancy.query.filter_by(shop_id=user.user_id).order_by(JobVacancy.id.desc()).all()
     
     return render_template('dashboard_shop.html', user=user, reqs=all_reqs, workers=workers, unlocked=unlocked, admin=admin_settings, my_vacancies=my_vacancies)
 
@@ -317,7 +317,7 @@ def unlock_contact(req_id):
     
     if user.wallet_credit >= credit_needed:
         user.wallet_credit -= credit_needed
-        new_unlock = UnlockedContact(shop_id=user.id, requirement_id=req.id)
+        new_unlock = UnlockedContact(shop_id=user.user_id, requirement_id=req.id)
         db.session.add(new_unlock)
         db.session.commit()
         flash(f"Contact Unlocked! {credit_needed} credits deducted.", "success")
@@ -360,7 +360,7 @@ def admin_action_credit(req_id, action):
         shop_user.wallet_credit += req.amount
         req.status = "Approved"
         db.session.commit()
-        flash(f"💸 {req.amount} Credits approve ho gaye hain user {shop_user.name} ke liye.", "success")
+        flash(f"頂 {req.amount} Credits approve ho gaye hain user {shop_user.name} ke liye.", "success")
         
     elif action == 'reject':
         req.status = "Rejected"
