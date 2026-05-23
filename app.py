@@ -6,7 +6,7 @@ import os
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'super_secret_key_for_local')
-
+    
 
 # Render/Neon ka Database URL lena
 db_url = os.environ.get('DATABASE_URL', 'sqlite:///portal.db')
@@ -55,6 +55,11 @@ class UnlockedLead(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     shop_owner_id = db.Column(db.Integer, db.ForeignKey('users.id')) # Yahan 'users.id' hai
     requirement_id = db.Column(db.Integer, db.ForeignKey('requirement.id'))
+
+class SiteSettings(db.Model):
+    __tablename__ = 'site_settings'
+    id = db.Column(db.Integer, primary_key=True)
+    maintenance_mode = db.Column(db.Boolean, default=False)
 
 class Vacancy(db.Model):
     __tablename__ = 'vacancy'
