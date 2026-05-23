@@ -146,7 +146,7 @@
           <img src="https://upload.wikimedia.org/wikipedia/commons/d/d0/QR_code_for_mobile_English_Wikipedia.svg" width="150" alt="Dummy QR">
           <h5 class="mt-2 fw-bold text-primary">admin@ybl</h5>
           <hr>
-          <form action="{{ url_for('buy_credits') }}" method="POST">
+          <form action="{{ url_for('submit_payment') }}" method="POST">
               <label class="mb-1 text-start w-100 fw-bold">Enter amount you paid:</label>
               <input type="number" name="amount" class="form-control mb-3" placeholder="e.g. 500" required>
               <button type="submit" class="btn btn-success w-100">Confirm Payment & Add Credits</button>
