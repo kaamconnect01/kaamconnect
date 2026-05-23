@@ -7,9 +7,6 @@ import os
 app = Flask(__name__)
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'super_secret_key_for_local')
 
-with app.app_context():
-    db.create_all()
-    print("Database tables created successfully!")
 
 # Render/Neon ka Database URL lena
 db_url = os.environ.get('DATABASE_URL', 'sqlite:///portal.db')
@@ -42,6 +39,10 @@ class User(UserMixin, db.Model):
     expertise = db.Column(db.String(100))
     wallet_balance = db.Column(db.Integer, default=0)
     per_day_amount = db.Column(db.Integer)
+
+with app.app_context():
+    db.create_all()
+    print("Database tables created successfully!")
 
 class Requirement(db.Model):
     __tablename__ = 'requirement'
