@@ -2,7 +2,7 @@ from flask import Flask, render_template, request, redirect, url_for, flash
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
-import os  # <--- YEH IMPORT HONA ZAROORI HAI
+import os
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'super_secret_key_for_local')
@@ -26,7 +26,7 @@ login_manager.login_view = 'login'
 # ================= DATABASE MODELS =================
 
 class User(UserMixin, db.Model):
-    __tablename__ = 'users'  # Postgres ka reserved keyword error hatane ke liye 'users' (plural) use karo
+    __tablename__ = 'users'  # Table name explicitly set to 'users'
     id = db.Column(db.Integer, primary_key=True)
     role = db.Column(db.String(20), nullable=False)
     name = db.Column(db.String(100), nullable=False)
@@ -47,20 +47,20 @@ class User(UserMixin, db.Model):
 
 class Requirement(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    customer_id = db.Column(db.Integer, db.ForeignKey('user.id'))
-    category = db.Column(db.String(50)) # Flat furniture, bed, sofa, etc.
+    customer_id = db.Column(db.Integer, db.ForeignKey('users.id')) # Fixed reference
+    category = db.Column(db.String(50)) 
     budget = db.Column(db.Integer)
     deadline = db.Column(db.String(50))
     description = db.Column(db.Text)
     
 class UnlockedLead(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    shop_owner_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    shop_owner_id = db.Column(db.Integer, db.ForeignKey('users.id')) # Fixed reference
     requirement_id = db.Column(db.Integer, db.ForeignKey('requirement.id'))
 
 class Vacancy(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    shop_owner_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    shop_owner_id = db.Column(db.Integer, db.ForeignKey('users.id')) # Fixed reference
     person_need = db.Column(db.String(100))
     address = db.Column(db.Text)
     task_type = db.Column(db.String(100))
@@ -73,10 +73,10 @@ class SiteSettings(db.Model):
 
 class PaymentRequest(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    shop_owner_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    shop_owner_id = db.Column(db.Integer, db.ForeignKey('users.id')) # Fixed reference
     amount = db.Column(db.Integer, nullable=False)
     trx_id = db.Column(db.String(100), nullable=False)
-    status = db.Column(db.String(20), default='Pending') # Pending, Approved, Rejected
+    status = db.Column(db.String(20), default='Pending') 
 
 @login_manager.user_loader
 def load_user(user_id):
@@ -98,7 +98,6 @@ def signup(role):
             flash('Mobile number already registered!')
             return redirect(url_for('signup', role=role))
             
-        # Role ke hisaab se form fields save honge
         new_user = User(
             role=role,
             mobile=mobile,
@@ -114,17 +113,15 @@ def signup(role):
         db.session.add(new_user)
         db.session.commit()
 
-        login_user(new_user)  # User ko auto-login kar do
+        login_user(new_user) 
         flash('Signup Successful! Welcome.')
 
-        # Role ke hisaab se sahi dashboard par bhej do
         if role == 'shop_owner':
             return redirect(url_for('shop_dash'))
         elif role == 'customer':
             return redirect(url_for('customer_dash'))
         else:
             return redirect(url_for('index'))
-        # --------------------------
         
     return render_template('signup.html', role=role)
 
@@ -137,7 +134,6 @@ def login():
         
         if user and check_password_hash(user.password, password):
             login_user(user)
-            # Role ke hisab se dashboard par bhejo
             if user.role == 'customer': return redirect(url_for('customer_dash'))
             elif user.role == 'shop_owner': return redirect(url_for('shop_dash'))
             elif user.role == 'worker': return redirect(url_for('worker_dash'))
@@ -151,15 +147,12 @@ def logout():
     logout_user()
     return redirect(url_for('index'))
 
-# --- Dashboards (Aapki Requirements ke hisaab se) ---
-
 @app.route('/customer/dashboard', methods=['GET', 'POST'])
 @login_required
 def customer_dash():
     if current_user.role != 'customer': return "Unauthorized"
     
     if request.method == 'POST':
-        # Customer jab requirement form bharega, toh uski contact details bhi update ho jayengi
         current_user.name = request.form.get('name')
         current_user.email = request.form.get('email')
         current_user.address = request.form.get('address')
@@ -176,19 +169,16 @@ def customer_dash():
         flash('Aapki requirement successfully publish ho gayi hai!')
         return redirect(url_for('customer_dash'))
         
-    # Purani publish ki hui requirements dikhane ke liye
     my_reqs = Requirement.query.filter_by(customer_id=current_user.id).all()
     return render_template('customer_dash.html', my_reqs=my_reqs)
 
 @app.route('/shop/dashboard', methods=['GET', 'POST'])
 @login_required
 def shop_dash():
-    # Role check ko safe banaya taaki Unauthorized error na aaye
     if current_user.role.lower() != 'shop_owner': 
         return redirect(url_for('login'))
     
     if request.method == 'POST':
-        # Vacancy publish logic (Ab error nahi aayega)
         person_need = request.form.get('person_need')
         if person_need: 
             new_vacancy = Vacancy(
@@ -204,21 +194,18 @@ def shop_dash():
             flash('Job Vacancy Published Successfully!')
         return redirect(url_for('shop_dash'))
 
-    # Saari details fetch karna
     requirements = Requirement.query.all()
     customers = {u.id: u for u in User.query.filter_by(role='customer').all()} 
     unlocked_leads = [lead.requirement_id for lead in UnlockedLead.query.filter_by(shop_owner_id=current_user.id).all()]
     workers = User.query.filter_by(role='worker').all()
     my_vacancies = Vacancy.query.filter_by(shop_owner_id=current_user.id).all()
     
-    # Admin ki UPI ID nikalna
     settings = SiteSettings.query.first()
     if not settings:
         settings = SiteSettings(admin_upi='admin@upi')
         db.session.add(settings)
         db.session.commit()
 
-    # Shop owner ki payment history
     my_requests = PaymentRequest.query.filter_by(shop_owner_id=current_user.id).order_by(PaymentRequest.id.desc()).all()
     
     return render_template('shop_dash.html', 
@@ -235,7 +222,6 @@ def shop_dash():
 def unlock_lead(req_id):
     req = Requirement.query.get(req_id)
     
-    # Credit deduction logic budget k hisaab se
     credit_cost = 50
     if req.budget > 50000: credit_cost = 200
     elif req.budget > 10000: credit_cost = 100
@@ -245,9 +231,9 @@ def unlock_lead(req_id):
         new_unlock = UnlockedLead(shop_owner_id=current_user.id, requirement_id=req.id)
         db.session.add(new_unlock)
         db.session.commit()
-        flash('Lead Unlocked Successfully! Customer details aapko dikh rahi hain.')
+        flash('Lead Unlocked Successfully!')
     else:
-        flash('Not enough credits. Please buy credits from your wallet!')
+        flash('Not enough credits.')
     return redirect(url_for('shop_dash'))
 
 @app.route('/submit_payment', methods=['POST'])
@@ -256,7 +242,6 @@ def submit_payment():
     amount = request.form.get('amount')
     trx_id = request.form.get('trx_id')
     
-    # Sirf Request Save karo
     new_req = PaymentRequest(
         shop_owner_id=current_user.id, 
         amount=amount, 
@@ -266,7 +251,7 @@ def submit_payment():
     db.session.add(new_req)
     db.session.commit()
     
-    flash("Request Admin ko bhej di gayi hai! Approval ke baad balance update hoga.")
+    flash("Request Admin ko bhej di gayi hai!")
     return redirect(url_for('shop_dash'))
 
 @app.route('/buy_credits_page')
@@ -274,14 +259,12 @@ def submit_payment():
 def buy_credits_page():
     return render_template('buy_credits.html')
 
-
 @app.route('/worker/dashboard', methods=['GET', 'POST'])
 @login_required
 def worker_dash():
     if current_user.role != 'worker': return "Unauthorized"
     
     if request.method == 'POST':
-        # Worker Edit Profile Logic
         current_user.name = request.form.get('name')
         current_user.address = request.form.get('address')
         current_user.experience = request.form.get('experience')
@@ -292,16 +275,11 @@ def worker_dash():
         flash('Profile Updated Successfully!')
         return redirect(url_for('worker_dash'))
 
-    # Job tab k liye sari vacancies laani hai
     vacancies = Vacancy.query.all()
-    # Jis shop owner ne vacancy dali hai, uski details dikhane k liye
     shop_owners = {u.id: u for u in User.query.filter_by(role='shop_owner').all()}
     
     return render_template('worker_dash.html', vacancies=vacancies, shop_owners=shop_owners)
 
-# ================= ADMIN ROUTES =================
-
-# Yeh route sirf ek baar chalana hai Admin account banane ke liye
 @app.route('/create_admin')
 def create_admin():
     if not User.query.filter_by(role='admin').first():
@@ -309,7 +287,7 @@ def create_admin():
         admin = User(role='admin', name='Super Admin', mobile='9999999999', password=hashed_pw, address='Head Office')
         db.session.add(admin)
         db.session.commit()
-        return "Admin account created successfully! Mobile: 9999999999 | Password: admin123 . Ab /login par jakar login karein."
+        return "Admin account created successfully!"
     return "Admin already exists!"
 
 @app.route('/admin/dashboard')
@@ -317,7 +295,6 @@ def create_admin():
 def admin_dash():
     if current_user.role != 'admin': return "Unauthorized"
     
-    # Dashboard ke statistics aur lists
     shop_owners = User.query.filter_by(role='shop_owner').all()
     workers = User.query.filter_by(role='worker').all()
     all_users = User.query.all()
@@ -342,7 +319,6 @@ def delete_user(user_id):
     if user:
         db.session.delete(user)
         db.session.commit()
-        flash(f'User {user.name} deleted successfully!')
     return redirect(url_for('admin_dash'))
 
 @app.route('/admin/edit_user/<int:user_id>', methods=['POST'])
@@ -357,12 +333,8 @@ def edit_user(user_id):
         if user.role == 'shop_owner':
             user.wallet_balance = request.form.get('wallet_balance', user.wallet_balance)
         db.session.commit()
-        flash('User details updated successfully!')
     return redirect(url_for('admin_dash'))
 
-# ==========================================
-# ADMIN PAYMENT CONTROLS
-# ==========================================
 @app.route('/admin/update_upi', methods=['POST'])
 @login_required
 def update_upi():
@@ -373,7 +345,6 @@ def update_upi():
         db.session.add(settings)
     settings.admin_upi = request.form.get('upi_id')
     db.session.commit()
-    flash('Admin UPI ID Updated Successfully!')
     return redirect(url_for('admin_dash'))
 
 @app.route('/approve_payment/<int:req_id>/<action>', methods=['POST'])
@@ -385,19 +356,13 @@ def approve_payment(req_id, action):
     shop_owner = User.query.get(req.shop_owner_id)
     
     if action == 'approve':
-        # Wallet update karo
         shop_owner.wallet_balance += req.amount
         req.status = 'Approved'
-        flash(f'Request Approved! ₹{req.amount} added to Shop Owner.')
     else:
         req.status = 'Rejected'
-        flash('Request Rejected.')
         
     db.session.commit()
     return redirect(url_for('admin_dash'))
-
-with app.app_context():
-    db.create_all()
 
 if __name__ == '__main__':
     app.run(debug=True)
