@@ -112,8 +112,18 @@ def signup(role):
         
         db.session.add(new_user)
         db.session.commit()
-        flash('Signup Successful! Please login.')
-        return redirect(url_for('login'))
+
+        login_user(new_user)  # User ko auto-login kar do
+        flash('Signup Successful! Welcome.')
+
+        # Role ke hisaab se sahi dashboard par bhej do
+        if role == 'shop_owner':
+            return redirect(url_for('shop_dash'))
+        elif role == 'customer':
+            return redirect(url_for('customer_dash'))
+        else:
+            return redirect(url_for('index'))
+        # --------------------------
         
     return render_template('signup.html', role=role)
 
@@ -242,16 +252,17 @@ def unlock_lead(req_id):
 @app.route('/submit_payment', methods=['POST'])
 @login_required
 def submit_payment():
-    if current_user.role != 'shop_owner': return "Unauthorized"
-    
     amount = request.form.get('amount')
     trx_id = request.form.get('trx_id')
     
-    if amount and trx_id:
-        new_req = PaymentRequest(shop_owner_id=current_user.id, amount=int(amount), trx_id=trx_id)
-        db.session.add(new_req)
-        db.session.commit()
-        flash('Payment request sent to Admin. Credits will be added upon approval!', 'success')
+    # 1. New request create karo
+    new_req = PaymentRequest(shop_owner_id=current_user.id, amount=amount, trx_id=trx_id, status='Pending')
+    
+    # 2. Database mein add aur commit zaroor karo!
+    db.session.add(new_req)
+    db.session.commit() 
+    
+    flash("Request sent to Admin!")
     return redirect(url_for('shop_dash'))
 
 @app.route('/buy_credits', methods=['POST'])
@@ -364,23 +375,24 @@ def update_upi():
     flash('Admin UPI ID Updated Successfully!')
     return redirect(url_for('admin_dash'))
 
-@app.route('/admin/approve_payment/<int:req_id>/<action>', methods=['POST'])
+@app.route('/approve_payment/<int:req_id>/<action>', methods=['POST'])
 @login_required
 def approve_payment(req_id, action):
     if current_user.role != 'admin': return "Unauthorized"
     
-    payment_req = PaymentRequest.query.get(req_id)
-    if payment_req and payment_req.status == 'Pending':
-        if action == 'approve':
-            shop_owner = User.query.get(payment_req.shop_owner_id)
-            shop_owner.wallet_balance += payment_req.amount
-            payment_req.status = 'Approved'
-            flash(f'Payment Approved! {payment_req.amount} credits added to {shop_owner.name}.')
-        elif action == 'reject':
-            payment_req.status = 'Rejected'
-            flash('Payment Rejected.')
-        db.session.commit()
+    req = PaymentRequest.query.get_or_404(req_id)
+    shop_owner = User.query.get(req.shop_owner_id)
+    
+    if action == 'approve':
+        # Wallet update karo
+        shop_owner.wallet_balance += req.amount
+        req.status = 'Approved'
+        flash(f'Request Approved! ₹{req.amount} added to Shop Owner.')
+    else:
+        req.status = 'Rejected'
+        flash('Request Rejected.')
         
+    db.session.commit()
     return redirect(url_for('admin_dash'))
 
 with app.app_context():
