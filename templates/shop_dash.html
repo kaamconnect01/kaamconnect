@@ -8,31 +8,11 @@
         </div>
         <div class="text-end">
             <h5 class="mb-1">Wallet: <span class="badge bg-warning text-dark">₹{{ current_user.wallet_balance }}</span></h5>
-            <button class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#buyCreditModal">Buy Credits</button>
+            <a href="{{ url_for('buy_credits') }}" class="btn btn-primary">Buy Credits</a>
         </div>
     </div>
 </div>
 
-<div class="card mt-4 border-info">
-    <div class="card-header bg-info text-white">💳 Add Credits (Payment)</div>
-    <div class="card-body">
-        <p>Admin UPI: <strong>{{ settings.admin_upi }}</strong></p>
-        <form action="{{ url_for('submit_payment') }}" method="POST">
-            <input type="number" name="amount" class="form-control mb-2" placeholder="Amount (Credits)" required>
-            <input type="text" name="trx_id" class="form-control mb-2" placeholder="Transaction ID (UTR No.)" required>
-            <button type="submit" class="btn btn-primary w-100">Submit Payment Proof</button>
-        </form>
-    </div>
-</div>
-
-<div class="mt-3">
-    <h6>Your Recent Requests:</h6>
-    <ul>
-        {% for req in my_requests %}
-        <li>Amount: ₹{{ req.amount }} | Trx: {{ req.trx_id }} - <b>{{ req.status }}</b></li>
-        {% endfor %}
-    </ul>
-</div>
 
 <!-- Tabs Navigation -->
 <ul class="nav nav-tabs" id="myTab" role="tablist">
