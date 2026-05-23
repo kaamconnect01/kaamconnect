@@ -323,6 +323,8 @@ def admin_dash():
     
     total_reqs = Requirement.query.count()
     total_vacancies = Vacancy.query.count()
+
+    pending_requests = PaymentRequest.query.filter_by(status='Pending').all()
     
     return render_template('admin_dash.html', 
                            shop_owners=shop_owners, 
