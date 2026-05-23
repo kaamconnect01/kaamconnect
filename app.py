@@ -40,9 +40,6 @@ class User(UserMixin, db.Model):
     wallet_balance = db.Column(db.Integer, default=0)
     per_day_amount = db.Column(db.Integer)
 
-with app.app_context():
-    db.create_all()
-    print("Database tables created successfully!")
 
 class Requirement(db.Model):
     __tablename__ = 'requirement'
@@ -362,6 +359,10 @@ def approve_payment(req_id, action):
         
     db.session.commit()
     return redirect(url_for('admin_dash'))
+
+with app.app_context():
+    db.create_all()
+    print("Database tables created successfully!")
 
 if __name__ == '__main__':
     app.run(debug=True)
