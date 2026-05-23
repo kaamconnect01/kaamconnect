@@ -25,9 +25,10 @@ login_manager.login_view = 'login'
 
 # ================= DATABASE MODELS =================
 
-class User(UserMixin, db.Model):
+cclass User(UserMixin, db.Model):
+    __tablename__ = 'users'  # <--- YE SABSE ZAROORI HAI
     id = db.Column(db.Integer, primary_key=True)
-    role = db.Column(db.String(20), nullable=False) # 'customer', 'shop_owner', 'worker', 'admin'
+    role = db.Column(db.String(20), nullable=False)
     name = db.Column(db.String(100), nullable=False)
     mobile = db.Column(db.String(15), unique=True, nullable=False)
     password = db.Column(db.String(200), nullable=False)
