@@ -1,0 +1,88 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="row mb-4">
+    <div class="col-md-12 d-flex justify-content-between align-items-center bg-white p-3 shadow-sm rounded">
+        <div>
+            <h4 class="mb-0 text-info fw-bold">Worker Dashboard</h4>
+            <small class="text-muted">Welcome, {{ current_user.name }} ({{ current_user.expertise }})</small>
+        </div>
+    </div>
+</div>
+
+<!-- Tabs Navigation -->
+<ul class="nav nav-tabs" id="workerTab" role="tablist">
+  <li class="nav-item" role="presentation">
+    <button class="nav-link active fw-bold text-dark" data-bs-toggle="tab" data-bs-target="#jobs" type="button">Available Jobs</button>
+  </li>
+  <li class="nav-item" role="presentation">
+    <button class="nav-link fw-bold text-dark" data-bs-toggle="tab" data-bs-target="#profile" type="button">Edit Profile</button>
+  </li>
+</ul>
+
+<!-- Tabs Content -->
+<div class="tab-content mt-3 bg-white p-3 shadow-sm rounded">
+  
+  <!-- TAB 1: AVAILABLE JOBS -->
+  <div class="tab-pane fade show active" id="jobs">
+      <h5 class="mb-3 text-secondary">Jobs Posted by Shop Owners</h5>
+      <div class="row">
+          {% for vac in vacancies %}
+          <div class="col-md-6 mb-3">
+              <div class="card border-0 shadow-sm bg-light">
+                  <div class="card-body">
+                      <div class="d-flex justify-content-between">
+                          <h5 class="card-title text-primary">{{ vac.person_need }}</h5>
+                          <h6 class="text-success fw-bold">₹{{ vac.per_day_pay }} / Day</h6>
+                      </div>
+                      <p class="mb-1 text-muted">{{ vac.description }}</p>
+                      <p class="mb-1 small"><b>Work Type:</b> {{ vac.task_type }}</p>
+                      <p class="mb-2 small"><b>Work Location:</b> {{ vac.address }}</p>
+                      <hr class="my-2">
+                      <p class="mb-1 small text-dark"><b>Shop Owner:</b> {{ shop_owners[vac.shop_owner_id].name }}</p>
+                      <a href="tel:{{ shop_owners[vac.shop_owner_id].mobile }}" class="btn btn-outline-success btn-sm w-100 fw-bold">
+                          Call Shop Owner ({{ shop_owners[vac.shop_owner_id].mobile }})
+                      </a>
+                  </div>
+              </div>
+          </div>
+          {% else %}
+          <p class="text-muted">Currently, koi job vacancy available nahi hai.</p>
+          {% endfor %}
+      </div>
+  </div>
+
+  <!-- TAB 2: EDIT PROFILE -->
+  <div class="tab-pane fade" id="profile">
+      <div class="row">
+          <div class="col-md-6 mx-auto">
+              <h5 class="mb-3 text-secondary">Update Your Details</h5>
+              <form method="POST">
+                  <div class="mb-3">
+                      <label>Full Name</label>
+                      <input type="text" name="name" class="form-control" value="{{ current_user.name }}" required>
+                  </div>
+                  <div class="mb-3">
+                      <label>Address / Location</label>
+                      <textarea name="address" class="form-control" rows="2" required>{{ current_user.address }}</textarea>
+                  </div>
+                  <div class="row mb-3">
+                      <div class="col-6">
+                          <label>Experience (Years)</label>
+                          <input type="text" name="experience" class="form-control" value="{{ current_user.experience }}" required>
+                      </div>
+                      <div class="col-6">
+                          <label>Expertise</label>
+                          <input type="text" name="expertise" class="form-control" value="{{ current_user.expertise }}" required>
+                      </div>
+                  </div>
+                  <div class="mb-3">
+                      <label>Expected Per Day Amount (₹)</label>
+                      <input type="number" name="per_day_amount" class="form-control" value="{{ current_user.per_day_amount }}" required>
+                  </div>
+                  <button type="submit" class="btn btn-info text-white w-100 fw-bold">Save Changes</button>
+              </form>
+          </div>
+      </div>
+  </div>
+</div>
+{% endblock %}

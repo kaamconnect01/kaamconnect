@@ -1,0 +1,81 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="row">
+    <div class="col-md-8 mx-auto">
+        <h3 class="mb-3 fw-bold text-primary">Post a Furniture Requirement</h3>
+        <div class="card shadow-sm mb-4 border-0">
+            <div class="card-body">
+                <form method="POST">
+                    <!-- Personal Info Section -->
+                    <h5 class="text-muted border-bottom pb-2">Your Contact Details (Will be hidden from shops until unlocked)</h5>
+                    <div class="row mb-3 mt-3">
+                        <div class="col-md-6">
+                            <label>Full Name</label>
+                            <input type="text" name="name" class="form-control" value="{{ current_user.name }}" required>
+                        </div>
+                        <div class="col-md-6 mt-2 mt-md-0">
+                            <label>Mobile Number (Auto-filled)</label>
+                            <input type="text" class="form-control text-muted" value="{{ current_user.mobile }}" readonly>
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label>Email ID</label>
+                            <input type="email" name="email" class="form-control" value="{{ current_user.email or '' }}">
+                        </div>
+                        <div class="col-md-6 mt-2 mt-md-0">
+                            <label>Full Address</label>
+                            <input type="text" name="address" class="form-control" value="{{ current_user.address or '' }}" required>
+                        </div>
+                    </div>
+
+                    <!-- Work Details Section -->
+                    <h5 class="text-muted border-bottom pb-2 mt-4">Work Details</h5>
+                    <div class="row mb-3 mt-3">
+                        <div class="col-md-4">
+                            <label>Furniture Category</label>
+                            <select name="category" class="form-select" required>
+                                <option value="Flat Furniture">Flat Furniture</option>
+                                <option value="Bed">Bed</option>
+                                <option value="Sofa">Sofa</option>
+                                <option value="Modular Kitchen">Modular Kitchen</option>
+                                <option value="Other">Other (Specify in detail)</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4 mt-2 mt-md-0">
+                            <label>Estimated Budget (₹)</label>
+                            <input type="number" name="budget" class="form-control" placeholder="e.g. 15000" required>
+                        </div>
+                        <div class="col-md-4 mt-2 mt-md-0">
+                            <label>Deadline (Completion Date)</label>
+                            <input type="date" name="deadline" class="form-control" required>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label>Description of Work</label>
+                        <textarea name="description" class="form-control" rows="3" placeholder="Kaam ki poori detail, size, material choice yahan likhein..." required></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary w-100 fw-bold">Publish Requirement</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Yahan par customer apni purani post ki hui requirements dekh payega -->
+        {% if my_reqs %}
+        <h4 class="mt-5 mb-3">My Published Requirements</h4>
+        <div class="list-group shadow-sm">
+            {% for req in my_reqs %}
+            <div class="list-group-item border-0 border-bottom">
+                <div class="d-flex w-100 justify-content-between">
+                    <h5 class="mb-1 text-primary">{{ req.category }}</h5>
+                    <small class="text-success fw-bold">Budget: ₹{{ req.budget }}</small>
+                </div>
+                <p class="mb-1 text-muted">{{ req.description }}</p>
+                <small class="text-muted">Deadline: <b>{{ req.deadline }}</b></small>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

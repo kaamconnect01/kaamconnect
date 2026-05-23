@@ -1,0 +1,157 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="row mb-4">
+    <div class="col-md-12 d-flex justify-content-between align-items-center bg-white p-3 shadow-sm rounded">
+        <div>
+            <h4 class="mb-0 text-success fw-bold">Shop Owner Dashboard</h4>
+            <small class="text-muted">Welcome, {{ current_user.name }}</small>
+        </div>
+        <div class="text-end">
+            <h5 class="mb-1">Wallet: <span class="badge bg-warning text-dark">₹{{ current_user.wallet_balance }}</span></h5>
+            <button class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#buyCreditModal">Buy Credits</button>
+        </div>
+    </div>
+</div>
+
+<!-- Tabs Navigation -->
+<ul class="nav nav-tabs" id="myTab" role="tablist">
+  <li class="nav-item" role="presentation">
+    <button class="nav-link active fw-bold" data-bs-toggle="tab" data-bs-target="#leads" type="button">Customer Leads</button>
+  </li>
+  <li class="nav-item" role="presentation">
+    <button class="nav-link fw-bold" data-bs-toggle="tab" data-bs-target="#workers" type="button">Find Workers</button>
+  </li>
+  <li class="nav-item" role="presentation">
+    <button class="nav-link fw-bold" data-bs-toggle="tab" data-bs-target="#vacancy" type="button">Post Vacancy</button>
+  </li>
+</ul>
+
+<!-- Tabs Content -->
+<div class="tab-content mt-3 bg-white p-3 shadow-sm rounded" id="myTabContent">
+  
+  <!-- TAB 1: CUSTOMER LEADS (Requirements) -->
+  <div class="tab-pane fade show active" id="leads">
+      <div class="row">
+          {% for req in requirements %}
+          <div class="col-md-6 mb-3">
+              <div class="card border-0 shadow-sm bg-light">
+                  <div class="card-body">
+                      <div class="d-flex justify-content-between">
+                          <h5 class="card-title text-primary">{{ req.category }}</h5>
+                          <h6 class="text-success fw-bold">Budget: ₹{{ req.budget }}</h6>
+                      </div>
+                      <p class="card-text text-muted mb-1">{{ req.description }}</p>
+                      <small class="text-danger d-block mb-3">Deadline: {{ req.deadline }}</small>
+                      
+                      <!-- Credit Logic Setup -->
+                      {% set cost = 50 %}
+                      {% if req.budget > 50000 %}{% set cost = 200 %}
+                      {% elif req.budget > 10000 %}{% set cost = 100 %}{% endif %}
+
+                      {% if req.id in unlocked_leads %}
+                          <!-- Unlocked State -->
+                          <div class="alert alert-success p-2 mb-0">
+                              <h6 class="mb-1 text-dark">Customer Details (Unlocked)</h6>
+                              <p class="mb-0 small">
+                                  <b>Name:</b> {{ customers[req.customer_id].name }}<br>
+                                  <b>Mobile:</b> <a href="tel:{{ customers[req.customer_id].mobile }}">{{ customers[req.customer_id].mobile }}</a><br>
+                                  <b>Address:</b> {{ customers[req.customer_id].address }}
+                              </p>
+                          </div>
+                      {% else %}
+                          <!-- Locked State -->
+                          <div class="alert alert-secondary p-2 mb-0 d-flex justify-content-between align-items-center">
+                              <div>
+                                  <h6 class="mb-0 text-muted">🔒 Contact Hidden</h6>
+                                  <small>Unlock cost: <b>{{ cost }} Credits</b></small>
+                              </div>
+                              <form action="{{ url_for('unlock_lead', req_id=req.id) }}" method="POST">
+                                  <button type="submit" class="btn btn-warning btn-sm fw-bold">Unlock Detail</button>
+                              </form>
+                          </div>
+                      {% endif %}
+                  </div>
+              </div>
+          </div>
+          {% else %}
+          <p class="text-muted">Abhi tak kisi customer ne requirement nahi dali hai.</p>
+          {% endfor %}
+      </div>
+  </div>
+
+  <!-- TAB 2: FIND WORKERS -->
+  <div class="tab-pane fade" id="workers">
+      <div class="row">
+          {% for worker in workers %}
+          <div class="col-md-4 mb-3">
+              <div class="card shadow-sm border-0">
+                  <div class="card-body">
+                      <h5 class="card-title text-info">{{ worker.name }}</h5>
+                      <p class="mb-1 small"><b>Expertise:</b> {{ worker.expertise }}</p>
+                      <p class="mb-1 small"><b>Experience:</b> {{ worker.experience }} Years</p>
+                      <p class="mb-1 small"><b>Per Day Charge:</b> ₹{{ worker.per_day_amount }}</p>
+                      <p class="mb-1 small"><b>Location:</b> {{ worker.address }}</p>
+                      <a href="tel:{{ worker.mobile }}" class="btn btn-outline-info btn-sm mt-2 w-100">Call Worker ({{ worker.mobile }})</a>
+                  </div>
+              </div>
+          </div>
+          {% else %}
+          <p class="text-muted">Koi worker available nahi hai.</p>
+          {% endfor %}
+      </div>
+  </div>
+
+  <!-- TAB 3: POST VACANCY -->
+  <div class="tab-pane fade" id="vacancy">
+      <div class="row">
+          <div class="col-md-6">
+              <h5 class="mb-3 text-secondary">Publish a New Vacancy</h5>
+              <form method="POST">
+                  <div class="mb-2"><input type="text" name="person_need" class="form-control" placeholder="I need a... (e.g., Sofa Maker)" required></div>
+                  <div class="mb-2"><input type="text" name="task_type" class="form-control" placeholder="Type of Work" required></div>
+                  <div class="mb-2"><input type="number" name="per_day_pay" class="form-control" placeholder="Per Day Pay Offered (₹)" required></div>
+                  <div class="mb-2"><input type="text" name="address" class="form-control" placeholder="Work Location Address" required></div>
+                  <div class="mb-2"><textarea name="description" class="form-control" rows="2" placeholder="Work Details..." required></textarea></div>
+                  <button type="submit" class="btn btn-primary w-100">Publish Vacancy</button>
+              </form>
+          </div>
+          <div class="col-md-6 mt-4 mt-md-0">
+              <h5 class="mb-3 text-secondary">My Active Vacancies</h5>
+              <ul class="list-group">
+                  {% for vac in my_vacancies %}
+                  <li class="list-group-item">
+                      <b>{{ vac.person_need }}</b> (₹{{ vac.per_day_pay }}/day) <br>
+                      <small class="text-muted">{{ vac.task_type }} | {{ vac.address }}</small>
+                  </li>
+                  {% else %}
+                  <p class="text-muted small">You haven't posted any vacancies yet.</p>
+                  {% endfor %}
+              </ul>
+          </div>
+      </div>
+  </div>
+</div>
+
+<!-- Modal For Buying Credits (UPI Setup simulation) -->
+<div class="modal fade" id="buyCreditModal" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header bg-dark text-white">
+        <h5 class="modal-title">Buy Wallet Credits (1 Cr = ₹1)</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body text-center">
+          <p class="text-muted">Pay using UPI on Admin Account</p>
+          <img src="https://upload.wikimedia.org/wikipedia/commons/d/d0/QR_code_for_mobile_English_Wikipedia.svg" width="150" alt="Dummy QR">
+          <h5 class="mt-2 fw-bold text-primary">admin@ybl</h5>
+          <hr>
+          <form action="{{ url_for('buy_credits') }}" method="POST">
+              <label class="mb-1 text-start w-100 fw-bold">Enter amount you paid:</label>
+              <input type="number" name="amount" class="form-control mb-3" placeholder="e.g. 500" required>
+              <button type="submit" class="btn btn-success w-100">Confirm Payment & Add Credits</button>
+          </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
