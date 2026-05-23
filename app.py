@@ -78,7 +78,7 @@ class PaymentRequest(db.Model):
 
 @login_manager.user_loader
 def load_user(users_id):
-    return Users.query.get(int(users_id))
+    return Users.query.get(int(user_id))
 
 # ================= ROUTES =================
 
