@@ -1,14 +1,30 @@
-<div class="container mt-4">
-    <h3>💳 Payment Details</h3>
-    <p>UPI ID: <b>yourname@upi</b></p>
-    <p>Scan QR code above (if added) and pay.</p>
-    
-    <hr>
-    
-    <h5>Submit Transaction Details</h5>
-    <form action="{{ url_for('submit_payment') }}" method="POST">
-        <input type="number" name="amount" class="form-control mb-2" placeholder="Amount Paid" required>
-        <input type="text" name="trx_id" class="form-control mb-2" placeholder="Transaction ID (UTR Number)" required>
-        <button type="submit" class="btn btn-success">Send Request</button>
-    </form>
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0">💳 Buy Credits</h4>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-info">
+                        <strong>Step 1:</strong> Pay to this UPI: <code>yourname@upi</code>
+                    </div>
+                    
+                    <hr>
+                    
+                    <form action="{{ url_for('submit_payment') }}" method="POST">
+                        <div class="mb-3">
+                            <label>Amount (₹)</label>
+                            <input type="number" name="amount" class="form-control" placeholder="Enter amount paid" required>
+                        </div>
+                        <div class="mb-3">
+                            <label>Transaction/UTR ID</label>
+                            <input type="text" name="trx_id" class="form-control" placeholder="Paste 12 digit UTR number" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary w-100">Submit Request</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
