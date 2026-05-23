@@ -15,6 +15,44 @@
   <li class="nav-item"><button class="nav-link fw-bold text-success" data-bs-toggle="tab" data-bs-target="#alldata">Database (All Data)</button></li>
 </ul>
 
+<div class="card mt-4 border-primary">
+    <div class="card-header bg-primary text-white">⚙️ Site Settings (UPI Update)</div>
+    <div class="card-body">
+        <form action="{{ url_for('update_upi') }}" method="POST">
+            <div class="input-group">
+                <input type="text" name="upi_id" class="form-control" placeholder="Enter Admin UPI (e.g., example@upi)" required>
+                <button type="submit" class="btn btn-success">Save UPI</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="card mt-4 border-warning">
+    <div class="card-header bg-warning text-dark">💰 Pending Payment Requests</div>
+    <div class="card-body">
+        <table class="table">
+            <thead><tr><th>Shop Owner ID</th><th>Amount</th><th>Trx ID</th><th>Action</th></tr></thead>
+            <tbody>
+                {% for req in PaymentRequest.query.filter_by(status='Pending').all() %}
+                <tr>
+                    <td>{{ req.shop_owner_id }}</td>
+                    <td>₹{{ req.amount }}</td>
+                    <td>{{ req.trx_id }}</td>
+                    <td>
+                        <form action="{{ url_for('approve_payment', req_id=req.id, action='approve') }}" method="POST" class="d-inline">
+                            <button class="btn btn-sm btn-success">Approve</button>
+                        </form>
+                        <form action="{{ url_for('approve_payment', req_id=req.id, action='reject') }}" method="POST" class="d-inline">
+                            <button class="btn btn-sm btn-danger">Reject</button>
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
 <!-- Tabs Content -->
 <div class="tab-content mt-3 bg-white p-3 shadow-sm rounded">
   
