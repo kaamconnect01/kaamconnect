@@ -62,6 +62,17 @@ class Vacancy(db.Model):
     per_day_pay = db.Column(db.Integer)
     description = db.Column(db.Text)
 
+class SiteSettings(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    admin_upi = db.Column(db.String(100), default='admin@upi')
+
+class PaymentRequest(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    shop_owner_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    amount = db.Column(db.Integer, nullable=False)
+    trx_id = db.Column(db.String(100), nullable=False)
+    status = db.Column(db.String(20), default='Pending') # Pending, Approved, Rejected
+
 @login_manager.user_loader
 def load_user(user_id):
     return User.query.get(int(user_id))
@@ -157,37 +168,52 @@ def customer_dash():
 @app.route('/shop/dashboard', methods=['GET', 'POST'])
 @login_required
 def shop_dash():
-    if current_user.role != 'shop_owner': return "Unauthorized"
+    # Role check ko safe banaya taaki Unauthorized error na aaye
+    if current_user.role.lower() != 'shop_owner': 
+        return redirect(url_for('login'))
     
     if request.method == 'POST':
-        # Job Vacancy publish karne ka logic
-        new_vacancy = Vacancy(
-            shop_owner_id=current_user.id,
-            person_need=request.form.get('person_need'),
-            address=request.form.get('address'),
-            task_type=request.form.get('task_type'),
-            per_day_pay=request.form.get('per_day_pay'),
-            description=request.form.get('description')
-        )
-        db.session.add(new_vacancy)
-        db.session.commit()
-        flash('Job Vacancy Published Successfully!')
+        # Vacancy publish logic (Ab error nahi aayega)
+        person_need = request.form.get('person_need')
+        if person_need: 
+            new_vacancy = Vacancy(
+                shop_owner_id=current_user.id,
+                person_need=person_need,
+                address=request.form.get('address'),
+                task_type=request.form.get('task_type'),
+                per_day_pay=request.form.get('per_day_pay'),
+                description=request.form.get('description')
+            )
+            db.session.add(new_vacancy)
+            db.session.commit()
+            flash('Job Vacancy Published Successfully!')
         return redirect(url_for('shop_dash'))
 
     # Saari details fetch karna
     requirements = Requirement.query.all()
-    customers = {u.id: u for u in User.query.filter_by(role='customer').all()} # Customer detail link karne k liye
+    customers = {u.id: u for u in User.query.filter_by(role='customer').all()} 
     unlocked_leads = [lead.requirement_id for lead in UnlockedLead.query.filter_by(shop_owner_id=current_user.id).all()]
-    
     workers = User.query.filter_by(role='worker').all()
     my_vacancies = Vacancy.query.filter_by(shop_owner_id=current_user.id).all()
+    
+    # Admin ki UPI ID nikalna
+    settings = SiteSettings.query.first()
+    if not settings:
+        settings = SiteSettings(admin_upi='admin@upi')
+        db.session.add(settings)
+        db.session.commit()
+
+    # Shop owner ki payment history
+    my_requests = PaymentRequest.query.filter_by(shop_owner_id=current_user.id).order_by(PaymentRequest.id.desc()).all()
     
     return render_template('shop_dash.html', 
                            requirements=requirements, 
                            customers=customers, 
                            unlocked_leads=unlocked_leads,
                            workers=workers,
-                           my_vacancies=my_vacancies)
+                           my_vacancies=my_vacancies,
+                           settings=settings,
+                           my_requests=my_requests)
 
 @app.route('/unlock_lead/<int:req_id>', methods=['POST'])
 @login_required
@@ -207,6 +233,21 @@ def unlock_lead(req_id):
         flash('Lead Unlocked Successfully! Customer details aapko dikh rahi hain.')
     else:
         flash('Not enough credits. Please buy credits from your wallet!')
+    return redirect(url_for('shop_dash'))
+
+@app.route('/submit_payment', methods=['POST'])
+@login_required
+def submit_payment():
+    if current_user.role != 'shop_owner': return "Unauthorized"
+    
+    amount = request.form.get('amount')
+    trx_id = request.form.get('trx_id')
+    
+    if amount and trx_id:
+        new_req = PaymentRequest(shop_owner_id=current_user.id, amount=int(amount), trx_id=trx_id)
+        db.session.add(new_req)
+        db.session.commit()
+        flash('Payment request sent to Admin. Credits will be added upon approval!', 'success')
     return redirect(url_for('shop_dash'))
 
 @app.route('/buy_credits', methods=['POST'])
@@ -266,6 +307,8 @@ def admin_dash():
     shop_owners = User.query.filter_by(role='shop_owner').all()
     workers = User.query.filter_by(role='worker').all()
     all_users = User.query.all()
+
+    pending_payments = PaymentRequest.query.filter_by(status='Pending').all()
     
     total_reqs = Requirement.query.count()
     total_vacancies = Vacancy.query.count()
@@ -301,6 +344,41 @@ def edit_user(user_id):
             user.wallet_balance = request.form.get('wallet_balance', user.wallet_balance)
         db.session.commit()
         flash('User details updated successfully!')
+    return redirect(url_for('admin_dash'))
+
+# ==========================================
+# ADMIN PAYMENT CONTROLS
+# ==========================================
+@app.route('/admin/update_upi', methods=['POST'])
+@login_required
+def update_upi():
+    if current_user.role != 'admin': return "Unauthorized"
+    settings = SiteSettings.query.first()
+    if not settings:
+        settings = SiteSettings()
+        db.session.add(settings)
+    settings.admin_upi = request.form.get('upi_id')
+    db.session.commit()
+    flash('Admin UPI ID Updated Successfully!')
+    return redirect(url_for('admin_dash'))
+
+@app.route('/admin/approve_payment/<int:req_id>/<action>', methods=['POST'])
+@login_required
+def approve_payment(req_id, action):
+    if current_user.role != 'admin': return "Unauthorized"
+    
+    payment_req = PaymentRequest.query.get(req_id)
+    if payment_req and payment_req.status == 'Pending':
+        if action == 'approve':
+            shop_owner = User.query.get(payment_req.shop_owner_id)
+            shop_owner.wallet_balance += payment_req.amount
+            payment_req.status = 'Approved'
+            flash(f'Payment Approved! {payment_req.amount} credits added to {shop_owner.name}.')
+        elif action == 'reject':
+            payment_req.status = 'Rejected'
+            flash('Payment Rejected.')
+        db.session.commit()
+        
     return redirect(url_for('admin_dash'))
 
 with app.app_context():
