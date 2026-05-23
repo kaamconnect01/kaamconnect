@@ -307,8 +307,6 @@ def admin_dash():
     shop_owners = User.query.filter_by(role='shop_owner').all()
     workers = User.query.filter_by(role='worker').all()
     all_users = User.query.all()
-
-    pending_payments = PaymentRequest.query.filter_by(status='Pending').all()
     
     total_reqs = Requirement.query.count()
     total_vacancies = Vacancy.query.count()
