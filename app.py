@@ -25,8 +25,8 @@ login_manager.login_view = 'login'
 
 # ================= DATABASE MODELS =================
 
-cclass User(UserMixin, db.Model):
-    __tablename__ = 'users'  # <--- YE SABSE ZAROORI HAI
+class User(UserMixin, db.Model):
+    __tablename__ = 'users'  # Postgres ka reserved keyword error hatane ke liye 'users' (plural) use karo
     id = db.Column(db.Integer, primary_key=True)
     role = db.Column(db.String(20), nullable=False)
     name = db.Column(db.String(100), nullable=False)
