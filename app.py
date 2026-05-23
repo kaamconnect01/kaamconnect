@@ -7,6 +7,10 @@ import os
 app = Flask(__name__)
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'super_secret_key_for_local')
 
+with app.app_context():
+    db.create_all()
+    print("Database tables created successfully!")
+
 # Render/Neon ka Database URL lena
 db_url = os.environ.get('DATABASE_URL', 'sqlite:///portal.db')
 if db_url.startswith("postgres://"):
@@ -14,10 +18,6 @@ if db_url.startswith("postgres://"):
 
 app.config['SQLALCHEMY_DATABASE_URI'] = db_url
 db = SQLAlchemy(app)
-
-with app.app_context():
-    db.create_all()
-    print("Database tables created successfully!")
 
 login_manager = LoginManager()
 login_manager.init_app(app)
