@@ -26,7 +26,7 @@ db = SQLAlchemy(app)
 # ================= DB MODELS ================= #
 
 class User(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, primary_key=True)
     role = db.Column(db.String(20), nullable=False) # 'customer', 'shop', 'worker', 'admin'
     mobile = db.Column(db.String(15), unique=True, nullable=False)
     name = db.Column(db.String(100), nullable=True)
