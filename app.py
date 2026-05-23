@@ -27,8 +27,10 @@ login_manager.login_view = 'login'
 
 # ================= DATABASE MODELS =================
 
+# --- Ye models bilkul dhyan se copy karo ---
+
 class User(UserMixin, db.Model):
-    __tablename__ = 'users'  # Sahi table name
+    __tablename__ = 'users'  # MUST be 'users'
     id = db.Column(db.Integer, primary_key=True)
     role = db.Column(db.String(20), nullable=False)
     name = db.Column(db.String(100), nullable=False)
@@ -42,45 +44,41 @@ class User(UserMixin, db.Model):
     per_day_amount = db.Column(db.Integer)
 
 class Requirement(db.Model):
+    __tablename__ = 'requirement'
     id = db.Column(db.Integer, primary_key=True)
-    # Yahan 'users.id' hona chahiye
-    customer_id = db.Column(db.Integer, db.ForeignKey('users.id')) 
+    customer_id = db.Column(db.Integer, db.ForeignKey('users.id')) # Yahan 'users.id' hai
     category = db.Column(db.String(50))
     budget = db.Column(db.Integer)
     deadline = db.Column(db.String(50))
     description = db.Column(db.Text)
-    
+
 class UnlockedLead(db.Model):
+    __tablename__ = 'unlocked_lead'
     id = db.Column(db.Integer, primary_key=True)
-    # Yahan 'users.id' hona chahiye
-    shop_owner_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+    shop_owner_id = db.Column(db.Integer, db.ForeignKey('users.id')) # Yahan 'users.id' hai
     requirement_id = db.Column(db.Integer, db.ForeignKey('requirement.id'))
 
 class Vacancy(db.Model):
+    __tablename__ = 'vacancy'
     id = db.Column(db.Integer, primary_key=True)
-    # Yahan 'users.id' hona chahiye
-    shop_owner_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+    shop_owner_id = db.Column(db.Integer, db.ForeignKey('users.id')) # Yahan 'users.id' hai
     person_need = db.Column(db.String(100))
     address = db.Column(db.Text)
     task_type = db.Column(db.String(100))
     per_day_pay = db.Column(db.Integer)
     description = db.Column(db.Text)
 
-class SiteSettings(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    admin_upi = db.Column(db.String(100), default='admin@upi')
-
 class PaymentRequest(db.Model):
+    __tablename__ = 'payment_request'
     id = db.Column(db.Integer, primary_key=True)
-    # Yahan 'users.id' hona chahiye
-    shop_owner_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+    shop_owner_id = db.Column(db.Integer, db.ForeignKey('users.id')) # Yahan 'users.id' hai
     amount = db.Column(db.Integer, nullable=False)
     trx_id = db.Column(db.String(100), nullable=False)
     status = db.Column(db.String(20), default='Pending') 
 
 @login_manager.user_loader
-def load_user(user_id):
-    return User.query.get(int(user_id))
+def load_user(users_id):
+    return Users.query.get(int(users_id))
 
 # ================= ROUTES =================
 
