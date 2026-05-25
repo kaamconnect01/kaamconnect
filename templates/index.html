@@ -1,41 +1,40 @@
 {% extends 'base.html' %}
-
 {% block content %}
-<div class="text-center mt-5">
-    <h1 class="display-4 fw-bold">Welcome to India's No.1 Furniture Hub</h1>
-    <p class="lead text-muted">Aapko furniture banwana hai, ya naya kaam chahiye? Hum sab connect karte hain.</p>
+<div class="text-center mt-3 mb-5">
+    <h1 class="display-5 fw-bolder text-dark">Welcome to <span class="text-primary">Kaamconnect</span></h1>
+    <p class="lead text-muted">India's No.1 Furniture Hub. Connect with customers, shop owners, and workers.</p>
 </div>
 
-<div class="row mt-5 text-center g-4">
-    <!-- Customer Box -->
-    <div class="col-md-4">
-        <div class="card shadow-sm h-100">
-            <div class="card-body">
-                <h3 class="card-title">I am a Customer</h3>
-                <p class="card-text">Apni requirement dalein aur best quotes paayein.</p>
-                <a href="{{ url_for('signup', role='customer') }}" class="btn btn-primary w-100 mb-2">Signup as Customer</a>
+<div class="row g-4 justify-content-center">
+    <div class="col-md-4 col-sm-12">
+        <div class="card h-100 text-center shadow-lg border-0" style="background: linear-gradient(135deg, #fdfbfb 0%, #ebedee 100%);">
+            <div class="card-body py-5">
+                <i class="fa-solid fa-user-tie fa-3x text-primary mb-3"></i>
+                <h3 class="fw-bold">I am a Customer</h3>
+                <p class="text-muted">Post your requirement and get the best quotes from top shops.</p>
+                <a href="{{ url_for('signup', role='customer') }}" class="btn btn-primary w-100 rounded-pill fw-bold mt-3">Signup as Customer</a>
             </div>
         </div>
     </div>
     
-    <!-- Shop Owner Box -->
-    <div class="col-md-4">
-        <div class="card shadow-sm h-100">
-            <div class="card-body">
-                <h3 class="card-title">I am a Shop Owner</h3>
-                <p class="card-text">Naye customers dhoondhein aur workers hire karein.</p>
-                <a href="{{ url_for('signup', role='shop_owner') }}" class="btn btn-success w-100 mb-2">Signup as Shop Owner</a>
+    <div class="col-md-4 col-sm-12">
+        <div class="card h-100 text-center shadow-lg border-0" style="background: linear-gradient(135deg, #e0c3fc 0%, #8ec5fc 100%);">
+            <div class="card-body py-5">
+                <i class="fa-solid fa-store fa-3x text-dark mb-3"></i>
+                <h3 class="fw-bold">I am a Shop Owner</h3>
+                <p class="text-dark">Find direct customer leads and hire expert workers easily.</p>
+                <a href="{{ url_for('signup', role='shop_owner') }}" class="btn btn-dark w-100 rounded-pill fw-bold mt-3">Signup as Shop Owner</a>
             </div>
         </div>
     </div>
 
-    <!-- Worker Box -->
-    <div class="col-md-4">
-        <div class="card shadow-sm h-100">
-            <div class="card-body">
-                <h3 class="card-title">I am a Worker</h3>
-                <p class="card-text">Apne area mein kaam/job vacancy dhoondhein.</p>
-                <a href="{{ url_for('signup', role='worker') }}" class="btn btn-info w-100 mb-2 text-white">Signup as Worker</a>
+    <div class="col-md-4 col-sm-12">
+        <div class="card h-100 text-center shadow-lg border-0" style="background: linear-gradient(135deg, #d4fc79 0%, #96e6a1 100%);">
+            <div class="card-body py-5">
+                <i class="fa-solid fa-hammer fa-3x text-success mb-3"></i>
+                <h3 class="fw-bold">I am a Worker</h3>
+                <p class="text-dark">Find daily wage jobs and vacancies near your location.</p>
+                <a href="{{ url_for('signup', role='worker') }}" class="btn btn-success w-100 rounded-pill fw-bold mt-3">Signup as Worker</a>
             </div>
         </div>
     </div>
