@@ -41,6 +41,7 @@ class User(UserMixin, db.Model):
     expertise = db.Column(db.String(100))
     wallet_balance = db.Column(db.Integer, default=0)
     per_day_amount = db.Column(db.Integer)
+    is_available = db.Column(db.Boolean, default=True)
 
     # CASCADES: Agar user delete ho, toh uska sab data delete ho jaye (500 error fix)
     requirements = db.relationship('Requirement', backref='customer_user', cascade='all, delete-orphan')
@@ -201,7 +202,7 @@ def shop_dash():
     requirements = Requirement.query.order_by(Requirement.id.desc()).all()
     customers = {u.id: u for u in User.query.filter_by(role='customer').all()} 
     unlocked_leads = [lead.requirement_id for lead in UnlockedLead.query.filter_by(shop_owner_id=current_user.id).all()]
-    workers = User.query.filter_by(role='worker').all()
+    workers = User.query.filter_by(role='worker', is_available=True).all()
     my_vacancies = Vacancy.query.filter_by(shop_owner_id=current_user.id).order_by(Vacancy.id.desc()).all()
     my_requests = PaymentRequest.query.filter_by(shop_owner_id=current_user.id).order_by(PaymentRequest.id.desc()).all()
     
@@ -361,6 +362,82 @@ def reset_db_safely():
 
 with app.app_context():
     db.create_all()
+
+# =======================================================
+# NAYE ROUTES: EDIT & DELETE FUNCTIONALITIES
+# =======================================================
+
+# 1. Customer: Requirement Delete karne ke liye
+@app.route('/delete_requirement/<int:req_id>', methods=['POST'])
+@login_required
+def delete_requirement(req_id):
+    if current_user.role != 'customer':
+        return "Unauthorized", 403
+    req = Requirement.query.filter_by(id=req_id, customer_id=current_user.id).first_or_404()
+    db.session.delete(req)
+    db.session.commit()
+    flash('Aapki requirement successfully delete ho gayi hai!', 'success')
+    return redirect(url_for('customer_dash'))
+
+# 2. Customer: Requirement Edit karne ke liye
+@app.route('/edit_requirement/<int:req_id>', methods=['POST'])
+@login_required
+def edit_requirement(req_id):
+    if current_user.role != 'customer':
+        return "Unauthorized", 403
+    req = Requirement.query.filter_by(id=req_id, customer_id=current_user.id).first_or_404()
+    
+    req.category = request.form.get('category')
+    req.budget = request.form.get('budget')
+    req.deadline = request.form.get('deadline')
+    req.description = request.form.get('description')
+    
+    db.session.commit()
+    flash('Aapki requirement successfully update ho gayi hai!', 'success')
+    return redirect(url_for('customer_dash'))
+
+# 3. Shop Owner: Vacancy Delete karne ke liye (Aapke model ka naam Vacancy hai)
+@app.route('/delete_vacancy/<int:vac_id>', methods=['POST'])
+@login_required
+def delete_vacancy(vac_id):
+    if current_user.role.lower() != 'shop_owner':
+        return "Unauthorized", 403
+    vac = Vacancy.query.filter_by(id=vac_id, shop_owner_id=current_user.id).first_or_404()
+    db.session.delete(vac)
+    db.session.commit()
+    flash('Job Vacancy successfully hata di gayi hai!', 'success')
+    return redirect(url_for('shop_dash'))
+
+# 4. Worker: Availability Chhipane/Hane ke liye (Jab kaam mil jaye)
+@app.route('/worker/hide_profile', methods=['POST'])
+@login_required
+def worker_hide_profile():
+    if current_user.role != 'worker':
+        return "Unauthorized", 403
+    
+    current_user.is_available = False  # Isse worker marketplace se hide ho jayega
+    db.session.commit()
+    flash('Aapki availability marketplace se hata di gayi hai! Jab aapko fir se kaam chahiye ho, toh profile edit karke save kar dein.', 'success')
+    return redirect(url_for('worker_dash'))
+
+@app.route('/update_worker_profile', methods=['POST']) # Is route ka naam aapki app me jo ho wo check kar lena (jaise edit_profile ya update_profile)
+@login_required
+def update_worker_profile():
+    if current_user.role != 'worker':
+        return "Unauthorized", 403
+        
+    current_user.name = request.form.get('name')
+    current_user.address = request.form.get('address')
+    current_user.experience = request.form.get('experience')
+    current_user.expertise = request.form.get('expertise')
+    current_user.per_day_amount = request.form.get('per_day_amount')
+    
+    current_user.is_available = True  # Form save karte hi worker fir se AVAILABLE ho jayega!
+    
+    db.session.commit()
+    flash('Aapka profile successfully update aur activate ho gaya hai.', 'success')
+    return redirect(url_for('worker_dash'))
+
 
 if __name__ == '__main__':
     app.run(debug=True)
