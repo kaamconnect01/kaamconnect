@@ -96,38 +96,42 @@ def load_user(user_id):
 def index():
     return render_template('index.html')
 
-@app.route('/signup/<role>', methods=['GET', 'POST'])
-def signup(role):
+@app.route('/signup', methods=['GET', 'POST'])
+def signup():
     if request.method == 'POST':
+        role = request.form.get('role') # Form se role lenge
         mobile = request.form.get('mobile')
         password = generate_password_hash(request.form.get('password'))
         
         if User.query.filter_by(mobile=mobile).first():
             flash('Mobile number already registered!', 'danger')
-            return redirect(url_for('signup', role=role))
+            return redirect(url_for('signup'))
             
         new_user = User(
-            role=role, mobile=mobile, password=password,
-            name=request.form.get('name', 'Customer'),
-            email=request.form.get('email'), address=request.form.get('address'),
-            experience=request.form.get('experience'), expertise=request.form.get('expertise'),
+            role=role, 
+            mobile=mobile, 
+            password=password,
+            name=request.form.get('name', 'User'),
+            email=request.form.get('email'), 
+            address=request.form.get('address'),
+            experience=request.form.get('experience'), 
+            expertise=request.form.get('expertise'),
             per_day_amount=request.form.get('per_day_amount')
         )
         
         db.session.add(new_user)
         db.session.commit()
 
-        # Auto Login & Session Persistence
         session.permanent = True
         login_user(new_user) 
-        flash('Signup Successful! Welcome.', 'success')
+        flash('Welcome to Kaamconnect! Account created successfully.', 'success')
 
         if role == 'shop_owner': return redirect(url_for('shop_dash'))
         elif role == 'customer': return redirect(url_for('customer_dash'))
         elif role == 'worker': return redirect(url_for('worker_dash'))
         else: return redirect(url_for('index'))
         
-    return render_template('signup.html', role=role)
+    return render_template('signup.html')
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
