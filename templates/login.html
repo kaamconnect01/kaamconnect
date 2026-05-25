@@ -1,25 +1,163 @@
 {% extends 'base.html' %}
 {% block content %}
-<div class="row justify-content-center align-items-center mt-4">
-    <div class="col-md-5 col-sm-12">
-        <div class="card shadow-lg border-0 p-4">
-            <div class="text-center mb-4">
-                <i class="fa-solid fa-user-circle fa-4x text-primary"></i>
-                <h3 class="fw-bold mt-2">Welcome Back</h3>
-                <p class="text-muted">Login to your account</p>
+<style>
+    /* =========================================
+       PREMIUM APPLE-STYLE LOGIN DESIGN (MOBILE RESPONSIVE)
+       ========================================= */
+    :root {
+        --apple-blue: #0071e3;
+        --apple-dark: #1d1d1f;
+        --apple-gray: #86868b;
+        --apple-bg: #f5f5f7;
+    }
+
+    body {
+        background-color: #f5f5f7;
+    }
+
+    .login-container {
+        background: #ffffff;
+        border-radius: 28px;
+        box-shadow: 0 15px 50px rgba(0,0,0,0.05);
+        overflow: hidden;
+        border: 1px solid rgba(0,0,0,0.03);
+    }
+
+    /* Branding Window Layout */
+    .brand-side {
+        background: linear-gradient(135deg, #0b0f19 0%, #111827 100%);
+        color: white;
+        padding: 40px;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        position: relative;
+    }
+    .brand-side::before {
+        content: ''; position: absolute; top: -20%; right: -20%;
+        width: 300px; height: 300px; background: radial-gradient(circle, rgba(0, 113, 227, 0.15) 0%, transparent 70%);
+    }
+
+    .form-side {
+        padding: 40px;
+    }
+
+    .form-control {
+        border-radius: 12px;
+        padding: 12px 16px;
+        border: 1px solid #d2d2d7;
+        background-color: #fbfbfd;
+        font-size: 0.95rem;
+        transition: all 0.3s ease;
+    }
+    .form-control:focus {
+        border-color: var(--apple-blue);
+        box-shadow: 0 0 0 4px rgba(0, 113, 227, 0.1);
+        background-color: #ffffff;
+    }
+
+    .input-group-text {
+        background-color: #fbfbfd;
+        border: 1px solid #d2d2d7;
+        border-radius: 12px 0 0 12px;
+        color: var(--apple-gray);
+    }
+    .has-icon .form-control {
+        border-radius: 0 12px 12px 0;
+    }
+
+    .apple-btn-primary {
+        background: linear-gradient(90deg, #0071e3, #005bb5);
+        color: white;
+        border-radius: 980px;
+        padding: 14px;
+        font-weight: 600;
+        border: none;
+        transition: all 0.3s ease;
+        box-shadow: 0 5px 15px rgba(0, 113, 227, 0.2);
+    }
+    .apple-btn-primary:hover {
+        transform: scale(1.01);
+        box-shadow: 0 8px 20px rgba(0, 113, 227, 0.3);
+        color: white;
+    }
+
+    .info-pill {
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        padding: 15px;
+        border-radius: 16px;
+        margin-bottom: 15px;
+        backdrop-filter: blur(10px);
+    }
+</style>
+
+<div class="container mt-5 mb-5">
+    <div class="row login-container g-0 d-flex flex-column-reverse flex-lg-row">
+        
+        <div class="col-lg-5 brand-side">
+            <div>
+                <h2 class="fw-bold mb-3" style="letter-spacing: -1px;">Welcome Back!</h2>
+                <p class="text-white-50">Log in to access your dashboard, manage active requests, check available jobs, or top-up your wallet seamlessly.</p>
             </div>
+
+            <div class="my-4">
+                <div class="info-pill">
+                    <div class="d-flex align-items-center">
+                        <i class="fa-solid fa-chart-line text-primary fa-lg me-3"></i>
+                        <div>
+                            <h6 class="mb-0 fw-bold text-white">Live Dashboard Control</h6>
+                            <small class="text-white-50">Track customer leads and profile interactions.</small>
+                        </div>
+                    </div>
+                </div>
+                <div class="info-pill">
+                    <div class="d-flex align-items-center">
+                        <i class="fa-solid fa-circle-nodes text-success fa-lg me-3"></i>
+                        <div>
+                            <h6 class="mb-0 fw-bold text-white">Direct Marketplace Access</h6>
+                            <small class="text-white-50">Connect with users without any middleman cuts.</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div>
+                <small class="text-white-50"><i class="fa-solid fa-user-shield me-2"></i> Secure & Verified Gateway.</small>
+            </div>
+        </div>
+
+        <div class="col-lg-7 form-side">
+            <div class="mb-4">
+                <h3 class="fw-bold text-dark" style="letter-spacing: -0.5px;">Account Sign In</h3>
+                <p class="text-muted small">Please enter your registered mobile number and password.</p>
+            </div>
+
             <form method="POST">
-                <div class="form-floating mb-3">
-                    <input type="text" name="mobile" class="form-control" id="floatingMobile" placeholder="Mobile" required>
-                    <label for="floatingMobile"><i class="fa-solid fa-phone me-2"></i>Mobile Number</label>
+                <div class="mb-4">
+                    <label class="form-label small fw-bold text-secondary">Registered Mobile Number</label>
+                    <div class="input-group has-icon">
+                        <span class="input-group-text"><i class="fa-solid fa-phone"></i></span>
+                        <input type="text" name="mobile" class="form-control" required placeholder="Enter 10-digit number">
+                    </div>
                 </div>
-                <div class="form-floating mb-4">
-                    <input type="password" name="password" class="form-control" id="floatingPass" placeholder="Password" required>
-                    <label for="floatingPass"><i class="fa-solid fa-lock me-2"></i>Password</label>
+                
+                <div class="mb-4">
+                    <label class="form-label small fw-bold text-secondary">Password</label>
+                    <div class="input-group has-icon">
+                        <span class="input-group-text"><i class="fa-solid fa-lock"></i></span>
+                        <input type="password" name="password" class="form-control" required placeholder="Enter account password">
+                    </div>
                 </div>
-                <button type="submit" class="btn btn-primary w-100 py-3 fw-bold rounded-pill shadow">LOGIN NOW</button>
+
+                <button type="submit" class="btn apple-btn-primary w-100 py-3 mt-2 fw-bold">Sign In to Dashboard</button>
+                
+                <div class="text-center mt-4">
+                    <p class="text-muted small mb-0">Don't have an account yet? <a href="{{ url_for('signup') }}" class="text-primary fw-bold text-decoration-none">Create an account here</a></p>
+                </div>
             </form>
         </div>
+
     </div>
 </div>
 {% endblock %}
