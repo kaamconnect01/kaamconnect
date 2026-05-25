@@ -1,42 +1,226 @@
 {% extends 'base.html' %}
 {% block content %}
-<div class="text-center mt-3 mb-5">
-    <h1 class="display-5 fw-bolder text-dark">Welcome to <span class="text-primary">Kaamconnect</span></h1>
-    <p class="lead text-muted">India's No.1 Furniture Hub. Connect with customers, shop owners, and workers.</p>
+<style>
+    /* =========================================
+       PREMIUM DARK & LIGHT HYBRID DESIGN
+       ========================================= */
+    :root {
+        --brand-blue: #0071e3;
+        --brand-dark: #0b0f19;
+        --brand-darker: #05070c;
+        --brand-gold: #f59e0b;
+        --text-gray: #a1a1aa;
+    }
+
+    /* Animations */
+    @keyframes dropDown {
+        0% { opacity: 0; transform: translateY(-80px) scale(0.95); }
+        70% { transform: translateY(10px) scale(1); }
+        100% { opacity: 1; transform: translateY(0) scale(1); }
+    }
+    @keyframes fadeInUp {
+        0% { opacity: 0; transform: translateY(40px); }
+        100% { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes pulseGlow {
+        0% { text-shadow: 0 0 10px rgba(245, 158, 11, 0.2); }
+        50% { text-shadow: 0 0 30px rgba(245, 158, 11, 0.6); }
+        100% { text-shadow: 0 0 10px rgba(245, 158, 11, 0.2); }
+    }
+
+    .animate-drop {
+        animation: dropDown 1.2s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+    }
+    .animate-up {
+        animation: fadeInUp 1s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        opacity: 0;
+    }
+    .delay-1 { animation-delay: 0.2s; }
+    .delay-2 { animation-delay: 0.4s; }
+    .delay-3 { animation-delay: 0.6s; }
+
+    /* Hero Section (Dark & Cinematic) */
+    .hero-dark-section {
+        background: linear-gradient(135deg, var(--brand-darker) 0%, var(--brand-dark) 100%);
+        padding: 120px 20px 100px;
+        border-radius: 30px;
+        margin-top: 10px;
+        color: white;
+        position: relative;
+        overflow: hidden;
+        box-shadow: 0 20px 50px rgba(0,0,0,0.2);
+    }
+    
+    /* Background Glow Effect */
+    .hero-dark-section::before {
+        content: ''; position: absolute; top: -50%; left: 50%; transform: translateX(-50%);
+        width: 80%; height: 100%; background: radial-gradient(circle, rgba(0, 113, 227, 0.15) 0%, transparent 70%);
+        z-index: 0; pointer-events: none;
+    }
+
+    .hero-content { position: relative; z-index: 1; }
+
+    .hero-title {
+        font-weight: 900;
+        letter-spacing: -2px;
+        font-size: clamp(3rem, 6vw, 5.5rem); /* Responsive huge text */
+        line-height: 1.1;
+    }
+    .gradient-text-gold {
+        background: linear-gradient(90deg, #fde68a, #f59e0b);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        animation: pulseGlow 3s infinite;
+    }
+    .hero-subtitle {
+        font-size: 1.3rem;
+        color: var(--text-gray);
+        max-width: 700px;
+        margin: 0 auto;
+        font-weight: 300;
+    }
+
+    /* Category Badges */
+    .category-scroll {
+        display: flex; gap: 15px; justify-content: center; flex-wrap: wrap; margin-top: 30px;
+    }
+    .cat-badge {
+        background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1);
+        padding: 10px 20px; border-radius: 50px; color: white; font-weight: 500;
+        backdrop-filter: blur(10px); transition: 0.3s;
+    }
+    .cat-badge:hover { background: rgba(255,255,255,0.15); transform: translateY(-3px); }
+
+    /* Vision Section */
+    .vision-section {
+        padding: 100px 20px;
+        text-align: center;
+        background: #ffffff;
+    }
+    .vision-text {
+        font-size: 2rem; font-weight: 700; color: #1d1d1f; max-width: 800px; margin: 0 auto; line-height: 1.4; letter-spacing: -0.5px;
+    }
+
+    /* Benefits Grid */
+    .benefit-wrapper { background: #fbfbfd; padding: 80px 0; }
+    
+    .benefit-card {
+        background: #ffffff; border-radius: 24px; padding: 40px;
+        border: 1px solid rgba(0,0,0,0.04);
+        box-shadow: 0 10px 30px rgba(0,0,0,0.02);
+        transition: transform 0.4s ease, box-shadow 0.4s ease;
+        height: 100%; text-align: left;
+    }
+    .benefit-card:hover {
+        transform: translateY(-10px);
+        box-shadow: 0 20px 50px rgba(0,0,0,0.08);
+    }
+    .icon-box {
+        width: 70px; height: 70px; border-radius: 20px;
+        display: flex; align-items: center; justify-content: center; margin-bottom: 25px;
+    }
+    .icon-blue { background: rgba(0, 113, 227, 0.1); color: var(--brand-blue); }
+    .icon-dark { background: rgba(11, 15, 25, 0.1); color: var(--brand-dark); }
+    .icon-gold { background: rgba(245, 158, 11, 0.1); color: var(--brand-gold); }
+
+    .premium-btn {
+        background: linear-gradient(90deg, #0071e3, #005bb5);
+        color: white; border-radius: 980px; padding: 16px 40px; font-size: 1.2rem;
+        font-weight: 600; box-shadow: 0 10px 20px rgba(0, 113, 227, 0.3); border: none;
+        transition: 0.3s;
+    }
+    .premium-btn:hover { transform: scale(1.05); color: white; box-shadow: 0 15px 30px rgba(0, 113, 227, 0.4); }
+</style>
+
+<div class="hero-dark-section text-center">
+    <div class="container hero-content">
+        <h1 class="hero-title mb-3 animate-drop">Welcome to <br><span class="gradient-text-gold">Kaamconnect</span></h1>
+        
+        <p class="hero-subtitle mb-4 animate-up delay-1">
+            India's ultimate network bridging the gap between Customers and Skilled Professionals. No Middlemen. No Hidden Fees. Just Direct Connections.
+        </p>
+
+        <div class="category-scroll animate-up delay-2 mb-5">
+            <div class="cat-badge"><i class="fa-solid fa-couch me-2"></i>Furniture</div>
+            <div class="cat-badge"><i class="fa-solid fa-bolt me-2"></i>Electricians</div>
+            <div class="cat-badge"><i class="fa-solid fa-faucet-drip me-2"></i>Plumbers</div>
+            <div class="cat-badge"><i class="fa-solid fa-paint-roller me-2"></i>Painters</div>
+            <div class="cat-badge"><i class="fa-solid fa-hammer me-2"></i>Carpenters</div>
+        </div>
+        
+        <div class="animate-up delay-3">
+            <a href="{{ url_for('signup') }}" class="btn premium-btn">Join the Network <i class="fa-solid fa-arrow-right ms-2"></i></a>
+        </div>
+    </div>
 </div>
 
-<div class="row g-4 justify-content-center">
-    <div class="col-md-4 col-sm-12">
-        <div class="card h-100 text-center shadow-lg border-0" style="background: linear-gradient(135deg, #fdfbfb 0%, #ebedee 100%);">
-            <div class="card-body py-5">
-                <i class="fa-solid fa-user-tie fa-3x text-primary mb-3"></i>
-                <h3 class="fw-bold">I am a Customer</h3>
-                <p class="text-muted">Post your requirement and get the best quotes from top shops.</p>
-                <a href="{{ url_for('signup', role='customer') }}" class="btn btn-primary w-100 rounded-pill fw-bold mt-3">Signup as Customer</a>
-            </div>
-        </div>
+<div class="vision-section animate-up">
+    <div class="container">
+        <span class="text-primary fw-bold text-uppercase tracking-widest small mb-3 d-block">Our Vision</span>
+        <h2 class="vision-text">
+            "To empower every skilled worker in India by providing them direct access to jobs, while giving customers a hassle-free, transparent way to build and maintain their homes."
+        </h2>
     </div>
-    
-    <div class="col-md-4 col-sm-12">
-        <div class="card h-100 text-center shadow-lg border-0" style="background: linear-gradient(135deg, #e0c3fc 0%, #8ec5fc 100%);">
-            <div class="card-body py-5">
-                <i class="fa-solid fa-store fa-3x text-dark mb-3"></i>
-                <h3 class="fw-bold">I am a Shop Owner</h3>
-                <p class="text-dark">Find direct customer leads and hire expert workers easily.</p>
-                <a href="{{ url_for('signup', role='shop_owner') }}" class="btn btn-dark w-100 rounded-pill fw-bold mt-3">Signup as Shop Owner</a>
-            </div>
-        </div>
-    </div>
+</div>
 
-    <div class="col-md-4 col-sm-12">
-        <div class="card h-100 text-center shadow-lg border-0" style="background: linear-gradient(135deg, #d4fc79 0%, #96e6a1 100%);">
-            <div class="card-body py-5">
-                <i class="fa-solid fa-hammer fa-3x text-success mb-3"></i>
-                <h3 class="fw-bold">I am a Worker</h3>
-                <p class="text-dark">Find daily wage jobs and vacancies near your location.</p>
-                <a href="{{ url_for('signup', role='worker') }}" class="btn btn-success w-100 rounded-pill fw-bold mt-3">Signup as Worker</a>
+<div class="benefit-wrapper">
+    <div class="container">
+        <div class="text-center mb-5 animate-up">
+            <h2 class="fw-bold text-dark" style="font-size: 2.5rem; letter-spacing: -1px;">Built for Everyone.</h2>
+            <p class="text-muted fs-5">Ek platform. Teen alag roles. Sabka fayda.</p>
+        </div>
+
+        <div class="row g-4">
+            <div class="col-lg-4 animate-up delay-1">
+                <div class="benefit-card">
+                    <div class="icon-box icon-blue"><i class="fa-solid fa-user-shield fa-2x"></i></div>
+                    <h3 class="fw-bold text-dark mb-3">I am a Customer</h3>
+                    <p class="text-muted mb-4">Post your home requirements—be it a new sofa, wiring fix, or plumbing leak. Get competitive quotes directly from verified professionals.</p>
+                    
+                    <ul class="list-unstyled text-dark mb-0">
+                        <li class="mb-3 d-flex align-items-start"><i class="fa-solid fa-circle-check text-primary mt-1 me-3"></i> <div><b>Post Free Requests:</b> Submit your task in seconds.</div></li>
+                        <li class="mb-3 d-flex align-items-start"><i class="fa-solid fa-circle-check text-primary mt-1 me-3"></i> <div><b>Privacy Assured:</b> Your number is hidden until you agree.</div></li>
+                        <li class="mb-3 d-flex align-items-start"><i class="fa-solid fa-circle-check text-primary mt-1 me-3"></i> <div><b>Save Money:</b> Compare quotes and choose the best.</div></li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="col-lg-4 animate-up delay-2">
+                <div class="benefit-card" style="border-top: 4px solid var(--brand-dark);">
+                    <div class="icon-box icon-dark"><i class="fa-solid fa-shop fa-2x"></i></div>
+                    <h3 class="fw-bold text-dark mb-3">I am a Shop/Contractor</h3>
+                    <p class="text-muted mb-4">Scale your business faster. Find direct leads from customers in your city and hire daily-wage workers instantly during peak seasons.</p>
+                    
+                    <ul class="list-unstyled text-dark mb-0">
+                        <li class="mb-3 d-flex align-items-start"><i class="fa-solid fa-circle-check text-dark mt-1 me-3"></i> <div><b>Direct Leads:</b> Unlock customer contacts with minimal credits.</div></li>
+                        <li class="mb-3 d-flex align-items-start"><i class="fa-solid fa-circle-check text-dark mt-1 me-3"></i> <div><b>Hire on Demand:</b> Post job vacancies and find workers.</div></li>
+                        <li class="mb-3 d-flex align-items-start"><i class="fa-solid fa-circle-check text-dark mt-1 me-3"></i> <div><b>Zero Commission:</b> Keep 100% of your project profits.</div></li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="col-lg-4 animate-up delay-3">
+                <div class="benefit-card">
+                    <div class="icon-box icon-gold"><i class="fa-solid fa-helmet-safety fa-2x"></i></div>
+                    <h3 class="fw-bold text-dark mb-3">I am a Worker</h3>
+                    <p class="text-muted mb-4">Your skills deserve respect and the right pay. Connect directly with shop owners and contractors looking for your exact expertise.</p>
+                    
+                    <ul class="list-unstyled text-dark mb-0">
+                        <li class="mb-3 d-flex align-items-start"><i class="fa-solid fa-circle-check text-warning mt-1 me-3"></i> <div><b>Daily Jobs:</b> Find work matching your trade (Paint, Wood, Wire).</div></li>
+                        <li class="mb-3 d-flex align-items-start"><i class="fa-solid fa-circle-check text-warning mt-1 me-3"></i> <div><b>No Middlemen:</b> Say goodbye to contractor cuts.</div></li>
+                        <li class="mb-3 d-flex align-items-start"><i class="fa-solid fa-circle-check text-warning mt-1 me-3"></i> <div><b>Direct Calls:</b> Call employers directly from your dashboard.</div></li>
+                    </ul>
+                </div>
             </div>
         </div>
+    </div>
+</div>
+
+<div class="container animate-up mb-5">
+    <div class="card border-0 rounded-4 p-5 text-center" style="background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%); box-shadow: inset 0 0 50px rgba(0,0,0,0.02);">
+        <h2 class="fw-bold text-dark mb-3">Ready to join India's fastest-growing network?</h2>
+        <p class="text-muted mb-4">Takes less than a minute to set up your free profile.</p>
+        <a href="{{ url_for('signup') }}" class="btn premium-btn px-5"><i class="fa-solid fa-rocket me-2"></i> Get Started Today</a>
     </div>
 </div>
 {% endblock %}
