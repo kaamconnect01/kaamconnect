@@ -1,60 +1,55 @@
 {% extends 'base.html' %}
 {% block content %}
-<div class="row justify-content-center mt-4">
+<div class="row justify-content-center mt-2">
     <div class="col-md-6 col-sm-12">
-        <div class="card shadow-sm border-0">
-            <div class="card-header bg-primary text-white">
-                <h4 class="mb-0 text-center">Signup as {{ role.replace('_', ' ').title() }}</h4>
+        <div class="card shadow-lg border-0 p-3">
+            <div class="text-center mb-3">
+                <h3 class="fw-bold text-primary">Create {{ role.replace('_', ' ').title() }} Account</h3>
+                <small class="text-muted">Fill the details below to join</small>
             </div>
-            <div class="card-body">
-                <form method="POST">
-                    <!-- Sabke liye mandatory -->
-                    <div class="mb-3">
-                        <label>Mobile Number</label>
-                        <input type="text" name="mobile" class="form-control" required placeholder="10 Digit Number">
+            <form method="POST">
+                <div class="row g-2">
+                    <div class="col-md-6 mb-2">
+                        <label class="form-label small fw-bold">Mobile Number</label>
+                        <input type="text" name="mobile" class="form-control bg-light" required placeholder="10 Digit Number">
                     </div>
-                    <div class="mb-3">
-                        <label>Password</label>
-                        <input type="password" name="password" class="form-control" required>
+                    <div class="col-md-6 mb-2">
+                        <label class="form-label small fw-bold">Password</label>
+                        <input type="password" name="password" class="form-control bg-light" required placeholder="Create Password">
                     </div>
 
-                    <!-- Agar user Customer nahi hai, tabhi ye details pucho -->
                     {% if role != 'customer' %}
-                        <div class="mb-3">
-                            <label>Full Name</label>
-                            <input type="text" name="name" class="form-control" required>
+                        <div class="col-md-12 mb-2">
+                            <label class="form-label small fw-bold">Full Name</label>
+                            <input type="text" name="name" class="form-control bg-light" required>
                         </div>
-                        <div class="mb-3">
-                            <label>Email ID</label>
-                            <input type="email" name="email" class="form-control">
+                        <div class="col-md-12 mb-2">
+                            <label class="form-label small fw-bold">Email ID (Optional)</label>
+                            <input type="email" name="email" class="form-control bg-light">
                         </div>
-                        <div class="mb-3">
-                            <label>Full Address</label>
-                            <textarea name="address" class="form-control" rows="2" required></textarea>
+                        <div class="col-md-12 mb-2">
+                            <label class="form-label small fw-bold">Full Address</label>
+                            <textarea name="address" class="form-control bg-light" rows="2" required></textarea>
                         </div>
-                        <div class="row mb-3">
-                            <div class="col-6">
-                                <label>Experience (Years)</label>
-                                <input type="text" name="experience" class="form-control" required>
-                            </div>
-                            <div class="col-6">
-                                <label>Expertise</label>
-                                <input type="text" name="expertise" class="form-control" placeholder="e.g. Sofa, Bed" required>
-                            </div>
+                        <div class="col-md-6 mb-2">
+                            <label class="form-label small fw-bold">Experience (Years)</label>
+                            <input type="text" name="experience" class="form-control bg-light" required>
+                        </div>
+                        <div class="col-md-6 mb-2">
+                            <label class="form-label small fw-bold">Expertise</label>
+                            <input type="text" name="expertise" class="form-control bg-light" placeholder="e.g. Sofa, Bed" required>
                         </div>
                     {% endif %}
 
-                    <!-- Agar user Worker hai toh per day amount pucho -->
                     {% if role == 'worker' %}
-                        <div class="mb-3">
-                            <label>Last Job Per Day Amount (₹)</label>
-                            <input type="number" name="per_day_amount" class="form-control" required>
+                        <div class="col-md-12 mb-3">
+                            <label class="form-label small fw-bold">Expected Per Day Pay (₹)</label>
+                            <input type="number" name="per_day_amount" class="form-control bg-light" required>
                         </div>
                     {% endif %}
-
-                    <button type="submit" class="btn btn-primary w-100 mt-2">Create Account</button>
-                </form>
-            </div>
+                </div>
+                <button type="submit" class="btn btn-primary w-100 py-2 mt-3 fw-bold rounded-pill shadow">CREATE ACCOUNT</button>
+            </form>
         </div>
     </div>
 </div>
