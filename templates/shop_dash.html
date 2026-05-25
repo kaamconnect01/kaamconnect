@@ -109,6 +109,20 @@
                       </div>
                       <small class="text-muted d-block mt-1">{{ vac.task_type }} • {{ vac.address }}</small>
                   </div>
+
+                    <div class="card p-3 mb-2 border-0 shadow-sm rounded-4 d-flex flex-row justify-content-between align-items-center">
+                        <div>
+                            <h6 class="fw-bold mb-1 text-dark">{{ vac.person_need }} Ki Jarurat Hai</h6>
+                            <p class="small text-muted mb-0">{{ vac.task_type }} | ₹{{ vac.per_day_pay }}/Day</p>
+                        </div>
+                        
+                        <form action="{{ url_for('delete_vacancy', vac_id=vac.id) }}" method="POST" class="m-0" onsubmit="return confirm('Kya aap is Job Vacancy ko marketplace se hatana chahte hain?');">
+                            <button type="submit" class="btn btn-sm btn-danger rounded-circle p-2" style="width: 36px; height: 36px;">
+                                <i class="fa-solid fa-trash"></i>
+                            </button>
+                        </form>
+                    </div>
+
               </div>
               {% else %}
               <p class="text-muted small">No active jobs posted.</p>
