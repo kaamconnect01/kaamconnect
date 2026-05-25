@@ -1,24 +1,24 @@
 {% extends 'base.html' %}
 {% block content %}
-<div class="row justify-content-center mt-5">
+<div class="row justify-content-center align-items-center mt-4">
     <div class="col-md-5 col-sm-12">
-        <div class="card shadow-sm border-0">
-            <div class="card-header bg-dark text-white">
-                <h4 class="mb-0 text-center">Login to Your Account</h4>
+        <div class="card shadow-lg border-0 p-4">
+            <div class="text-center mb-4">
+                <i class="fa-solid fa-user-circle fa-4x text-primary"></i>
+                <h3 class="fw-bold mt-2">Welcome Back</h3>
+                <p class="text-muted">Login to your account</p>
             </div>
-            <div class="card-body">
-                <form method="POST">
-                    <div class="mb-3">
-                        <label>Mobile Number</label>
-                        <input type="text" name="mobile" class="form-control" required>
-                    </div>
-                    <div class="mb-3">
-                        <label>Password</label>
-                        <input type="password" name="password" class="form-control" required>
-                    </div>
-                    <button type="submit" class="btn btn-success w-100 mt-2">Login</button>
-                </form>
-            </div>
+            <form method="POST">
+                <div class="form-floating mb-3">
+                    <input type="text" name="mobile" class="form-control" id="floatingMobile" placeholder="Mobile" required>
+                    <label for="floatingMobile"><i class="fa-solid fa-phone me-2"></i>Mobile Number</label>
+                </div>
+                <div class="form-floating mb-4">
+                    <input type="password" name="password" class="form-control" id="floatingPass" placeholder="Password" required>
+                    <label for="floatingPass"><i class="fa-solid fa-lock me-2"></i>Password</label>
+                </div>
+                <button type="submit" class="btn btn-primary w-100 py-3 fw-bold rounded-pill shadow">LOGIN NOW</button>
+            </form>
         </div>
     </div>
 </div>
