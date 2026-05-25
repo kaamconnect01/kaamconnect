@@ -1,179 +1,142 @@
 {% extends 'base.html' %}
 {% block content %}
-<div class="row mb-4">
-    <div class="col-md-12 bg-dark text-white p-3 shadow-sm rounded d-flex justify-content-between align-items-center">
-        <h4 class="mb-0 fw-bold">⚙️ Admin Control Panel</h4>
-        <span class="badge bg-danger">Super Admin</span>
+<div class="card bg-dark text-white border-0 shadow p-4 rounded-4 mb-4">
+    <div class="d-flex justify-content-between align-items-center">
+        <h4 class="fw-bold mb-0"><i class="fa-solid fa-shield-halved text-warning me-2"></i> Super Admin Panel</h4>
+        <span class="badge bg-danger px-3 py-2">Restricted Access</span>
     </div>
 </div>
 
-<!-- Tabs Navigation -->
-<ul class="nav nav-tabs" id="adminTab" role="tablist">
-  <li class="nav-item"><button class="nav-link active fw-bold" data-bs-toggle="tab" data-bs-target="#overview">Overview</button></li>
-  <li class="nav-item"><button class="nav-link fw-bold" data-bs-toggle="tab" data-bs-target="#shops">Shop Owners</button></li>
-  <li class="nav-item"><button class="nav-link fw-bold" data-bs-toggle="tab" data-bs-target="#workers">Workers</button></li>
-  <li class="nav-item"><button class="nav-link fw-bold text-success" data-bs-toggle="tab" data-bs-target="#alldata">Database (All Data)</button></li>
+<ul class="nav nav-pills nav-fill bg-white shadow-sm rounded-pill p-2 mb-4" id="adminTab" role="tablist">
+  <li class="nav-item"><button class="nav-link active rounded-pill fw-bold" data-bs-toggle="tab" data-bs-target="#overview">Overview</button></li>
+  <li class="nav-item"><button class="nav-link rounded-pill fw-bold" data-bs-toggle="tab" data-bs-target="#shops">Shops</button></li>
+  <li class="nav-item"><button class="nav-link rounded-pill fw-bold" data-bs-toggle="tab" data-bs-target="#workers">Workers</button></li>
+  <li class="nav-item"><button class="nav-link rounded-pill fw-bold text-danger" data-bs-toggle="tab" data-bs-target="#alldata">Database</button></li>
 </ul>
 
-<div class="card mt-4 border-primary">
-    <div class="card-header bg-primary text-white">⚙️ Site Settings (UPI Update)</div>
-    <div class="card-body">
-        <form action="{{ url_for('update_upi') }}" method="POST">
-            <div class="input-group">
-                <input type="text" name="upi_id" class="form-control" placeholder="Enter Admin UPI (e.g., example@upi)" required>
-                <button type="submit" class="btn btn-success">Save UPI</button>
+<div class="row g-4 mb-4">
+    <div class="col-md-6">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-header bg-primary text-white fw-bold"><i class="fa-solid fa-gear me-1"></i> Site Settings</div>
+            <div class="card-body">
+                <form action="{{ url_for('update_upi') }}" method="POST">
+                    <label class="small fw-bold mb-1">Update Master UPI ID</label>
+                    <div class="input-group">
+                        <input type="text" name="upi_id" class="form-control" value="{{ admin_upi }}" required>
+                        <button type="submit" class="btn btn-primary fw-bold">Update</button>
+                    </div>
+                </form>
             </div>
-        </form>
+        </div>
     </div>
-</div>
-
-<div class="card mt-4 border-warning">
-    <div class="card-header bg-warning text-dark">💰 Pending Payment Requests</div>
-    <div class="card-body">
-        <table class="table">
-            <thead><tr><th>Shop Owner ID</th><th>Amount</th><th>Trx ID</th><th>Action</th></tr></thead>
-            <tbody>
+    <div class="col-md-6">
+        <div class="card border-0 shadow-sm h-100 border-start border-4 border-warning">
+            <div class="card-header bg-white text-dark fw-bold border-0"><i class="fa-solid fa-clock text-warning me-1"></i> Pending Payments ({{ pending_requests|length }})</div>
+            <div class="card-body p-2" style="max-height: 200px; overflow-y: auto;">
                 {% for req in pending_requests %}
-                <tr>
-                    <td>{{ req.shop_owner_id }}</td>
-                    <td>₹{{ req.amount }}</td>
-                    <td>{{ req.trx_id }}</td>
-                    <td>
-                        <form action="{{ url_for('approve_payment', req_id=req.id, action='approve') }}" method="POST" class="d-inline">
-                            <button class="btn btn-sm btn-success">Approve</button>
-                        </form>
-                        <form action="{{ url_for('approve_payment', req_id=req.id, action='reject') }}" method="POST" class="d-inline">
-                            <button class="btn btn-sm btn-danger">Reject</button>
-                        </form>
-                    </td>
-                </tr>
+                <div class="d-flex justify-content-between align-items-center border-bottom pb-2 mb-2">
+                    <div>
+                        <span class="badge bg-dark">ID: {{ req.shop_owner_id }}</span>
+                        <span class="fw-bold ms-2 text-success">₹{{ req.amount }}</span><br>
+                        <small class="text-muted">TRX: {{ req.trx_id }}</small>
+                    </div>
+                    <div>
+                        <form action="{{ url_for('approve_payment', req_id=req.id, action='approve') }}" method="POST" class="d-inline"><button class="btn btn-sm btn-success px-3 me-1"><i class="fa-solid fa-check"></i></button></form>
+                        <form action="{{ url_for('approve_payment', req_id=req.id, action='reject') }}" method="POST" class="d-inline"><button class="btn btn-sm btn-danger px-3"><i class="fa-solid fa-xmark"></i></button></form>
+                    </div>
+                </div>
+                {% else %}
+                <p class="text-center text-muted mt-3 small">All caught up! No pending requests.</p>
                 {% endfor %}
-            </tbody>
-        </table>
+            </div>
+        </div>
     </div>
 </div>
 
-<!-- Tabs Content -->
-<div class="tab-content mt-3 bg-white p-3 shadow-sm rounded">
-  
-  <!-- TAB 1: OVERVIEW -->
+<div class="tab-content">
   <div class="tab-pane fade show active" id="overview">
-      <div class="row text-center mt-3">
-          <div class="col-md-3 mb-3"><div class="card bg-primary text-white p-3"><h5>Total Shop Owners</h5><h3>{{ shop_owners|length }}</h3></div></div>
-          <div class="col-md-3 mb-3"><div class="card bg-info text-white p-3"><h5>Total Workers</h5><h3>{{ workers|length }}</h3></div></div>
-          <div class="col-md-3 mb-3"><div class="card bg-success text-white p-3"><h5>Jobs (Requirements)</h5><h3>{{ total_reqs }}</h3></div></div>
-          <div class="col-md-3 mb-3"><div class="card bg-warning text-dark p-3"><h5>Worker Vacancies</h5><h3>{{ total_vacancies }}</h3></div></div>
+      <div class="row text-center g-3">
+          <div class="col-6 col-md-3"><div class="card shadow-sm border-0 bg-primary text-white py-4 h-100 rounded-4"><h2>{{ shop_owners|length }}</h2><small>Shop Owners</small></div></div>
+          <div class="col-6 col-md-3"><div class="card shadow-sm border-0 bg-info text-white py-4 h-100 rounded-4"><h2>{{ workers|length }}</h2><small>Workers</small></div></div>
+          <div class="col-6 col-md-3"><div class="card shadow-sm border-0 bg-success text-white py-4 h-100 rounded-4"><h2>{{ total_reqs }}</h2><small>Customer Jobs</small></div></div>
+          <div class="col-6 col-md-3"><div class="card shadow-sm border-0 bg-warning text-dark py-4 h-100 rounded-4"><h2>{{ total_vacancies }}</h2><small>Shop Vacancies</small></div></div>
       </div>
   </div>
 
-  <!-- TAB 2: SHOP OWNERS -->
   <div class="tab-pane fade" id="shops">
-      <div class="table-responsive mt-3">
-          <table class="table table-bordered table-hover align-middle">
-              <thead class="table-dark">
-                  <tr><th>ID</th><th>Name</th><th>Mobile</th><th>Wallet (₹)</th><th>Action</th></tr>
-              </thead>
-              <tbody>
-                  {% for shop in shop_owners %}
-                  <tr>
-                      <td>{{ shop.id }}</td>
-                      <td>{{ shop.name }}</td>
-                      <td>{{ shop.mobile }}</td>
-                      <td class="text-success fw-bold">₹{{ shop.wallet_balance }}</td>
-                      <td>
-                          <!-- Edit Button Triggers Modal -->
-                          <button class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#editModal{{ shop.id }}">Edit</button>
-                          <!-- Delete Form -->
-                          <form action="{{ url_for('delete_user', user_id=shop.id) }}" method="POST" class="d-inline" onsubmit="return confirm('Are you sure you want to delete this shop?');">
-                              <button type="submit" class="btn btn-sm btn-danger">Delete</button>
-                          </form>
-                      </td>
-                  </tr>
-                  <!-- Edit Modal for Shop -->
-                  <div class="modal fade" id="editModal{{ shop.id }}">
-                      <div class="modal-dialog"><div class="modal-content">
-                          <div class="modal-header"><h5 class="modal-title">Edit {{ shop.name }}</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
-                          <form action="{{ url_for('edit_user', user_id=shop.id) }}" method="POST">
-                              <div class="modal-body">
-                                  <input type="text" name="name" class="form-control mb-2" value="{{ shop.name }}" required>
-                                  <input type="text" name="mobile" class="form-control mb-2" value="{{ shop.mobile }}" required>
-                                  <input type="text" name="address" class="form-control mb-2" value="{{ shop.address }}" required>
-                                  <label>Wallet Balance (₹)</label>
-                                  <input type="number" name="wallet_balance" class="form-control mb-2" value="{{ shop.wallet_balance }}">
-                              </div>
-                              <div class="modal-footer"><button type="submit" class="btn btn-success">Save Changes</button></div>
-                          </form>
-                      </div></div>
-                  </div>
-                  {% endfor %}
-              </tbody>
-          </table>
+      <div class="card border-0 shadow-sm p-3">
+          <div class="table-responsive">
+              <table class="table align-middle">
+                  <thead class="table-light"><tr><th>ID</th><th>Name</th><th>Mobile</th><th>Wallet</th><th>Action</th></tr></thead>
+                  <tbody>
+                      {% for shop in shop_owners %}
+                      <tr>
+                          <td>{{ shop.id }}</td><td>{{ shop.name }}</td><td>{{ shop.mobile }}</td>
+                          <td class="text-success fw-bold">₹{{ shop.wallet_balance }}</td>
+                          <td>
+                              <button class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#editModal{{ shop.id }}"><i class="fa-solid fa-pen"></i></button>
+                              <form action="{{ url_for('delete_user', user_id=shop.id) }}" method="POST" class="d-inline" onsubmit="return confirm('WARNING: This will delete ALL data related to this shop. Continue?');">
+                                  <button type="submit" class="btn btn-sm btn-outline-danger"><i class="fa-solid fa-trash"></i></button>
+                              </form>
+                          </td>
+                      </tr>
+                      <div class="modal fade" id="editModal{{ shop.id }}">
+                          <div class="modal-dialog modal-dialog-centered"><div class="modal-content border-0 shadow">
+                              <div class="modal-header bg-light border-0"><h5 class="modal-title fw-bold">Edit {{ shop.name }}</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+                              <form action="{{ url_for('edit_user', user_id=shop.id) }}" method="POST">
+                                  <div class="modal-body">
+                                      <input type="text" name="name" class="form-control mb-2" value="{{ shop.name }}" required>
+                                      <input type="text" name="mobile" class="form-control mb-2" value="{{ shop.mobile }}" required>
+                                      <input type="text" name="address" class="form-control mb-3" value="{{ shop.address }}" required>
+                                      <label class="small fw-bold">Wallet Balance (₹)</label>
+                                      <input type="number" name="wallet_balance" class="form-control" value="{{ shop.wallet_balance }}">
+                                  </div>
+                                  <div class="modal-footer border-0"><button type="submit" class="btn btn-dark w-100 rounded-pill">Save Updates</button></div>
+                              </form>
+                          </div></div>
+                      </div>
+                      {% endfor %}
+                  </tbody>
+              </table>
+          </div>
       </div>
   </div>
 
-  <!-- TAB 3: WORKERS -->
   <div class="tab-pane fade" id="workers">
-      <div class="table-responsive mt-3">
-          <table class="table table-bordered table-hover align-middle">
-              <thead class="table-dark">
-                  <tr><th>ID</th><th>Name</th><th>Mobile</th><th>Expertise</th><th>Action</th></tr>
-              </thead>
-              <tbody>
-                  {% for worker in workers %}
-                  <tr>
-                      <td>{{ worker.id }}</td>
-                      <td>{{ worker.name }}</td>
-                      <td>{{ worker.mobile }}</td>
-                      <td>{{ worker.expertise }}</td>
-                      <td>
-                          <button class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#editModal{{ worker.id }}">Edit</button>
-                          <form action="{{ url_for('delete_user', user_id=worker.id) }}" method="POST" class="d-inline" onsubmit="return confirm('Are you sure?');">
-                              <button type="submit" class="btn btn-sm btn-danger">Delete</button>
-                          </form>
-                      </td>
-                  </tr>
-                  <!-- Edit Modal for Worker -->
-                  <div class="modal fade" id="editModal{{ worker.id }}">
-                      <div class="modal-dialog"><div class="modal-content">
-                          <div class="modal-header"><h5 class="modal-title">Edit {{ worker.name }}</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
-                          <form action="{{ url_for('edit_user', user_id=worker.id) }}" method="POST">
-                              <div class="modal-body">
-                                  <input type="text" name="name" class="form-control mb-2" value="{{ worker.name }}" required>
-                                  <input type="text" name="mobile" class="form-control mb-2" value="{{ worker.mobile }}" required>
-                                  <input type="text" name="address" class="form-control mb-2" value="{{ worker.address }}" required>
-                              </div>
-                              <div class="modal-footer"><button type="submit" class="btn btn-success">Save Changes</button></div>
-                          </form>
-                      </div></div>
-                  </div>
-                  {% endfor %}
-              </tbody>
-          </table>
+       <div class="card border-0 shadow-sm p-3">
+          <div class="table-responsive">
+              <table class="table align-middle">
+                  <thead class="table-light"><tr><th>ID</th><th>Name</th><th>Mobile</th><th>Action</th></tr></thead>
+                  <tbody>
+                      {% for worker in workers %}
+                      <tr>
+                          <td>{{ worker.id }}</td><td>{{ worker.name }}</td><td>{{ worker.mobile }}</td>
+                          <td>
+                              <form action="{{ url_for('delete_user', user_id=worker.id) }}" method="POST" class="d-inline" onsubmit="return confirm('Delete worker?');">
+                                  <button type="submit" class="btn btn-sm btn-outline-danger"><i class="fa-solid fa-trash"></i></button>
+                              </form>
+                          </td>
+                      </tr>
+                      {% endfor %}
+                  </tbody>
+              </table>
+          </div>
       </div>
   </div>
 
-  <!-- TAB 4: DATABASE (ALL DATA MASTER) -->
   <div class="tab-pane fade" id="alldata">
-      <h5 class="mt-3 text-secondary">Complete User Database</h5>
-      <div class="table-responsive">
-          <table class="table table-striped table-sm text-center align-middle">
-              <thead class="bg-secondary text-white">
-                  <tr><th>ID</th><th>Role</th><th>Name</th><th>Mobile</th><th>Address</th></tr>
-              </thead>
-              <tbody>
-                  {% for user in all_users %}
-                  <tr>
-                      <td>{{ user.id }}</td>
-                      <td><span class="badge bg-dark">{{ user.role.upper() }}</span></td>
-                      <td>{{ user.name }}</td>
-                      <td>{{ user.mobile }}</td>
-                      <td class="text-start">{{ user.address or 'N/A' }}</td>
-                  </tr>
-                  {% endfor %}
-              </tbody>
-          </table>
+      <div class="card border-0 shadow-sm p-3">
+          <div class="table-responsive">
+              <table class="table table-sm text-center align-middle" style="font-size: 14px;">
+                  <thead class="table-dark"><tr><th>ID</th><th>Role</th><th>Name</th><th>Mobile</th></tr></thead>
+                  <tbody>
+                      {% for user in all_users %}
+                      <tr><td>{{ user.id }}</td><td><span class="badge bg-secondary">{{ user.role.upper() }}</span></td><td>{{ user.name }}</td><td>{{ user.mobile }}</td></tr>
+                      {% endfor %}
+                  </tbody>
+              </table>
+          </div>
       </div>
   </div>
-  
 </div>
 {% endblock %}
