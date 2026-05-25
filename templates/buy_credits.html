@@ -1,30 +1,33 @@
-<div class="container mt-5">
-    <div class="row justify-content-center">
-        <div class="col-md-6">
-            <div class="card shadow">
-                <div class="card-header bg-primary text-white">
-                    <h4 class="mb-0">💳 Buy Credits</h4>
+{% extends 'base.html' %}
+{% block content %}
+<div class="row justify-content-center mt-3">
+    <div class="col-md-6 col-sm-12">
+        <div class="card shadow-lg border-0 text-center">
+            <div class="card-header bg-dark text-white py-3">
+                <h4 class="mb-0 fw-bold"><i class="fa-solid fa-wallet text-warning"></i> Add Wallet Credits</h4>
+            </div>
+            <div class="card-body p-4">
+                <p class="text-muted mb-2">Pay securely via UPI to Admin. (1 Credit = ₹1)</p>
+                
+                <div class="bg-light p-3 rounded mb-4 border border-info">
+                    <h5 class="text-dark fw-bold mb-0">Admin UPI ID</h5>
+                    <h3 class="text-primary mt-2">{{ upi_id }}</h3>
+                    <small class="text-danger fw-bold">Please copy this UPI and pay using PhonePe/GPay/Paytm.</small>
                 </div>
-                <div class="card-body">
-                    <div class="alert alert-info">
-                        <strong>Step 1:</strong> Pay to this UPI: <code>yourname@upi</code>
+                
+                <form action="{{ url_for('submit_payment') }}" method="POST" class="text-start">
+                    <div class="mb-3">
+                        <label class="fw-bold small">Amount Paid (₹)</label>
+                        <input type="number" name="amount" class="form-control form-control-lg bg-light" placeholder="e.g. 500" required>
                     </div>
-                    
-                    <hr>
-                    
-                    <form action="{{ url_for('submit_payment') }}" method="POST">
-                        <div class="mb-3">
-                            <label>Amount (₹)</label>
-                            <input type="number" name="amount" class="form-control" placeholder="Enter amount paid" required>
-                        </div>
-                        <div class="mb-3">
-                            <label>Transaction/UTR ID</label>
-                            <input type="text" name="trx_id" class="form-control" placeholder="Paste 12 digit UTR number" required>
-                        </div>
-                        <button type="submit" class="btn btn-primary w-100">Submit Request</button>
-                    </form>
-                </div>
+                    <div class="mb-4">
+                        <label class="fw-bold small">Transaction/UTR Number</label>
+                        <input type="text" name="trx_id" class="form-control form-control-lg bg-light" placeholder="Enter 12 digit UTR" required>
+                    </div>
+                    <button type="submit" class="btn btn-success w-100 py-3 rounded-pill fw-bold shadow"><i class="fa-solid fa-paper-plane me-1"></i> SEND APPROVAL REQUEST</button>
+                </form>
             </div>
         </div>
     </div>
 </div>
+{% endblock %}
