@@ -10,6 +10,29 @@
   <li class="nav-item"><button class="nav-link rounded-pill fw-bold" data-bs-toggle="tab" data-bs-target="#profile">My Profile</button></li>
 </ul>
 
+<div class="card border-0 bg-warning bg-opacity-10 p-4 rounded-4 mt-4">
+    <div class="d-flex align-items-start">
+        <i class="fa-solid fa-circle-check text-warning fa-2x me-3 mt-1"></i>
+        <div>
+            <h5 class="fw-bold text-dark mb-1">Kaam Mil Gaya Hai?</h5>
+            
+            {% if current_user.is_available %}
+                <p class="text-muted small mb-3">Agar aapko job mil gayi hai aur aap nahi chahte ki contractor ya dukandaron ke calls aayein, toh apni availability yahan se temporary hata sakte hain.</p>
+                <form action="{{ url_for('worker_hide_profile') }}" method="POST" onsubmit="return confirm('Kya aap apni availability ko temporary chhipana chahte hain?');">
+                    <button type="submit" class="btn btn-sm btn-warning fw-bold px-3 rounded-pill">
+                        <i class="fa-solid fa-eye-slash me-1"></i> Mujhe Abhi Kaam Nahi Chahiye (Hide Profile)
+                    </button>
+                </form>
+            {% else %}
+                <p class="text-danger small mb-3"><b>Aapki profile abhi chhipat (Hidden) hai.</b> Dukanwalo ko aapka number nahi dikhega. Dobara dikhne ke liye upar 'Save Changes' par click karke profile active karein.</p>
+                <button class="btn btn-sm btn-secondary px-3 rounded-pill" disabled>
+                    <i class="fa-solid fa-lock me-1"></i> Profile is Hidden
+                </button>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
 <div class="tab-content">
   <div class="tab-pane fade show active" id="jobs">
       <div class="row g-3">
