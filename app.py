@@ -232,6 +232,7 @@ def shop_dash():
     
     return render_template('shop_dash.html', requirements=requirements, customers=customers, 
                            unlocked_leads=unlocked_leads, workers=workers, 
+                           get_unlock_cost=get_unlock_cost,
                            my_vacancies=my_vacancies, my_requests=my_requests)
 
 @app.route('/unlock_lead/<int:req_id>', methods=['POST'])
@@ -461,6 +462,33 @@ def update_worker_profile():
     db.session.commit()
     flash('Aapka profile successfully update aur activate ho gaya hai.', 'success')
     return redirect(url_for('worker_dash'))
+
+# =======================================================
+# UTILITY FUNCTION: BUDGET KE HISAB SE CREDIT CALCULATE KARNA
+# =======================================================
+def get_unlock_cost(budget_str):
+    try:
+        # Budget string se saare comma aur extra space hatakar number me badlein
+        if not budget_str:
+            return 50  # Minimum cost agar budget khali ho
+        
+        # Agar budget string me text ho (jaise "₹2,000"), toh sirf digits nikalne ke liye:
+        budget = int(''.join(filter(str.isdigit, str(budget_str))))
+        
+        if budget <= 2000:
+            return 50
+        elif budget <= 5000:
+            return 70
+        elif budget <= 10000:
+            return 90
+        elif budget <= 20000:
+            return 120
+        elif budget <= 35000:
+            return 140
+        else:
+            return 200
+    except:
+        return 50  # Kisi bhi error ke case me minimum 50 credits safe rakhna
 
 
 if __name__ == '__main__':
