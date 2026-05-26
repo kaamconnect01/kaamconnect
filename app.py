@@ -373,14 +373,25 @@ def delete_user(user_id):
 def edit_user(user_id):
     if current_user.role != 'admin': return "Unauthorized", 401
     user = User.query.get(user_id)
+    
     if user:
-        user.name = request.form.get('name')
-        user.mobile = request.form.get('mobile')
-        user.address = request.form.get('address')
-        if user.role == 'shop_owner':
+        # SAFE UPDATE: Sirf tabhi badlein jab form se data bheja gaya ho (wipout hone se bachayega)
+        if 'name' in request.form:
+            user.name = request.form.get('name')
+        if 'mobile' in request.form:
+            user.mobile = request.form.get('mobile')
+        if 'email' in request.form:
+            user.email = request.form.get('email')
+        if 'address' in request.form:
+            user.address = request.form.get('address')
+            
+        # Shop Owner ke liye special wallet balance handler
+        if user.role == 'shop_owner' and 'wallet_balance' in request.form:
             user.wallet_balance = request.form.get('wallet_balance', user.wallet_balance)
+            
         db.session.commit()
-        flash('User details updated.', 'success')
+        flash(f'{user.name} ki details successfully update ho gayi hain.', 'success')
+        
     return redirect(url_for('admin_dash'))
 
 @app.route('/admin/update_upi', methods=['POST'])
