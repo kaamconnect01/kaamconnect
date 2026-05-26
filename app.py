@@ -327,17 +327,35 @@ def admin_dash():
     
     shop_owners = User.query.filter_by(role='shop_owner').all()
     workers = User.query.filter_by(role='worker').all()
+    
+    # 🔥 NAYA CODE: Sirf Customers ka data nikalna
+    customers = User.query.filter_by(role='customer').order_by(User.id.desc()).all()
+    
     all_users = User.query.all()
     total_reqs = Requirement.query.count()
     total_vacancies = Vacancy.query.count()
     pending_requests = PaymentRequest.query.filter_by(status='Pending').all()
     
+    # 🔥 NAYA CODE: Har customer ne kitni requirements daali hain, uska count dictionary me save karna
+    customer_req_counts = {}
+    for c in customers:
+        count = Requirement.query.filter_by(customer_id=c.id).count()
+        customer_req_counts[c.id] = count
+    
     settings = SiteSettings.query.first()
     admin_upi = settings.admin_upi if settings else "admin@upi"
     
-    return render_template('admin_dash.html', shop_owners=shop_owners, workers=workers, 
-                           all_users=all_users, total_reqs=total_reqs, 
-                           total_vacancies=total_vacancies, pending_requests=pending_requests, admin_upi=admin_upi)
+    # render_template me customers aur customer_req_counts variables ko add kar diya
+    return render_template('admin_dash.html', 
+                           shop_owners=shop_owners, 
+                           workers=workers, 
+                           customers=customers, 
+                           customer_req_counts=customer_req_counts,
+                           all_users=all_users, 
+                           total_reqs=total_reqs, 
+                           total_vacancies=total_vacancies, 
+                           pending_requests=pending_requests, 
+                           admin_upi=admin_upi)
 
 @app.route('/admin/delete_user/<int:user_id>', methods=['POST'])
 @login_required
