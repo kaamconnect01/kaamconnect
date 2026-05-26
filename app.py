@@ -109,7 +109,7 @@ def signup():
         experience = request.form.get('experience')
         expertise = request.form.get('expertise')
         
-        # Safe Integer handling for per_day_amount
+        # Safe Integer handling for per_day_amount (InvalidTextRepresentation Fix)
         per_day_raw = request.form.get('per_day_amount')
         per_day_amount = int(per_day_raw) if per_day_raw and per_day_raw.strip() else None
 
@@ -119,8 +119,10 @@ def signup():
             flash('Mobile number pehle se registered hai!', 'danger')
             return redirect(url_for('signup', role=role))
 
+        # Password ko securely hash karein
         hashed_password = generate_password_hash(password, method='scrypt')
         
+        # Naya user object create karein (with is_available=True)
         new_user = User(
             role=role,
             mobile=mobile,
@@ -130,16 +132,28 @@ def signup():
             address=address,
             experience=experience,
             expertise=expertise,
-            per_day_amount=per_day_amount, # Ab yahan empty string nahi jayegi
+            per_day_amount=per_day_amount,
             wallet_balance=0,
             is_available=True
         )
         
         db.session.add(new_user)
-        db.session.commit()
+        db.session.commit() # DB me save ho gaya
         
-        flash('Account successfully ban gaya hai! Login karein.', 'success')
-        return redirect(url_for('login'))
+        # 🔥 FIRST TIME AUTO-LOGIN: User ko password bina daale turant login karwayein
+        login_user(new_user)
+        
+        flash('Account successfully ban gaya hai aur aap login ho chuke hain!', 'success')
+        
+        # Role ke hisab se sahi dashboard par redirect karein
+        if new_user.role == 'customer':
+            return redirect(url_for('customer_dash'))
+        elif new_user.role == 'shop_owner':
+            return redirect(url_for('shop_dash'))
+        elif new_user.role == 'worker':
+            return redirect(url_for('worker_dash'))
+            
+        return redirect(url_for('index'))
         
     role = request.args.get('role', 'customer')
     return render_template('signup.html', role=role)
