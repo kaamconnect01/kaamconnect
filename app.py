@@ -361,11 +361,34 @@ def admin_dash():
 @login_required
 def delete_user(user_id):
     if current_user.role != 'admin': return "Unauthorized", 401
+    
     user = User.query.get(user_id)
     if user:
-        db.session.delete(user)
-        db.session.commit()
-        flash('User and all related data deleted successfully.', 'success')
+        try:
+            # Agar delete hone wala user CUSTOMER hai:
+            if user.role == 'customer':
+                # Uski saari requirements (jobs) nikal lo
+                user_reqs = Requirement.query.filter_by(customer_id=user.id).all()
+                for req in user_reqs:
+                    # Pehle un jobs par jitne bhi dukanwalo ne unlock kiya hai, wo hatao
+                    UnlockedLead.query.filter_by(requirement_id=req.id).delete()
+                # Fir customer ki saari requirements delete karo
+                Requirement.query.filter_by(customer_id=user.id).delete()
+            
+            # Agar delete hone wala user SHOP OWNER hai:
+            elif user.role == 'shop_owner':
+                # Usne jitni leads unlock ki thi, unka record hatao
+                UnlockedLead.query.filter_by(shop_owner_id=user.id).delete()
+                
+            # Ab aakhir mein safely User ko delete kar do
+            db.session.delete(user)
+            db.session.commit()
+            flash('User aur usse juda saara data successfully delete ho gaya.', 'success')
+            
+        except Exception as e:
+            db.session.rollback() # Error aane par database ko safe rakho
+            flash('Error: Data delete nahi ho paya kyunki ye kisi dusre table se juda hai.', 'danger')
+            
     return redirect(url_for('admin_dash'))
 
 @app.route('/admin/edit_user/<int:user_id>', methods=['POST'])
