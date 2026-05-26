@@ -238,19 +238,48 @@ def shop_dash():
 @app.route('/unlock_lead/<int:req_id>', methods=['POST'])
 @login_required
 def unlock_lead(req_id):
+    if current_user.role.lower() != 'shop_owner':
+        return "Unauthorized", 403
+        
     req = Requirement.query.get_or_404(req_id)
-    credit_cost = 50
-    if req.budget > 50000: credit_cost = 200
-    elif req.budget > 10000: credit_cost = 100
     
+    # 🔥 NEW LOGIC: Budget ko integer me badlein aur exact range cost nikalen
+    try:
+        budget_num = int(''.join(filter(str.isdigit, str(req.budget)))) if req.budget else 0
+    except ValueError:
+        budget_num = 0
+
+    # Aapki batayi hui exact ranges backend par lagayi hain:
+    if budget_num <= 2000:
+        credit_cost = 50
+    elif budget_num <= 5000:
+        credit_cost = 70
+    elif budget_num <= 10000:
+        credit_cost = 90
+    elif budget_num <= 20000:
+        credit_cost = 120
+    elif budget_num <= 35000:
+        credit_cost = 140
+    else:
+        credit_cost = 200
+        
+    # Check karein ki dukanwala isse pehle se unlock toh nahi kar chuka hai
+    already_unlocked = UnlockedLead.query.filter_by(shop_owner_id=current_user.id, requirement_id=req.id).first()
+    if already_unlocked:
+        flash('Yeh lead aapne pehle se hi unlock ki hui hai!', 'info')
+        return redirect(url_for('shop_dash'))
+
+    # Wallet Balance verification
     if current_user.wallet_balance >= credit_cost:
         current_user.wallet_balance -= credit_cost
         new_unlock = UnlockedLead(shop_owner_id=current_user.id, requirement_id=req.id)
+        
         db.session.add(new_unlock)
         db.session.commit()
-        flash('Lead Unlocked Successfully!', 'success')
+        flash(f'Lead successfully unlock ho gayi hai! {credit_cost} Credits deduct hue hain.', 'success')
     else:
-        flash('Not enough credits in Wallet. Please recharge.', 'danger')
+        flash('Aapke wallet me sufficiant credits nahi hain. Please recharge karein.', 'danger')
+        
     return redirect(url_for('shop_dash'))
 
 @app.route('/buy_credits_page')
