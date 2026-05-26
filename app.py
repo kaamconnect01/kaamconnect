@@ -100,39 +100,49 @@ def index():
 @app.route('/signup', methods=['GET', 'POST'])
 def signup():
     if request.method == 'POST':
-        role = request.form.get('role') # Form se role lenge
+        role = request.form.get('role')
         mobile = request.form.get('mobile')
-        password = generate_password_hash(request.form.get('password'))
+        password = request.form.get('password')
+        name = request.form.get('name')
+        email = request.form.get('email')
+        address = request.form.get('address')
+        experience = request.form.get('experience')
+        expertise = request.form.get('expertise')
         
-        if User.query.filter_by(mobile=mobile).first():
-            flash('Mobile number already registered!', 'danger')
-            return redirect(url_for('signup'))
-            
+        # Safe Integer handling for per_day_amount
+        per_day_raw = request.form.get('per_day_amount')
+        per_day_amount = int(per_day_raw) if per_day_raw and per_day_raw.strip() else None
+
+        # Check karein ki number pehle se register na ho
+        user_exists = User.query.filter_by(mobile=mobile).first()
+        if user_exists:
+            flash('Mobile number pehle se registered hai!', 'danger')
+            return redirect(url_for('signup', role=role))
+
+        hashed_password = generate_password_hash(password, method='scrypt')
+        
         new_user = User(
-            role=role, 
-            mobile=mobile, 
-            password=password,
-            name=request.form.get('name', 'User'),
-            email=request.form.get('email'), 
-            address=request.form.get('address'),
-            experience=request.form.get('experience'), 
-            expertise=request.form.get('expertise'),
-            per_day_amount=request.form.get('per_day_amount')
+            role=role,
+            mobile=mobile,
+            password=hashed_password,
+            name=name,
+            email=email,
+            address=address,
+            experience=experience,
+            expertise=expertise,
+            per_day_amount=per_day_amount, # Ab yahan empty string nahi jayegi
+            wallet_balance=0,
+            is_available=True
         )
         
         db.session.add(new_user)
         db.session.commit()
-
-        session.permanent = True
-        login_user(new_user) 
-        flash('Welcome to Kaamconnect! Account created successfully.', 'success')
-
-        if role == 'shop_owner': return redirect(url_for('shop_dash'))
-        elif role == 'customer': return redirect(url_for('customer_dash'))
-        elif role == 'worker': return redirect(url_for('worker_dash'))
-        else: return redirect(url_for('index'))
         
-    return render_template('signup.html')
+        flash('Account successfully ban gaya hai! Login karein.', 'success')
+        return redirect(url_for('login'))
+        
+    role = request.args.get('role', 'customer')
+    return render_template('signup.html', role=role)
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
