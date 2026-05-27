@@ -1,33 +1,141 @@
 {% extends 'base.html' %}
 {% block content %}
-<div class="row justify-content-center mt-3">
-    <div class="col-md-6 col-sm-12">
-        <div class="card shadow-lg border-0 text-center">
-            <div class="card-header bg-dark text-white py-3">
-                <h4 class="mb-0 fw-bold"><i class="fa-solid fa-wallet text-warning"></i> Add Wallet Credits</h4>
-            </div>
-            <div class="card-body p-4">
-                <p class="text-muted mb-2">Pay securely via UPI to Admin. (1 Credit = ₹1)</p>
+<div class="container mt-4 mb-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card bg-dark text-white border-0 shadow-lg rounded-4 p-4">
                 
-                <div class="bg-light p-3 rounded mb-4 border border-info">
-                    <h5 class="text-dark fw-bold mb-0">Admin UPI ID</h5>
-                    <h3 class="text-primary mt-2">{{ upi_id }}</h3>
-                    <small class="text-danger fw-bold">Please copy this UPI and pay using PhonePe/GPay/Paytm.</small>
+                <div class="text-center mb-4">
+                    <h4 class="fw-bold text-warning">
+                        <i class="fa-solid fa-wallet me-2"></i> Add Wallet Credits
+                    </h4>
+                    <p class="text-muted small">Pay securely via UPI to Admin. (1 Credit = ₹1)</p>
                 </div>
-                
-                <form action="{{ url_for('submit_payment') }}" method="POST" class="text-start">
+
+                <div class="card bg-light text-dark rounded-3 p-3 mb-4 text-center border-0 position-relative">
+                    <span class="text-muted d-block small mb-1 fw-bold">Admin UPI ID</span>
+                    <h5 class="fw-bold text-primary mb-2" id="adminUpiId">{{ upi_id }}</h5>
+                    
+                    <button type="button" class="btn btn-sm btn-outline-secondary rounded-pill px-3 py-1 mt-1" onclick="copyUpiId()">
+                        <i class="fa-regular fa-copy me-1"></i> Copy UPI ID
+                    </button>
+                    <p class="text-danger small mt-2 mb-0 fw-semibold" style="font-size: 11px;">
+                        *Please enter amount below first to pay directly via apps!
+                    </p>
+                </div>
+
+                <form action="{{ url_for('submit_payment') }}" method="POST">
+                    
                     <div class="mb-3">
-                        <label class="fw-bold small">Amount Paid (₹)</label>
-                        <input type="number" name="amount" class="form-control form-control-lg bg-light" placeholder="e.g. 500" required>
+                        <label class="form-label fw-bold text-light">Amount Paid (₹)</label>
+                        <input type="number" id="amount_input" name="amount" class="form-control form-control-lg bg-secondary text-white border-0 text-center" placeholder="e.g. 500" required min="1">
                     </div>
+
                     <div class="mb-4">
-                        <label class="fw-bold small">Transaction/UTR Number</label>
-                        <input type="text" name="trx_id" class="form-control form-control-lg bg-light" placeholder="Enter 12 digit UTR" required>
+                        <label class="form-label d-block text-center text-muted small fw-bold mb-3">⚡ Fast Pay Via App (Mobile Only) ⚡</label>
+                        <div class="row g-2 justify-content-center">
+                            
+                            <div class="col-4">
+                                <button type="button" class="btn btn-light w-100 py-2 shadow-sm rounded-3 fw-bold border" onclick="payViaApp('gpay')" style="font-size: 13px;">
+                                    <span style="color:#4285F4">G</span><span style="color:#EA4335">P</span><span style="color:#FBBC05">a</span><span style="color:#34A853">y</span>
+                                </button>
+                            </div>
+                            
+                            <div class="col-4">
+                                <button type="button" class="btn w-100 py-2 shadow-sm rounded-3 text-white fw-bold" onclick="payViaApp('phonepe')" style="background-color: #5f259f; font-size: 13px;">
+                                    PhonePe
+                                </button>
+                            </div>
+                            
+                            <div class="col-4">
+                                <button type="button" class="btn w-100 py-2 shadow-sm rounded-3 text-white fw-bold" onclick="payViaApp('paytm')" style="background-color: #00baf2; font-size: 13px;">
+                                    Paytm
+                                </button>
+                            </div>
+                            
+                        </div>
                     </div>
-                    <button type="submit" class="btn btn-success w-100 py-3 rounded-pill fw-bold shadow"><i class="fa-solid fa-paper-plane me-1"></i> SEND APPROVAL REQUEST</button>
+
+                    <div class="mb-4">
+                        <label class="form-label fw-bold text-light">Transaction / UTR Number</label>
+                        <input type="text" name="trx_id" class="form-control form-control-lg bg-secondary text-white border-0 text-center" placeholder="Enter 12 digit UTR" required>
+                        <div class="form-text text-muted small text-center mt-1">App se pay karne ke baad mila hua Ref No. ya UTR number yahan dalein.</div>
+                    </div>
+
+                    <button type="submit" class="btn btn-success btn-lg w-100 rounded-pill fw-bold py-2 shadow">
+                        <i class="fa-solid fa-paper-plane me-2"></i> SEND APPROVAL REQUEST
+                    </button>
+                    
                 </form>
+
+                <div class="mt-4 p-2 bg-secondary bg-opacity-25 rounded-3 text-center">
+                    <p class="text-muted mb-0" style="font-size: 12px;">
+                        <i class="fa-solid fa-circle-info me-1 text-warning"></i> 
+                        <strong>Note:</strong> Direct app button sirf Mobile phones par kaam karenge. PC/Laptop users UPI ID copy karke मैन्युअली pay karein.
+                    </p>
+                </div>
+
             </div>
         </div>
     </div>
 </div>
+
+<script>
+function payViaApp(appName) {
+    var amount = document.getElementById('amount_input').value;
+    
+    // Validation Check
+    if (!amount || amount <= 0) {
+        alert("Pehle kripya 'Amount Paid' field mein sahi amount bharein!");
+        document.getElementById('amount_input').focus();
+        return;
+    }
+    
+    var upiId = "{{ upi_id }}"; 
+    var name = encodeURIComponent("KaamConnect Admin");
+    
+    // Standard UPI Protocol Link
+    var baseUpiUrl = "pa=" + upiId + "&pn=" + name + "&am=" + amount + "&cu=INR&tn=KaamConnect%20Wallet%20Recharge";
+    var finalUrl = "";
+    
+    // Packages configured strictly for Android & iOS fallbacks (No Whatsapp/Browsers)
+    if (appName === 'gpay') {
+        if (/Android/i.test(navigator.userAgent)) {
+            finalUrl = "intent://pay?" + baseUpiUrl + "#Intent;scheme=upi;package=com.google.android.apps.nbu.paisa.user;end";
+        } else {
+            finalUrl = "upi://pay?" + baseUpiUrl;
+        }
+    } else if (appName === 'phonepe') {
+        if (/Android/i.test(navigator.userAgent)) {
+            finalUrl = "intent://pay?" + baseUpiUrl + "#Intent;scheme=upi;package=com.phonepe.app;end";
+        } else {
+            finalUrl = "phonepe://pay?" + baseUpiUrl;
+        }
+    } else if (appName === 'paytm') {
+        if (/Android/i.test(navigator.userAgent)) {
+            finalUrl = "intent://pay?" + baseUpiUrl + "#Intent;scheme=upi;package=net.one97.paytm;end";
+        } else {
+            finalUrl = "paytmmp://pay?" + baseUpiUrl;
+        }
+    }
+    
+    window.location.href = finalUrl;
+}
+
+// Seamless Copy functionality
+function copyUpiId() {
+    var upiText = document.getElementById("adminUpiId").innerText;
+    navigator.clipboard.writeText(upiText).then(function() {
+        alert("UPI ID Copy ho gayi hai! Ab aap kisi bhi app se pay kar sakte hain.");
+    }).catch(function(err) {
+        var textArea = document.createElement("textarea");
+        textArea.value = upiText;
+        document.body.appendChild(textArea);
+        textArea.select();
+        document.execCommand("copy");
+        document.body.removeChild(textArea);
+        alert("UPI ID Copy ho gayi hai!");
+    });
+}
+</script>
 {% endblock %}
