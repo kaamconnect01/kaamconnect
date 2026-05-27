@@ -36,21 +36,33 @@
 </head>
 <body>
 
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark sticky-top">
-        <div class="container">
-            <a class="navbar-brand" href="/"><i class="fa-solid fa-couch text-warning me-2"></i>Kaamconnect</a>
+    <nav class="navbar navbar-dark bg-dark sticky-top shadow-sm py-2">
+        <div class="container-fluid px-3 d-flex justify-content-between align-items-center">
             
-            <div class="desktop-nav-links ms-auto d-flex align-items-center">
-                {% if current_user.is_authenticated %}
-                    <span class="text-light me-4 fw-bold"><i class="fa-solid fa-user me-1"></i> {{ current_user.name }}</span>
-                    {% if current_user.role == 'shop_owner' %}
-                        <span class="badge bg-warning text-dark px-3 py-2 me-3"><i class="fa-solid fa-wallet"></i> ₹{{ current_user.wallet_balance }}</span>
-                    {% endif %}
-                    <a class="btn btn-outline-light btn-sm" href="{{ url_for('logout') }}"><i class="fa-solid fa-right-from-bracket"></i> Logout</a>
-                {% else %}
-                    <a class="btn btn-primary btn-sm me-2" href="{{ url_for('login') }}">Login</a>
-                {% endif %}
+            <a class="navbar-brand fw-bold text-warning m-0 d-flex align-items-center" href="/">
+                <i class="fa-solid fa-couch me-2"></i> <span class="fs-5">Kaamconnect</span>
+            </a>
+    
+            {% if current_user.is_authenticated %}
+            <div class="d-flex align-items-center gap-2 gap-md-3">
+                
+                <span class="text-light d-none d-md-inline small fw-bold">
+                    <i class="fa-solid fa-user me-1"></i> {{ current_user.name }}
+                </span>
+    
+                <a href="{{ url_for('buy_credits_page') }}" class="btn btn-warning btn-sm fw-bold rounded-pill px-3 d-flex align-items-center shadow-sm">
+                    <i class="fa-solid fa-wallet me-1 text-dark"></i>
+                    <span class="text-dark">₹{{ current_user.wallet_balance }}</span>
+                </a>
+    
+                <a href="{{ url_for('logout') }}" class="btn btn-outline-light btn-sm fw-bold rounded-pill px-3 d-flex align-items-center">
+                    <i class="fa-solid fa-right-from-bracket"></i>
+                    <span class="d-none d-sm-inline ms-1">Logout</span>
+                </a>
+                
             </div>
+            {% endif %}
+            
         </div>
     </nav>
 
