@@ -55,10 +55,14 @@
                     {% if current_user.is_authenticated %}
                         <li class="nav-item">
                             <a class="nav-link text-white px-3" href="
-                                {% if current_user.role == 'shop' %}
-                                    {{ url_for('shop_dashboard') }}
-                                {% else %}
+                                {% if current_user.role|lower == 'shop' %}
+                                    {{ url_for('shop_dash') }}
+                                {% elif current_user.role|lower == 'worker' %}
                                     {{ url_for('worker_dash') }}
+                                {% elif current_user.role|lower == 'customer' %}
+                                    {{ url_for('customer_dash') }}
+                                {% elif current_user.role|lower == 'admin' %}
+                                    {{ url_for('admin_dash') }}
                                 {% endif %}
                             ">
                                 <i class="fa-solid fa-gauge me-1"></i> Dashboard
@@ -104,52 +108,57 @@
     </div>
 
     <div class="mobile-bottom-nav d-md-none shadow-lg">
-    <div class="d-flex justify-content-around align-items-center h-100 px-1">
-        
-        <a href="/" class="nav-item-link">
-            <i class="fa-solid fa-house"></i>
-            <span>Home</span>
-        </a>
-        
-        {% if current_user.is_authenticated %}
-            {% if current_user.role == 'shop_owner' %}
-                <a href="{{ url_for('shop_dash') }}" class="nav-item-link">
-                    <i class="fa-solid fa-table-columns"></i>
-                    <span>Dashboard</span>
-                </a>
-                <a href="{{ url_for('buy_credits_page') }}" class="nav-item-link text-warning">
-                    <i class="fa-solid fa-wallet"></i>
-                    <span>Wallet</span>
-                </a>
+        <div class="d-flex justify-content-around align-items-center h-100 px-1">
             
-            {% elif current_user.role == 'worker' %}
-                <a href="{{ url_for('worker_dash') }}" class="nav-item-link">
-                    <i class="fa-solid fa-briefcase"></i>
-                    <span>Jobs</span>
-                </a>
+            <a href="/" class="nav-item-link">
+                <i class="fa-solid fa-house"></i>
+                <span>Home</span>
+            </a>
             
-            {% elif current_user.role == 'customer' %}
-                <a href="{{ url_for('customer_dash') }}" class="nav-item-link">
-                    <i class="fa-solid fa-clipboard-list"></i>
-                    <span>My Posts</span>
+            {% if current_user.is_authenticated %}
+                {% if current_user.role|lower == 'shop' %}
+                    <a href="{{ url_for('shop_dash') }}" class="nav-item-link">
+                        <i class="fa-solid fa-table-columns"></i>
+                        <span>Dashboard</span>
+                    </a>
+                    <a href="{{ url_for('buy_credits_page') }}" class="nav-item-link text-warning">
+                        <i class="fa-solid fa-wallet"></i>
+                        <span>Wallet</span>
+                    </a>
+                
+                {% elif current_user.role|lower == 'worker' %}
+                    <a href="{{ url_for('worker_dash') }}" class="nav-item-link">
+                        <i class="fa-solid fa-briefcase"></i>
+                        <span>Jobs</span>
+                    </a>
+                
+                {% elif current_user.role|lower == 'customer' %}
+                    <a href="{{ url_for('customer_dash') }}" class="nav-item-link">
+                        <i class="fa-solid fa-clipboard-list"></i>
+                        <span>My Posts</span>
+                    </a>
+                
+                {% elif current_user.role|lower == 'admin' %}
+                    <a href="{{ url_for('admin_dash') }}" class="nav-item-link">
+                        <i class="fa-solid fa-gear"></i>
+                        <span>Admin</span>
+                    </a>
+                {% endif %}
+
+                <a href="{{ url_for('logout') }}" class="nav-item-link text-danger">
+                    <i class="fa-solid fa-right-from-bracket"></i>
+                    <span>Logout</span>
                 </a>
-            
-            {% elif current_user.role == 'admin' %}
-                <a href="{{ url_for('admin_dash') }}" class="nav-item-link">
-                    <i class="fa-solid fa-gear"></i>
-                    <span>Admin</span>
+                
+            {% else %}
+                <a href="{{ url_for('login') }}" class="nav-item-link">
+                    <i class="fa-solid fa-user-lock"></i>
+                    <span>Login</span>
                 </a>
             {% endif %}
             
-            {% else %}
-            <a href="{{ url_for('login') }}" class="nav-item-link">
-                <i class="fa-solid fa-user-lock"></i>
-                <span>Login</span>
-            </a>
-        {% endif %}
-        
+        </div>
     </div>
-</div>
 
 <style>
 /* Floating Bar Design */
@@ -198,6 +207,11 @@
 /* Wallet icon ka color */
 .nav-item-link.text-warning {
     color: #ffb300 !important;
+}
+
+/* Logout icon ka color */
+.nav-item-link.text-danger {
+    color: #dc3545 !important;
 }
 
 /* App ke sabse niche khali jagah chhodna (Taaki list nav bar ke piche na chhupe) */
