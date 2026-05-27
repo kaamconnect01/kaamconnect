@@ -36,33 +36,53 @@
 </head>
 <body>
 
-    <nav class="navbar navbar-dark bg-dark sticky-top shadow-sm py-2">
-        <div class="container-fluid px-3 d-flex justify-content-between align-items-center">
-            
-            <a class="navbar-brand fw-bold text-warning m-0 d-flex align-items-center" href="/">
-                <i class="fa-solid fa-couch me-2"></i> <span class="fs-5">Kaamconnect</span>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark sticky-top shadow-sm py-2">
+        <div class="container">
+            <a class="navbar-brand fw-bold text-warning d-flex align-items-center" href="{{ url_for('index') }}">
+                <i class="fa-solid fa-couch me-2 text-warning"></i>Kaamconnect
             </a>
     
-            {% if current_user.is_authenticated %}
-            <div class="d-flex align-items-center gap-2 gap-md-3">
-                
-                <span class="text-light d-none d-md-inline small fw-bold">
-                    <i class="fa-solid fa-user me-1"></i> {{ current_user.name }}
-                </span>
+            <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
     
-                <a href="{{ url_for('buy_credits_page') }}" class="btn btn-warning btn-sm fw-bold rounded-pill px-3 d-flex align-items-center shadow-sm">
-                    <i class="fa-solid fa-wallet me-1 text-dark"></i>
-                    <span class="text-dark">₹{{ current_user.wallet_balance }}</span>
-                </a>
-    
-                <a href="{{ url_for('logout') }}" class="btn btn-outline-light btn-sm fw-bold rounded-pill px-3 d-flex align-items-center">
-                    <i class="fa-solid fa-right-from-bracket"></i>
-                    <span class="d-none d-sm-inline ms-1">Logout</span>
-                </a>
-                
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto align-items-center gap-2 mt-3 mt-lg-0">
+                    <li class="nav-item">
+                        <a class="nav-link text-white-50 px-3" href="{{ url_for('index') }}">Home</a>
+                    </li>
+                    
+                    {% if current_user.is_authenticated %}
+                        <li class="nav-item">
+                            <a class="nav-link text-white px-3" href="
+                                {% if current_user.role == 'shop' %}
+                                    {{ url_for('shop_dashboard') }}
+                                {% else %}
+                                    {{ url_for('worker_dashboard') }}
+                                {% endif %}
+                            ">
+                                <i class="fa-solid fa-gauge me-1"></i> Dashboard
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="btn btn-danger btn-sm rounded-pill px-3 shadow-sm" href="{{ url_for('logout') }}">
+                                <i class="fa-solid fa-right-from-bracket me-1"></i> Logout
+                            </a>
+                        </li>
+                    {% else %}
+                        <li class="nav-item">
+                            <a class="btn btn-outline-light btn-sm rounded-pill px-3 me-lg-2 fw-bold" href="{{ url_for('login') }}" style="border-width: 2px;">
+                                <i class="fa-solid fa-right-to-bracket me-1"></i> Login
+                            </a>
+                        </li>
+                        <li class="nav-item mt-2 mt-lg-0">
+                            <a class="btn btn-primary btn-sm rounded-pill px-3 fw-bold shadow-sm" href="{{ url_for('signup') }}">
+                                <i class="fa-solid fa-user-plus me-1"></i> Register
+                            </a>
+                        </li>
+                    {% endif %}
+                </ul>
             </div>
-            {% endif %}
-            
         </div>
     </nav>
 
