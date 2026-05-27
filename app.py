@@ -7,6 +7,8 @@ import os
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'super_secret_key_for_local')
+app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(hours=8)
+app.config['REMEMBER_COOKIE_DURATION'] = timedelta(hours=8)
 
 # DB Connection & SSL Drop Fix
 db_url = os.environ.get('DATABASE_URL', 'sqlite:///portal.db')
@@ -575,6 +577,10 @@ def get_unlock_cost(budget_str):
             return 200
     except:
         return 50  # Kisi bhi error ke case me minimum 50 credits safe rakhna
+
+@app.before_request
+def make_session_permanent():
+    session.permanent = True
 
 
 if __name__ == '__main__':
