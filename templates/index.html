@@ -2,7 +2,7 @@
 {% block content %}
 <style>
     /* =========================================
-       PREMIUM DARK & LIGHT HYBRID DESIGN
+       PREMIUM DARK & LIGHT HYBRID DESIGN (EXPANDED)
        ========================================= */
     :root {
         --brand-blue: #0071e3;
@@ -39,10 +39,10 @@
     .delay-2 { animation-delay: 0.4s; }
     .delay-3 { animation-delay: 0.6s; }
 
-    /* Hero Section (Dark & Cinematic) */
+    /* Hero Section */
     .hero-dark-section {
         background: linear-gradient(135deg, var(--brand-darker) 0%, var(--brand-dark) 100%);
-        padding: 120px 20px 100px;
+        padding: 140px 20px 120px;
         border-radius: 30px;
         margin-top: 10px;
         color: white;
@@ -51,7 +51,6 @@
         box-shadow: 0 20px 50px rgba(0,0,0,0.2);
     }
     
-    /* Background Glow Effect */
     .hero-dark-section::before {
         content: ''; position: absolute; top: -50%; left: 50%; transform: translateX(-50%);
         width: 80%; height: 100%; background: radial-gradient(circle, rgba(0, 113, 227, 0.15) 0%, transparent 70%);
@@ -63,7 +62,7 @@
     .hero-title {
         font-weight: 900;
         letter-spacing: -2px;
-        font-size: clamp(3rem, 6vw, 5.5rem); /* Responsive huge text */
+        font-size: clamp(3rem, 6vw, 5.5rem);
         line-height: 1.1;
     }
     .gradient-text-gold {
@@ -93,16 +92,16 @@
 
     /* Vision Section */
     .vision-section {
-        padding: 100px 20px;
+        padding: 120px 20px;
         text-align: center;
         background: #ffffff;
     }
     .vision-text {
-        font-size: 2rem; font-weight: 700; color: #1d1d1f; max-width: 800px; margin: 0 auto; line-height: 1.4; letter-spacing: -0.5px;
+        font-size: 2.2rem; font-weight: 700; color: #1d1d1f; max-width: 900px; margin: 0 auto; line-height: 1.4; letter-spacing: -0.5px;
     }
 
     /* Benefits Grid */
-    .benefit-wrapper { background: #fbfbfd; padding: 80px 0; }
+    .benefit-wrapper { background: #fbfbfd; padding: 100px 0; }
     
     .benefit-card {
         background: #ffffff; border-radius: 24px; padding: 40px;
@@ -123,6 +122,7 @@
     .icon-dark { background: rgba(11, 15, 25, 0.1); color: var(--brand-dark); }
     .icon-gold { background: rgba(245, 158, 11, 0.1); color: var(--brand-gold); }
 
+    /* Premium Button */
     .premium-btn {
         background: linear-gradient(90deg, #0071e3, #005bb5);
         color: white; border-radius: 980px; padding: 16px 40px; font-size: 1.2rem;
@@ -130,6 +130,38 @@
         transition: 0.3s;
     }
     .premium-btn:hover { transform: scale(1.05); color: white; box-shadow: 0 15px 30px rgba(0, 113, 227, 0.4); }
+
+    /* FAQ Accordion Styling */
+    .faq-section { padding: 100px 20px; background-color: #ffffff; }
+    .faq-accordion .accordion-item {
+        border: none; border-radius: 16px !important; margin-bottom: 15px;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.02); overflow: hidden;
+        border: 1px solid #f1f1f4;
+    }
+    .faq-accordion .accordion-button {
+        font-weight: 600; font-size: 1.15rem; color: #1d1d1f; padding: 22px;
+        background-color: #ffffff; box-shadow: none;
+    }
+    .faq-accordion .accordion-button:not(.collapsed) {
+        color: var(--brand-blue); background-color: #f4f9ff;
+    }
+    .faq-accordion .accordion-body {
+        padding: 22px; font-size: 1.05rem; color: #515154; line-height: 1.6; background-color: #ffffff;
+    }
+
+    /* Contact Cards */
+    .contact-section { padding: 100px 20px; background-color: #fbfbfd; }
+    .contact-card {
+        background: #ffffff; border-radius: 20px; padding: 35px 25px; text-align: center;
+        border: 1px solid rgba(0,0,0,0.03); box-shadow: 0 10px 30px rgba(0,0,0,0.02);
+        transition: 0.3s ease; height: 100%;
+    }
+    .contact-card:hover { transform: translateY(-5px); box-shadow: 0 15px 35px rgba(0,0,0,0.06); }
+    .contact-icon {
+        width: 60px; height: 60px; background: #f4f9ff; color: var(--brand-blue);
+        border-radius: 50%; display: flex; align-items: center; justify-content: center;
+        margin: 0 auto 20px; font-size: 1.5rem;
+    }
 </style>
 
 <div class="hero-dark-section text-center">
@@ -216,7 +248,131 @@
     </div>
 </div>
 
-<div class="container animate-up mb-5">
+<div class="faq-section">
+    <div class="container" style="max-width: 900px;">
+        <div class="text-center mb-5">
+            <span class="text-primary fw-bold text-uppercase small mb-2 d-block">Got Questions?</span>
+            <h2 class="fw-bold text-dark" style="font-size: 2.3rem; letter-spacing: -0.5px;">Frequently Asked Questions</h2>
+            <p class="text-muted">KaamConnect kaise kaam karta hai? Sabhi sawalon ke jawab yahan hain.</p>
+        </div>
+
+        <div class="accordion faq-accordion" id="kaamConnectFaq">
+            
+            <div class="accordion-item">
+                <h2 class="accordion-header">
+                    <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#faq1">
+                        Q1. KaamConnect kya hai aur yeh kaise kaam karta hai?
+                    </button>
+                </h2>
+                <div id="faq1" class="accordion-collapse collapse show" data-bs-parent="#kaamConnectFaq">
+                    <div class="accordion-body">
+                        KaamConnect ek direct professional network hai jo Customers, Shop Owners/Contractors aur Daily-wage Workers ko aapas mein jodta hai. Yeh koi consultancy nahi hai—yahan koi middlemen nahi hota, sabhi log aapas mein direct call par baat karte hain.
+                    </div>
+                </div>
+            </div>
+
+            <div class="accordion-item">
+                <h2 class="accordion-header">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq2">
+                        Q2. Kya Customers ke liye requirement post karna free hai?
+                    </button>
+                </h2>
+                <div id="faq2" class="accordion-collapse collapse" data-bs-parent="#kaamConnectFaq">
+                    <div class="accordion-body">
+                        Haan! Kisi bhi customer ke liye apne ghar ya shop ka kaam post karna bilkul 100% free hai. Aap jitni chahein requirements bina kisi fees ke post kar sakte hain.
+                    </div>
+                </div>
+            </div>
+
+            <div class="accordion-item">
+                <h2 class="accordion-header">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq3">
+                        Q3. Shop Owners ke liye Leads/Requirements system kaise kaam karta hai?
+                    </button>
+                </h2>
+                <div id="faq3" class="accordion-collapse collapse" data-bs-parent="#kaamConnectFaq">
+                    <div class="accordion-body">
+                        Shop owners apne wallet mein wallet balance/credits add karke local area ki customer requirements ko unlock kar sakte hain. Ek baar requirement unlock hote hi unhe customer ka direct contact number mil jata hai.
+                    </div>
+                </div>
+            </div>
+
+            <div class="accordion-item">
+                <h2 class="accordion-header">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq4">
+                        Q4. Kya KaamConnect kaam pura hone par koi commission leta hai?
+                    </button>
+                </h2>
+                <div id="faq4" class="accordion-collapse collapse" data-bs-parent="#kaamConnectFaq">
+                    <div class="accordion-body">
+                        Bilkul nahi! Hamara model zero-commission par chalta hai. Shop owners aur workers jitna bhi kamate hain, wo 100% unka apna hota hai. Hum deals ke beech mein koi cut ya percentage nahi lete.
+                    </div>
+                </div>
+            </div>
+
+            <div class="accordion-item">
+                <h2 class="accordion-header">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq5">
+                        Q5. Workers ko kaam kaise milta hai?
+                    </button>
+                </h2>
+                <div id="faq5" class="accordion-collapse collapse" data-bs-parent="#kaamConnectFaq">
+                    <div class="accordion-body">
+                        Contractors ya Shop Owners jab bhi naye jobs post karte hain, toh unhe unke dashboard par list dikh jati hai. Workers bina kisi charge ke direct unhe call karke kaam ke liye apply kar sakte hain.
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<div class="contact-section">
+    <div class="container">
+        <div class="text-center mb-5">
+            <span class="text-primary fw-bold text-uppercase tracking-wider small mb-2 d-block">Get In Touch</span>
+            <h2 class="fw-bold text-dark" style="font-size: 2.3rem; letter-spacing: -0.5px;">Contact Support Team</h2>
+            <p class="text-muted">Koi sawal ho ya dikkat? Hamari team se seedha sampark karein.</p>
+        </div>
+
+        <div class="row g-4 justify-content-center">
+            <div class="col-md-4">
+                <div class="contact-card">
+                    <div class="contact-icon">
+                        <i class="fa-solid fa-phone"></i>
+                    </div>
+                    <h5 class="fw-bold text-dark mb-2">Call / WhatsApp</h5>
+                    <p class="text-muted mb-3">Mon-Sat (10 AM to 6 PM)</p>
+                    <a href="tel:+919999999999" class="text-primary fw-bold text-decoration-none">+91 99999 99999</a>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="contact-card">
+                    <div class="contact-icon">
+                        <i class="fa-solid fa-envelope"></i>
+                    </div>
+                    <h5 class="fw-bold text-dark mb-2">Email Support</h5>
+                    <p class="text-muted mb-3">24/7 Response Within Hours</p>
+                    <a href="mailto:support@kaamconnect.com" class="text-primary fw-bold text-decoration-none">support@kaamconnect.com</a>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="contact-card">
+                    <div class="contact-icon">
+                        <i class="fa-solid fa-location-dot"></i>
+                    </div>
+                    <h5 class="fw-bold text-dark mb-2">Head Office</h5>
+                    <p class="text-muted mb-0">Udaipur, Rajasthan,</p>
+                    <p class="text-muted">India - 313001</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container animate-up mb-5 mt-4">
     <div class="card border-0 rounded-4 p-5 text-center" style="background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%); box-shadow: inset 0 0 50px rgba(0,0,0,0.02);">
         <h2 class="fw-bold text-dark mb-3">Ready to join India's fastest-growing network?</h2>
         <p class="text-muted mb-4">Takes less than a minute to set up your free profile.</p>
