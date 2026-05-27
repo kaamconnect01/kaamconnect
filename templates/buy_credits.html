@@ -83,9 +83,9 @@
 function payViaApp(appName) {
     var amount = document.getElementById('amount_input').value;
     
-    // Safety check taaki validation kharab na ho
+    // Safety check
     if (!amount || amount <= 0) {
-        alert("Kripya pehle 'Amount Paid' field mein jitne paise add karne hain wo bharein!");
+        alert("Kripya pehle 'Amount Paid' field mein sahi amount bharein!");
         document.getElementById('amount_input').focus();
         return;
     }
@@ -93,32 +93,45 @@ function payViaApp(appName) {
     var upiId = "{{ upi_id }}"; 
     var name = encodeURIComponent("KaamConnect Admin");
     
-    // Protocol URI String configuration
+    // Standard UPI Query Parameters
     var baseUpiUrl = "pa=" + upiId + "&pn=" + name + "&am=" + amount + "&cu=INR&tn=KaamConnect%20Wallet";
     var finalUrl = "";
     
-    // Direct app intents definition (No browser chooser / No WhatsApp interference)
+    // Check if User is on iOS (iPhone/iPad)
+    var isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+
     if (appName === 'gpay') {
-        if (/Android/i.test(navigator.userAgent)) {
-            finalUrl = "intent://pay?" + baseUpiUrl + "#Intent;scheme=upi;package=com.google.android.apps.nbu.paisa.user;end";
+        if (isIOS) {
+            // iOS strict custom url scheme for Google Pay
+            finalUrl = "gpay://upi/pay?" + baseUpiUrl;
         } else {
-            finalUrl = "upi://pay?" + baseUpiUrl;
+            // Android package intent to bypass YONO/Defaults
+            finalUrl = "intent://pay?" + baseUpiUrl + "#Intent;scheme=upi;package=com.google.android.apps.nbu.paisa.user;action=android.intent.action.VIEW;end";
         }
-    } else if (appName === 'phonepe') {
-        if (/Android/i.test(navigator.userAgent)) {
-            finalUrl = "intent://pay?" + baseUpiUrl + "#Intent;scheme=upi;package=com.phonepe.app;end";
+    } 
+    else if (appName === 'phonepe') {
+        if (isIOS) {
+            // iOS strict custom url scheme for PhonePe
+            finalUrl = "phonepe://upi/pay?" + baseUpiUrl;
         } else {
-            finalUrl = "phonepe://pay?" + baseUpiUrl;
+            // Android package intent for PhonePe
+            finalUrl = "intent://pay?" + baseUpiUrl + "#Intent;scheme=upi;package=com.phonepe.app;action=android.intent.action.VIEW;end";
         }
-    } else if (appName === 'paytm') {
-        if (/Android/i.test(navigator.userAgent)) {
-            finalUrl = "intent://pay?" + baseUpiUrl + "#Intent;scheme=upi;package=net.one97.paytm;end";
+    } 
+    else if (appName === 'paytm') {
+        if (isIOS) {
+            // iOS strict custom url scheme for Paytm
+            finalUrl = "paytmmp://upi/pay?" + baseUpiUrl;
         } else {
-            finalUrl = "paytmmp://pay?" + baseUpiUrl;
+            // Android package intent for Paytm
+            finalUrl = "intent://pay?" + baseUpiUrl + "#Intent;scheme=upi;package=net.one97.paytm;action=android.intent.action.VIEW;end";
         }
     }
     
-    window.location.href = finalUrl;
+    // Action trigger
+    if (finalUrl !== "") {
+        window.location.href = finalUrl;
+    }
 }
 
 // Clipboard auto-copy setup
