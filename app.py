@@ -357,12 +357,13 @@ def admin_dash():
                            pending_requests=pending_requests, 
                            admin_upi=admin_upi)
 
-@app.route('/admin/delete_user/<int:user_id>', methods=['POST'])
+@app.route('/admin/delete_user/<int:user_id>', methods=['GET', 'POST'])
 @login_required
 def delete_user(user_id):
     if current_user.role != 'admin': return "Unauthorized", 401
     
     user = User.query.get(user_id)
+    
     if user:
         try:
             # Agar delete hone wala user CUSTOMER hai:
@@ -370,15 +371,16 @@ def delete_user(user_id):
                 # Uski saari requirements (jobs) nikal lo
                 user_reqs = Requirement.query.filter_by(customer_id=user.id).all()
                 for req in user_reqs:
-                    # Pehle un jobs par jitne bhi dukanwalo ne unlock kiya hai, wo hatao
-                    UnlockedLead.query.filter_by(requirement_id=req.id).delete()
+                    # synchronize_session=False add kiya hai taaki strict delete ho bina session conflict ke
+                    UnlockedLead.query.filter_by(requirement_id=req.id).delete(synchronize_session=False)
+                
                 # Fir customer ki saari requirements delete karo
-                Requirement.query.filter_by(customer_id=user.id).delete()
+                Requirement.query.filter_by(customer_id=user.id).delete(synchronize_session=False)
             
             # Agar delete hone wala user SHOP OWNER hai:
             elif user.role == 'shop_owner':
                 # Usne jitni leads unlock ki thi, unka record hatao
-                UnlockedLead.query.filter_by(shop_owner_id=user.id).delete()
+                UnlockedLead.query.filter_by(shop_owner_id=user.id).delete(synchronize_session=False)
                 
             # Ab aakhir mein safely User ko delete kar do
             db.session.delete(user)
@@ -387,18 +389,21 @@ def delete_user(user_id):
             
         except Exception as e:
             db.session.rollback() # Error aane par database ko safe rakho
-            flash('Error: Data delete nahi ho paya kyunki ye kisi dusre table se juda hai.', 'danger')
+            print(f"Delete Error aaya hai: {e}") # Yeh aapko Render logs mein dikh jayega agar kuch fasa toh
+            flash('Error: Data delete nahi ho paya. System Error aaya hai.', 'danger')
             
     return redirect(url_for('admin_dash'))
 
-@app.route('/admin/edit_user/<int:user_id>', methods=['POST'])
+@app.route('/admin/edit_user/<int:user_id>', methods=['GET', 'POST'])
 @login_required
 def edit_user(user_id):
     if current_user.role != 'admin': return "Unauthorized", 401
+    
     user = User.query.get(user_id)
     
-    if user:
-        # SAFE UPDATE: Sirf tabhi badlein jab form se data bheja gaya ho (wipout hone se bachayega)
+    # Sirf tabhi update chalega jab request POST hogi (Form submit hone par)
+    if user and request.method == 'POST':
+        # SAFE UPDATE
         if 'name' in request.form:
             user.name = request.form.get('name')
         if 'mobile' in request.form:
