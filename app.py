@@ -216,9 +216,42 @@ def customer_dash():
 @app.route('/shop/dashboard', methods=['GET', 'POST'])
 @login_required
 def shop_dash():
-    if current_user.role.lower() != 'shop_owner': return redirect(url_for('login'))
+    if current_user.role.lower() != 'shop_owner': 
+        return redirect(url_for('login'))
     
+    # =========================================================
+    # 🔥 NEW SYSTEM: SUBSCRIPTION AUTO-DEDUCTION LOGIC
+    # =========================================================
+    current_month = datetime.now().month
+
+    # 1. Mahina badal gaya hai, toh deduction check karo (Auto-Deduct on 1st)
+    if current_user.last_deduction_month != current_month:
+        if current_user.wallet_balance >= 200:
+            current_user.wallet_balance -= 200
+            current_user.last_deduction_month = current_month
+            current_user.is_plan_active = True
+            db.session.commit()
+            flash("Naye mahine ka Platform Fee (200 Credits) auto-deduct ho gaya hai. Aapka account active hai!", "success")
+        else:
+            # Balance nahi hai toh turant account LOCK
+            current_user.is_plan_active = False
+            db.session.commit()
+
+    # 2. Agar account Blocked tha, aur dukaandar ne ab recharge kar liya (Balance >= 200)
+    if not current_user.is_plan_active and current_user.wallet_balance >= 200:
+        current_user.wallet_balance -= 200
+        current_user.last_deduction_month = current_month
+        current_user.is_plan_active = True
+        db.session.commit()
+        flash("Recharge successful! Aapka account dobara chalu ho gaya hai.", "success")
+    # =========================================================
+
     if request.method == 'POST':
+        # SECURITY CHECK: Agar plan inactive hai, toh vacancy post mat karne do
+        if not current_user.is_plan_active:
+            flash("Aapka plan inactive hai. Nayi vacancy dalne ke liye pehle recharge karein.", "danger")
+            return redirect(url_for('shop_dash'))
+
         person_need = request.form.get('person_need')
         if person_need: 
             new_vacancy = Vacancy(
@@ -231,6 +264,7 @@ def shop_dash():
             flash('Job Vacancy Published Successfully!', 'success')
         return redirect(url_for('shop_dash'))
 
+    # Puraana Data Fetching Logic (Same to Same)
     requirements = Requirement.query.order_by(Requirement.id.desc()).all()
     customers = {u.id: u for u in User.query.filter_by(role='customer').all()} 
     unlocked_leads = [lead.requirement_id for lead in UnlockedLead.query.filter_by(shop_owner_id=current_user.id).all()]
