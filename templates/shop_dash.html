@@ -233,49 +233,69 @@
   </div>
 </div>
                             
-                            {% if session.pop('show_welcome_popup', None) %}
-<div class="modal fade" id="welcomeShopModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="welcomeModalLabel" aria-hidden="true">
+{% if session.pop('show_welcome_popup', None) and current_user.is_plan_active %}
+<div class="modal fade" id="welcomeShopModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content border-0 shadow-lg rounded-4 overflow-hidden">
-            
             <div class="modal-header bg-success text-white border-0 d-flex flex-column align-items-center pt-4 pb-3 text-center">
                 <i class="fa-solid fa-gift fa-3x mb-2 text-warning"></i>
-                <h4 class="modal-title fw-bold" id="welcomeModalLabel">Congratulations! 🎉</h4>
-                <p class="mb-0 small text-white-50">Kaamconnect ki taraf se Welcome Bonus</p>
+                <h4 class="modal-title fw-bold">Congratulations! 🎉</h4>
+                <p class="mb-0 small text-white-50">Kaamconnect Welcome Bonus</p>
             </div>
-            
             <div class="modal-body p-4 text-center">
                 <h5 class="fw-bold text-dark mb-3">Aapke account mein <span class="text-success fs-4">50 Free Credits</span> add ho gaye hain!</h5>
-                <p class="text-muted small mb-4">Aap in free credits ka use customer ki pehli kuch leads (kaam) unlock karne ke liye kar sakte hain.</p>
+                <p class="text-muted small mb-4">Aap in credits se naye kaam unlock kar sakte hain.</p>
                 
-                <div class="alert alert-warning text-start border-warning shadow-sm rounded-3 mb-0" role="alert">
-                    <h6 class="alert-heading fw-bold text-dark d-flex align-items-center">
-                        <i class="fa-solid fa-triangle-exclamation text-danger me-2 fs-5"></i> 
-                        Dhyan Dein: Platform Active Rule
-                    </h6>
-                    <hr class="border-warning opacity-50">
-                    <p class="mb-2 small text-dark">Agar aapko is platform se lagatar naye kaam aur workers chahiye, toh aapko <strong>₹199 ka Monthly Platform Active Plan</strong> rakhna hoga.</p>
-                    <p class="mb-0 small text-dark">Har mahine unlimited leads dekhne ke liye aapke wallet mein minimum <strong>200 credits</strong> hona zaroori hai. Yahi aapki ₹199 monthly active fee hai.</p>
+                <div class="alert alert-danger text-start border-danger shadow-sm rounded-3 mb-0" role="alert">
+                    <h6 class="alert-heading fw-bold text-dark"><i class="fa-solid fa-triangle-exclamation text-danger me-2 fs-5"></i>Platform Active Rule</h6>
+                    <hr class="border-danger opacity-50">
+                    <p class="mb-2 small text-dark">Aapke Kaamconnect account se har mahine ki <strong>1 tareek ko automatic 200 credits (₹199)</strong> cut honge. Iske baad aap poore mahine unlimited leads aur workers dekh sakte hain.</p>
+                    <p class="mb-0 small fw-bold text-danger">Agar 1 tareek ko wallet mein 200 credits nahi hue, toh aapka account band ho jayega, aur aapko naya kaam nahi dikhega.</p>
                 </div>
             </div>
-            
             <div class="modal-footer border-0 pb-4 pt-2 d-flex justify-content-center bg-light">
                 <button type="button" class="btn btn-success fw-bold px-5 rounded-pill shadow-sm" data-bs-dismiss="modal">
-                    Mujhe Samajh Aa Gaya <i class="fa-solid fa-thumbs-up ms-1"></i>
+                    Mujhe Samajh Aa Gaya 👍
                 </button>
             </div>
-            
+        </div>
+    </div>
+</div>
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        new bootstrap.Modal(document.getElementById('welcomeShopModal')).show();
+    });
+</script>
+{% endif %}
+
+{% if not current_user.is_plan_active %}
+<div class="modal-backdrop fade show" style="backdrop-filter: blur(8px); background-color: rgba(0,0,0,0.7);"></div>
+
+<div class="modal fade show d-block" id="expiryModal" tabindex="-1" aria-hidden="true" style="z-index: 1055;">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg rounded-4 overflow-hidden">
+            <div class="modal-header bg-danger text-white border-0 d-flex flex-column align-items-center pt-4 pb-3 text-center">
+                <i class="fa-solid fa-circle-xmark fa-3x mb-2 text-white"></i>
+                <h4 class="modal-title fw-bold">Platform Plan Expired 🚫</h4>
+            </div>
+            <div class="modal-body p-4 text-center">
+                <h5 class="fw-bold text-dark mb-3">Aapka Account Band Kar Diya Gaya Hai</h5>
+                <p class="text-muted small mb-4">Aapke wallet mein 1 tareek ko <strong>200 credits (₹199)</strong> nahi the. Isliye aapki shop customers ko dikhna band ho gayi hai aur aapko naye kaam nahi dikhenge.</p>
+                
+                <div class="alert alert-warning text-dark text-start border-warning shadow-sm rounded-3 mb-4" role="alert">
+                    <i class="fa-solid fa-bolt text-warning me-2"></i><strong>Chalu Kaise Karein?</strong><br>
+                    Apna account turant chalu karne ke liye apne wallet mein credits add karein. Jaise hi balance 200 hoga, aapka account auto-activate ho jayega!
+                </div>
+                
+                <a href="{{ url_for('buy_credits_page') }}" class="btn btn-warning btn-lg fw-bold px-5 rounded-pill shadow-sm w-100 text-dark">
+                    <i class="fa-solid fa-wallet me-2"></i> Buy Credits Now
+                </a>
+            </div>
         </div>
     </div>
 </div>
 
-<script>
-    document.addEventListener("DOMContentLoaded", function() {
-        // Modal ko automatically open karne ke liye Bootstrap ka JS
-        var myModal = new bootstrap.Modal(document.getElementById('welcomeShopModal'));
-        myModal.show();
-    });
-</script>
+<style> body { overflow: hidden; } </style>
 {% endif %}
  
 {% endblock %}
