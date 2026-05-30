@@ -44,6 +44,8 @@ class User(UserMixin, db.Model):
     wallet_balance = db.Column(db.Integer, default=0)
     per_day_amount = db.Column(db.Integer)
     is_available = db.Column(db.Boolean, default=True)
+    last_deduction_month = db.Column(db.Integer, default=datetime.now().month)
+    is_plan_active = db.Column(db.Boolean, default=True)
 
     # CASCADES: Agar user delete ho, toh uska sab data delete ho jaye (500 error fix)
     requirements = db.relationship('Requirement', backref='customer_user', cascade='all, delete-orphan')
