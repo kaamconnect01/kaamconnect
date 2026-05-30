@@ -243,6 +243,10 @@ def shop_dash():
         current_user.last_deduction_month = current_month
         current_user.is_plan_active = True
         db.session.commit()
+        
+        # 🔥 YEH NAYI LINE ADD KI HAI (Success popup dikhane ke liye)
+        session['show_reactivation_popup'] = True
+        
         flash("Recharge successful! Aapka account dobara chalu ho gaya hai.", "success")
     # =========================================================
 
