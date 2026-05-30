@@ -1,15 +1,22 @@
 {% extends 'base.html' %}
 {% block content %}
-<div class="card bg-primary text-white shadow-sm border-0 mb-4 p-4 rounded-4" style="background: linear-gradient(45deg, #0d6efd, #0dcaf0);">
-    <div class="d-flex justify-content-between align-items-center">
-        <div>
-            <h3 class="fw-bold mb-1">Hello, {{ current_user.name }}! 👋</h3>
-            <p class="mb-0 text-light opacity-75">Manage your leads and vacancies</p>
+<div class="card bg-primary text-white shadow-sm border-0 mb-4 p-3 p-md-4 rounded-4" style="background: linear-gradient(45deg, #0d6efd, #0dcaf0);">
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-center gap-2 gap-md-0">
+        
+        <div class="text-center text-md-start">
+            <h3 class="fw-bold mb-1 fs-4 fs-md-3">Hello, {{ current_user.name }}! 👋</h3>
+            <p class="mb-0 text-light opacity-75 small">Manage your leads and vacancies</p>
         </div>
-        <div class="text-end d-none d-md-block">
-            <h4 class="mb-1">Wallet: <span class="badge bg-warning text-dark px-3 py-2">₹{{ current_user.wallet_balance }}</span></h4>
-            <a href="{{ url_for('buy_credits_page') }}" class="btn btn-dark btn-sm rounded-pill px-3 mt-1 fw-bold">Recharge</a>
+        
+        <div class="text-center text-md-end mt-2 mt-md-0">
+            <h4 class="mb-1 fs-5 fs-md-4 d-flex align-items-center justify-content-center justify-content-md-end gap-2">
+                Wallet: <span class="badge bg-warning text-dark px-3 py-2">₹{{ current_user.wallet_balance }}</span>
+            </h4>
+            <a href="{{ url_for('buy_credits_page') }}" class="btn btn-dark btn-sm rounded-pill px-4 mt-1 fw-bold shadow-sm">
+                Recharge
+            </a>
         </div>
+        
     </div>
 </div>
 
