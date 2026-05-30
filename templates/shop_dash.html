@@ -297,5 +297,47 @@
 
 <style> body { overflow: hidden; } </style>
 {% endif %}
- 
+                            
+{% if session.pop('show_reactivation_popup', None) %}
+<div class="modal fade" id="reactivationModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg rounded-4 overflow-hidden">
+            
+            <div class="modal-header bg-success text-white border-0 d-flex flex-column align-items-center pt-4 pb-3 text-center">
+                <i class="fa-solid fa-circle-check fa-4x mb-2 text-white shadow-sm rounded-circle"></i>
+                <h4 class="modal-title fw-bold mt-2">Account Activated! 🚀</h4>
+            </div>
+            
+            <div class="modal-body p-4 text-center">
+                <h5 class="fw-bold text-dark mb-3">Recharge Successful 🎉</h5>
+                <p class="text-muted small mb-4">Aapke wallet mein naye credits add ho gaye hain aur is mahine ki <strong>Platform Fee (200 credits)</strong> cut gayi hai.</p>
+                
+                <div class="alert alert-success text-start border-success shadow-sm rounded-3 mb-0" role="alert">
+                    <h6 class="alert-heading fw-bold text-dark d-flex align-items-center">
+                        <i class="fa-solid fa-unlock-keyhole text-success me-2 fs-5"></i> 
+                        Platform Ab Active Hai
+                    </h6>
+                    <hr class="border-success opacity-50">
+                    <p class="mb-0 small text-dark">Aapka Kaamconnect account is mahine ke liye poori tarah active ho gaya hai. Ab aap apni shop ki vacancies post kar sakte hain aur nayi leads dekh sakte hain!</p>
+                </div>
+            </div>
+            
+            <div class="modal-footer border-0 pb-4 pt-2 d-flex justify-content-center bg-light">
+                <button type="button" class="btn btn-success fw-bold px-5 rounded-pill shadow-sm" data-bs-dismiss="modal">
+                    Great! Kaam Shuru Karein <i class="fa-solid fa-arrow-right ms-1"></i>
+                </button>
+            </div>
+            
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        var successModal = new bootstrap.Modal(document.getElementById('reactivationModal'));
+        successModal.show();
+    });
+</script>
+{% endif %}
+
 {% endblock %}
