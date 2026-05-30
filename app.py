@@ -135,7 +135,7 @@ def signup():
             experience=experience,
             expertise=expertise,
             per_day_amount=per_day_amount,
-            wallet_balance=0,
+            wallet_balance=50,           # 🔥 YAHAN 0 KO 50 KAR DIYA HAI
             is_available=True
         )
         
@@ -144,6 +144,10 @@ def signup():
         
         # 🔥 FIRST TIME AUTO-LOGIN: User ko password bina daale turant login karwayein
         login_user(new_user)
+
+        # 🔥 WELCOME POPUP TRIGGER (Sirf Shop Owner ke liye)
+        if new_user.role == 'shop_owner':
+            session['show_welcome_popup'] = True
         
         flash('Account successfully ban gaya hai aur aap login ho chuke hain!', 'success')
         
