@@ -74,7 +74,6 @@ class UnlockedLead(db.Model):
     deadline = db.Column(db.String(100), nullable=True)
     notes = db.Column(db.Text, nullable=True)
     status = db.Column(db.String(50), default='Pending')
-    requirement = db.relationship('Requirement', backref=db.backref('unlocked_leads', lazy=True))
 
 class SiteSettings(db.Model):
     __tablename__ = 'site_settings'
