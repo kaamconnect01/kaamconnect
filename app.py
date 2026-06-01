@@ -97,7 +97,7 @@ class Quotation(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     shop_owner_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     worker_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=True) # Agar worker ko bhej rahe hain
-    job_id = db.Column(db.Integer, db.ForeignKey('job.id'), nullable=True)       # Agar kisi job post par bhej rahe hain
+    requirement_id = db.Column(db.Integer, db.ForeignKey('requirement.id'), nullable=True)
     
     amount = db.Column(db.Float, nullable=False)         # Estimate Amount
     deadline = db.Column(db.String(100), nullable=False)   # Kam kitne din me hoga (e.g., "3 Days")
