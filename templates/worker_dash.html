@@ -1,80 +1,192 @@
 {% extends 'base.html' %}
 {% block content %}
-<div class="card bg-success text-white shadow-sm border-0 mb-4 p-4 rounded-4">
-    <h3 class="fw-bold mb-1">Hello, {{ current_user.name }}! 🛠️</h3>
-    <p class="mb-0 text-light opacity-75">Find daily jobs matching your expertise ({{ current_user.expertise }}).</p>
-</div>
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-10 col-12">
 
-<ul class="nav nav-pills nav-fill bg-white shadow-sm rounded-pill p-2 mb-4" id="workerTab" role="tablist">
-  <li class="nav-item"><button class="nav-link active rounded-pill fw-bold" data-bs-toggle="tab" data-bs-target="#jobs">Live Jobs</button></li>
-  <li class="nav-item"><button class="nav-link rounded-pill fw-bold" data-bs-toggle="tab" data-bs-target="#profile">My Profile</button></li>
-</ul>
+            <div class="card bg-dark text-white shadow-sm border-0 mb-4 p-4 rounded-4 position-relative overflow-hidden">
+                <div class="position-absolute top-0 end-0 p-3 opacity-10">
+                    <i class="fa-solid fa-screwdriver-wrench fa-6x"></i>
+                </div>
+                <div class="card-body p-0 z-1">
+                    <h3 class="fw-bold mb-1 text-white">Welcome Back, {{ current_user.name }}! 👋</h3>
+                    <p class="mb-0 text-white-50 small">
+                        <i class="fa-solid fa-briefcase me-1"></i> Showing live jobs matching your skill: 
+                        <span class="badge bg-primary text-white rounded-pill px-3 py-1 ms-1 fw-bold">{{ current_user.expertise }}</span>
+                    </p>
+                </div>
+            </div>
 
-<div class="card border-0 bg-warning bg-opacity-10 p-4 rounded-4 mt-4">
-    <div class="d-flex align-items-start">
-        <i class="fa-solid fa-circle-check text-warning fa-2x me-3 mt-1"></i>
-        <div>
-            <h5 class="fw-bold text-dark mb-1">Kaam Mil Gaya Hai?</h5>
-            
             {% if current_user.is_available %}
-                <p class="text-muted small mb-3">Agar aapko job mil gayi hai aur aap nahi chahte ki contractor ya dukandaron ke calls aayein, toh apni availability yahan se temporary hata sakte hain.</p>
-                <form action="{{ url_for('worker_hide_profile') }}" method="POST" onsubmit="return confirm('Kya aap apni availability ko temporary chhipana chahte hain?');">
-                    <button type="submit" class="btn btn-sm btn-warning fw-bold px-3 rounded-pill">
-                        <i class="fa-solid fa-eye-slash me-1"></i> Mujhe Abhi Kaam Nahi Chahiye (Hide Profile)
-                    </button>
-                </form>
+                <div class="card border-0 shadow-sm bg-white rounded-4 p-4 mb-4 border-start border-4 border-success">
+                    <div class="d-flex flex-column flex-md-row align-items-md-center justify-content-between gap-3">
+                        <div class="d-flex align-items-start">
+                            <div class="bg-success bg-opacity-10 text-success p-3 rounded-3 me-3">
+                                <i class="fa-solid fa-circle-check fa-xl"></i>
+                            </div>
+                            <div>
+                                <h6 class="fw-bold text-dark mb-1">Aapka Profile Public Hai (Visible)</h6>
+                                <p class="text-muted small mb-0">Dukandar aur Contractors aapko kaam ke liye abhi call kar sakte hain.</p>
+                            </div>
+                        </div>
+                        <form action="{{ url_for('worker_hide_profile') }}" method="POST" class="m-0" onsubmit="return confirm('Kya aap apni availability ko temporary chhipana chahte hain?');">
+                            <button type="submit" class="btn btn-warning btn-sm fw-bold px-3 py-2 rounded-pill shadow-sm text-dark w-100">
+                                <i class="fa-solid fa-eye-slash me-1"></i> Temporary Hide Profile
+                            </button>
+                        </form>
+                    </div>
+                </div>
             {% else %}
-                <p class="text-danger small mb-3"><b>Aapki profile abhi chhipat (Hidden) hai.</b> Dukanwalo ko aapka number nahi dikhega. Dobara dikhne ke liye upar 'Save Changes' par click karke profile active karein.</p>
-                <button class="btn btn-sm btn-secondary px-3 rounded-pill" disabled>
-                    <i class="fa-solid fa-lock me-1"></i> Profile is Hidden
-                </button>
+                <div class="card border-0 shadow-sm bg-danger bg-opacity-10 rounded-4 p-4 mb-4 border-start border-4 border-danger">
+                    <div class="d-flex flex-column flex-md-row align-items-md-center justify-content-between gap-3">
+                        <div class="d-flex align-items-start">
+                            <div class="bg-danger bg-opacity-20 text-danger p-3 rounded-3 me-3">
+                                <i class="fa-solid fa-eye-slash fa-xl"></i>
+                            </div>
+                            <div>
+                                <h6 class="fw-bold text-danger mb-1">Aapki Profile Abhi Chhipat (Hidden) Hai!</h6>
+                                <p class="text-muted small mb-0">Dukanwalo ko aapka number nahi dikhega. Dobara active karne ke liye neeche <b>'My Profile'</b> tab me jakar <b>'Save Updates'</b> par click karein.</p>
+                            </div>
+                        </div>
+                        <button class="btn btn-secondary btn-sm px-4 py-2 rounded-pill shadow-sm fw-bold border-0 text-white w-100" style="opacity: 0.6;" disabled>
+                            <i class="fa-solid fa-lock me-1"></i> Profile Hidden
+                        </button>
+                    </div>
+                </div>
             {% endif %}
+
+            <ul class="nav nav-pills nav-fill bg-white shadow-sm border rounded-pill p-1 mb-4" id="workerTab" role="tablist">
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link active rounded-pill fw-bold py-2" data-bs-toggle="tab" data-bs-target="#jobs" type="button">
+                        <i class="fa-solid fa-bolt me-1"></i> Live Jobs Today
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link rounded-pill fw-bold py-2" data-bs-toggle="tab" data-bs-target="#profile" type="button">
+                        <i class="fa-solid fa-user-gear me-1"></i> My Profile Details
+                    </button>
+                </li>
+            </ul>
+
+            <div class="tab-content" id="workerTabContent">
+                
+                <div class="tab-pane fade show active" id="jobs" role="tabpanel">
+                    <div class="row g-3">
+                        {% for vac in vacancies %}
+                        <div class="col-md-6 col-12">
+                            <div class="card border-0 shadow-sm rounded-4 h-100 bg-white border border-light">
+                                <div class="card-body p-4 d-flex flex-column justify-content-between">
+                                    
+                                    <div>
+                                        <div class="d-flex justify-content-between align-items-start mb-3 gap-2">
+                                            <h5 class="fw-bold text-dark mb-0">{{ vac.person_need }}</h5>
+                                            <span class="badge bg-success bg-opacity-10 text-success fs-6 fw-bold px-3 py-2 rounded-3 border border-success border-opacity-10">
+                                                ₹{{ vac.per_day_pay }} <small class="text-muted fs-6 font-normal">/day</small>
+                                            </span>
+                                        </div>
+                                        
+                                        <p class="text-secondary small mb-4 bg-light p-3 rounded-3 border border-light" style="min-height: 60px;">
+                                            {{ vac.description }}
+                                        </p>
+                                    </div>
+                                    
+                                    <div>
+                                        <div class="p-3 rounded-3 bg-light border border-light mb-3 text-sm">
+                                            <div class="d-flex align-items-center mb-2 text-dark">
+                                                <i class="fa-solid fa-location-dot text-danger me-2 width-15"></i>
+                                                <span>{{ vac.address }}</span>
+                                            </div>
+                                            <div class="d-flex align-items-center text-dark">
+                                                <i class="fa-solid fa-store text-primary me-2 width-15"></i>
+                                                <span class="fw-semibold">{{ shop_owners[vac.shop_owner_id].name }}</span>
+                                            </div>
+                                        </div>
+                                        
+                                        <a href="tel:{{ shop_owners[vac.shop_owner_id].mobile }}" class="btn btn-success w-100 fw-bold rounded-pill py-2 shadow-sm transition-all hover-scale">
+                                            <i class="fa-solid fa-phone me-2"></i> Call Shopkeeper Now
+                                        </a>
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
+                        {% else %}
+                        <div class="col-12 text-center py-5 bg-white rounded-4 shadow-sm border border-dashed border-2">
+                            <i class="fa-solid fa-mug-hot fa-3x mb-3 text-muted opacity-50"></i>
+                            <h5 class="fw-bold text-secondary mb-1">No Jobs Posted Today</h5>
+                            <p class="text-muted small mb-0">Aapki expertise se match khane wale kaam aate hi yahan dikh jayenge.</p>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <div class="tab-pane fade" id="profile" role="tabpanel">
+                    <div class="card shadow-sm border-0 p-4 rounded-4 mx-auto bg-white border border-light" style="max-width: 650px;">
+                        <div class="text-center mb-4 border-bottom pb-3">
+                            <h5 class="fw-bold text-dark mb-1"><i class="fa-solid fa-user-pen text-primary me-1"></i> Edit Profile Details</h5>
+                            <p class="text-muted small mb-0">Apni jankari update karein taaki contractors ko sahi data mile.</p>
+                        </div>
+                        
+                        <form action="{{ url_for('update_worker_profile') }}" method="POST">
+                            
+                            <div class="mb-3">
+                                <label class="small fw-bold text-dark mb-1">Your Full Name</label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-light text-muted border-0"><i class="fa-solid fa-user"></i></span>
+                                    <input type="text" name="name" class="form-control bg-light border-0 shadow-none ps-2" value="{{ current_user.name }}" placeholder="Enter full name" required>
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="small fw-bold text-dark mb-1">Current Full Address</label>
+                                <textarea name="address" class="form-control bg-light border-0 shadow-none" rows="2" placeholder="Enter complete address details" required>{{ current_user.address }}</textarea>
+                            </div>
+
+                            <div class="row g-3 mb-3">
+                                <div class="col-6">
+                                    <label class="small fw-bold text-dark mb-1">Experience (Years/Months)</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text bg-light text-muted border-0"><i class="fa-solid fa-star"></i></span>
+                                        <input type="text" name="experience" class="form-control bg-light border-0 shadow-none ps-2" value="{{ current_user.experience }}" placeholder="e.g., 5 Years" required>
+                                    </div>
+                                </div>
+                                <div class="col-6">
+                                    <label class="small fw-bold text-dark mb-1">Your Main Expertise</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text bg-light text-muted border-0"><i class="fa-solid fa-user-gear"></i></span>
+                                        <input type="text" name="expertise" class="form-control bg-light border-0 shadow-none ps-2" value="{{ current_user.expertise }}" placeholder="e.g., Carpenter" required>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="mb-4">
+                                <label class="small fw-bold text-dark mb-1">Daily Wage Expectation (₹ / Day)</label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-light text-success fw-bold border-0">₹</span>
+                                    <input type="number" name="per_day_amount" class="form-control bg-light border-0 shadow-none ps-2" value="{{ current_user.per_day_amount }}" placeholder="Expected rate per day" required>
+                                </div>
+                            </div>
+
+                            <button type="submit" class="btn btn-primary w-100 rounded-pill py-2 fw-bold shadow-sm transition-all hover-scale">
+                                <i class="fa-solid fa-cloud-arrow-up me-1"></i> SAVE UPDATES & ACTIVATE PROFILE
+                            </button>
+                        </form>
+
+                    </div>
+                </div>
+
+            </div>
+
         </div>
     </div>
 </div>
 
-<div class="tab-content">
-  <div class="tab-pane fade show active" id="jobs">
-      <div class="row g-3">
-          {% for vac in vacancies %}
-          <div class="col-md-6">
-              <div class="card border-0 shadow-sm h-100">
-                  <div class="card-body">
-                      <div class="d-flex justify-content-between mb-2">
-                          <h5 class="fw-bold text-dark">{{ vac.person_need }}</h5>
-                          <h5 class="text-success fw-bold">₹{{ vac.per_day_pay }} <small class="text-muted fs-6">/day</small></h5>
-                      </div>
-                      <p class="text-muted small mb-3">{{ vac.description }}</p>
-                      <div class="bg-light p-2 rounded small mb-3 text-dark">
-                          <b><i class="fa-solid fa-location-dot text-danger me-1"></i></b> {{ vac.address }}<br>
-                          <b><i class="fa-solid fa-store text-primary me-1 mt-2"></i></b> {{ shop_owners[vac.shop_owner_id].name }}
-                      </div>
-                      <a href="tel:{{ shop_owners[vac.shop_owner_id].mobile }}" class="btn btn-outline-success w-100 fw-bold rounded-pill">
-                          <i class="fa-solid fa-phone me-1"></i> Call Shop ({{ shop_owners[vac.shop_owner_id].mobile }})
-                      </a>
-                  </div>
-              </div>
-          </div>
-          {% else %}
-          <div class="text-center w-100 py-5 text-muted"><i class="fa-solid fa-sleepy fa-3x mb-3"></i><p>No job vacancies posted today.</p></div>
-          {% endfor %}
-      </div>
-  </div>
-
-  <div class="tab-pane fade" id="profile">
-      <div class="card shadow-sm border-0 p-4 rounded-4 mx-auto" style="max-width: 600px;">
-          <h5 class="fw-bold text-center mb-4">Update Profile Details</h5>
-          <form method="POST">
-              <div class="mb-3"><label class="small fw-bold">Full Name</label><input type="text" name="name" class="form-control bg-light" value="{{ current_user.name }}" required></div>
-              <div class="mb-3"><label class="small fw-bold">Address</label><textarea name="address" class="form-control bg-light" rows="2" required>{{ current_user.address }}</textarea></div>
-              <div class="row mb-3">
-                  <div class="col-6"><label class="small fw-bold">Experience</label><input type="text" name="experience" class="form-control bg-light" value="{{ current_user.experience }}" required></div>
-                  <div class="col-6"><label class="small fw-bold">Expertise</label><input type="text" name="expertise" class="form-control bg-light" value="{{ current_user.expertise }}" required></div>
-              </div>
-              <div class="mb-4"><label class="small fw-bold">Daily Wage Expectation (₹)</label><input type="number" name="per_day_amount" class="form-control bg-light" value="{{ current_user.per_day_amount }}" required></div>
-              <button type="submit" class="btn btn-dark w-100 rounded-pill py-2 fw-bold shadow">Save Updates</button>
-          </form>
-      </div>
-  </div>
-</div>
+<style>
+    .width-15 { width: 15px; text-align: center; }
+    .font-normal { font-weight: normal; }
+    .transition-all { transition: all 0.2s ease-in-out; }
+    .hover-scale:hover { transform: translateY(-2px); box-shadow: 0 .5rem 1rem rgba(0,0,0,.15)!important; }
+    .nav-pills .nav-link.active { background-color: var(--bs-primary) !important; color: white !important; }
+    .nav-pills .nav-link { color: var(--bs-secondary); }
+</style>
 {% endblock %}
