@@ -78,7 +78,6 @@
                            BUTTONS SWITCH BASED ON WALLET BALANCE & UNLOCK STATUS
                            ======================================================= #}
                         {% if req.is_unlocked %}
-                            <!-- Agar lead pehle se unlock hai, toh yeh dikhega -->
                             <div class="bg-light p-3 rounded-3 border border-dashed mt-3 text-center">
                                 <p class="mb-2 small text-muted fw-bold">👉 Is Lead ke liye apna response select karein:</p>
                                 <div class="d-flex gap-2 justify-content-center">
@@ -91,13 +90,11 @@
                                 </div>
                             </div>
                         {% else %}
-                            <!-- Agar lead lock hai, toh aapka purana balance check wala system chalega -->
                             {% if current_user.wallet_balance < cost %}
                                 <button type="button" class="btn btn-outline-warning text-dark w-100 fw-bold border-2 mt-3" data-bs-toggle="modal" data-bs-target="#insufficientModal{{ req.id }}">
                                     <i class="fa-solid fa-lock me-1"></i> Unlock for {{ cost }} Credits
                                 </button>
                             {% else %}
-                                <!-- Is button par click karte hi ab niche wala Quotation Form khulega -->
                                 <button type="button" class="btn btn-outline-warning text-dark w-100 fw-bold border-2 mt-3" data-bs-toggle="modal" data-bs-target="#confirmModal{{ req.id }}">
                                     <i class="fa-solid fa-lock me-1"></i> Unlock & Send Quote
                                 </button>
@@ -132,36 +129,53 @@
                         </div>
 
                         {# =======================================================
-                           POPUP 2: PREMIUM CONFIRMATION & INSTRUCTION MODAL
+                           POPUP 2: NEW QUOTATION & CONFIRMATION MODAL
                            ======================================================= #}
                         <div class="modal fade" id="confirmModal{{ req.id }}" tabindex="-1" aria-hidden="true">
                             <div class="modal-dialog modal-dialog-centered">
-                                <div class="modal-content rounded-4 border-0 shadow-lg p-3">
-                                    <div class="modal-header border-0 pb-0">
-                                        <h5 class="modal-title fw-bold text-dark"><i class="fa-solid fa-shield-halved text-primary me-2"></i> Confirm Unlock</h5>
-                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                <div class="modal-content border-0 shadow-lg rounded-4">
+                                    
+                                    <div class="modal-header bg-dark text-white border-0">
+                                        <h5 class="modal-title fw-bold">✍️ Enter Quotation & Unlock</h5>
+                                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
                                     </div>
                                     
-                                    <form action="{{ url_for('unlock_lead', req_id=req.id) }}" method="POST" class="m-0">
-                                        <div class="modal-body py-3 text-start">
-                                            <p class="text-dark mb-3">Customer ka budget <b>₹{{ req.budget }}</b> hai, isliye aapke Kaamconnect account se <span class="badge bg-primary fs-6">{{ cost }} Credits</span> katenge.</p>
-                                            
-                                            <div class="p-3 bg-primary bg-opacity-10 border border-primary border-opacity-25 rounded-3 mb-3">
-                                                <ul class="list-unstyled mb-0 text-start small text-dark">
-                                                    <li class="mb-2"><i class="fa-solid fa-circle-check text-success me-2"></i> Unlock hone ke baad aapko customer ke saare details aur contact number dikhenge.</li>
-                                                    <li class="mb-2"><i class="fa-solid fa-circle-check text-success me-2"></i> Contact number milne ke baad aap customer se <b>khud direct baat</b> kar sakte hain.</li>
-                                                    <li><i class="fa-solid fa-circle-check text-success me-2"></i> Aap bina kisi middleman ke apne <b>best tareeke se deal</b> final kar sakte hain!</li>
-                                                </ul>
+                                    <form method="POST" action="{{ url_for('unlock_lead', req_id=req.id) }}">
+                                        <div class="modal-body p-4">
+                                            <div class="alert alert-info small border-0 mb-4">
+                                                <i class="fa-solid fa-circle-info me-1"></i> Is lead ko unlock karne par aapke wallet se <strong>{{ cost }} credits</strong> katenge.
                                             </div>
                                             
-                                            <p class="text-muted small text-center mb-0 fw-bold">Kya aap details unlock karne ke liye taiyar hain?</p>
+                                            <div class="mb-3">
+                                                <label class="form-label small fw-bold text-secondary">Aapka Estimate Budget (₹) <span class="text-danger">*</span></label>
+                                                <div class="input-group">
+                                                    <span class="input-group-text bg-light"><i class="fa-solid fa-indian-rupee-sign small"></i></span>
+                                                    <input type="number" name="amount" class="form-control" placeholder="e.g. 1500" required>
+                                                </div>
+                                            </div>
+
+                                            <div class="mb-3">
+                                                <label class="form-label small fw-bold text-secondary">Kitne din me kaam khatam hoga? <span class="text-danger">*</span></label>
+                                                <div class="input-group">
+                                                    <span class="input-group-text bg-light"><i class="fa-solid fa-clock small"></i></span>
+                                                    <input type="text" name="deadline" class="form-control" placeholder="e.g. 2 Days / 24 Hours" required>
+                                                </div>
+                                            </div>
+
+                                            <div class="mb-0">
+                                                <label class="form-label small fw-bold text-secondary">Extra Notes / Baatein (Optional)</label>
+                                                <textarea name="notes" class="form-control" rows="3" placeholder="Kaam ke baare mein kuch alag se likhna chahein..."></textarea>
+                                            </div>
                                         </div>
                                         
-                                        <div class="modal-footer border-0 pt-0 d-flex gap-2">
-                                            <button type="button" class="btn btn-light rounded-pill flex-grow-1 py-2 fw-bold" data-bs-dismiss="modal">Cancel</button>
-                                            <button type="submit" class="btn btn-primary rounded-pill flex-grow-1 py-2 fw-bold shadow-sm">Yes, Confirm Unlock</button>
+                                        <div class="modal-footer border-0 bg-light rounded-bottom-4">
+                                            <button type="button" class="btn btn-sm btn-secondary rounded-pill px-4" data-bs-dismiss="modal">Cancel</button>
+                                            <button type="submit" class="btn btn-sm btn-warning text-dark fw-bold rounded-pill px-4 shadow-sm">
+                                                Confirm & Submit 🚀
+                                            </button>
                                         </div>
                                     </form>
+                                    
                                 </div>
                             </div>
                         </div>
@@ -348,61 +362,6 @@
         </div>
     </div>
 </div>
-
-<!-- QUOTATION POPUP FORM -->
-<div class="modal fade" id="quoteModal" tabindex="-1" aria-labelledby="quoteModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content border-0 shadow rounded-4">
-            <div class="modal-header bg-dark text-white border-0">
-                <h5 class="modal-title fw-bold" id="quoteModalLabel">✍️ Send Work Quotation</h5>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <!-- Dynamic Action Link passes Worker/Lead ID via JS -->
-            <form id="quoteForm" method="POST" action="">
-                <div class="modal-body p-4">
-                    <p class="text-muted small">Apna behtareen estimate dein taaki samne wala aapka order turant confirm kare.</p>
-                    
-                    <div class="mb-3">
-                        <label class="form-label small fw-bold">Estimate Budget / Amount (₹)</label>
-                        <div class="input-group">
-                            <span class="input-group-text"><i class="fa-solid fa-indian-rupee-sign"></i></span>
-                            <input type="number" name="amount" class="form-control" placeholder="e.g. 2500" required>
-                        </div>
-                    </div>
-
-                    <div class="mb-3">
-                        <label class="form-label small fw-bold">Deadline / Time Required</label>
-                        <div class="input-group">
-                            <span class="input-group-text"><i class="fa-solid fa-clock"></i></span>
-                            <input type="text" name="deadline" class="form-control" placeholder="e.g. 2 Days / Next Sunday" required>
-                        </div>
-                    </div>
-
-                    <div class="mb-3">
-                        <label class="form-label small fw-bold">Extra Notes / Work Details (Optional)</label>
-                        <textarea name="notes" class="form-control" rows="3" placeholder="Kaam ke baare mein thoda details likhein..."></textarea>
-                    </div>
-                </div>
-                <div class="modal-footer border-0 bg-light rounded-bottom-4">
-                    <button type="button" class="btn btn-secondary rounded-pill px-4 btn-sm" data-bs-dismiss="modal">Cancel</button>
-                    <button type="submit" class="btn btn-primary rounded-pill px-4 btn-sm fw-bold">Submit Quotation 🚀</button>
-                </div>
-            </form>
-        </div>
-    </div>
-</div>
-
-<!-- JS to trigger Modal dynamically with correct User ID -->
-<script>
-function openQuoteModal(workerId) {
-    // Form action dynamic set karega taaki sahi worker ko bhej sake
-    document.getElementById('quoteForm').action = '/submit_quotation/' + workerId;
-    var myModal = new bootstrap.Modal(document.getElementById('quoteModal'));
-    myModal.show();
-}
-</script>                            
-                            
-
 <script>
     document.addEventListener("DOMContentLoaded", function() {
         var successModal = new bootstrap.Modal(document.getElementById('reactivationModal'));
@@ -410,59 +369,4 @@ function openQuoteModal(workerId) {
     });
 </script>
 {% endif %}
-
- <!-- QUOTATION & CONFIRMATION POPUP FORM -->
-<div class="modal fade" id="confirmModal{{ req.id }}" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content border-0 shadow-lg rounded-4">
-            
-            <div class="modal-header bg-dark text-white border-0">
-                <h5 class="modal-title fw-bold">✍️ Enter Quotation & Unlock</h5>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            
-            <!-- Form action aapke purane unlock route par hi bhejega data -->
-            <form method="POST" action="/unlock_request/{{ req.id }}">
-                <div class="modal-body p-4">
-                    <div class="alert alert-info small border-0 mb-4">
-                        <i class="fa-solid fa-circle-info me-1"></i> Is lead ko unlock karne par aapke wallet se <strong>{{ cost }} credits</strong> katenge.
-                    </div>
-                    
-                    <!-- 1. Amount Field -->
-                    <div class="mb-3">
-                        <label class="form-label small fw-bold text-secondary">Aapka Estimate Budget (₹) <span class="text-danger">*</span></label>
-                        <div class="input-group">
-                            <span class="input-group-text bg-light"><i class="fa-solid fa-indian-rupee-sign small"></i></span>
-                            <input type="number" name="amount" class="form-control" placeholder="e.g. 1500" required>
-                        </div>
-                    </div>
-
-                    <!-- 2. Deadline Field -->
-                    <div class="mb-3">
-                        <label class="form-label small fw-bold text-secondary">Kitne din me kaam khatam hoga? <span class="text-danger">*</span></label>
-                        <div class="input-group">
-                            <span class="input-group-text bg-light"><i class="fa-solid fa-clock small"></i></span>
-                            <input type="text" name="deadline" class="form-control" placeholder="e.g. 2 Days / 24 Hours" required>
-                        </div>
-                    </div>
-
-                    <!-- 3. Extra Notes Field -->
-                    <div class="mb-0">
-                        <label class="form-label small fw-bold text-secondary">Extra Notes / Baatein (Optional)</label>
-                        <textarea name="notes" class="form-control" rows="3" placeholder="Kaam ke baare mein kuch alag se likhna chahein..."></textarea>
-                    </div>
-                </div>
-                
-                <div class="modal-footer border-0 bg-light rounded-bottom-4">
-                    <button type="button" class="btn btn-sm btn-secondary rounded-pill px-4" data-bs-dismiss="modal">Cancel</button>
-                    <button type="submit" class="btn btn-sm btn-warning text-dark fw-bold rounded-pill px-4 shadow-sm">
-                        Confirm & Submit 🚀
-                    </button>
-                </div>
-            </form>
-            
-        </div>
-    </div>
-</div>                               
-
 {% endblock %}
