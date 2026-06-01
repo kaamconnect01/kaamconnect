@@ -61,6 +61,7 @@ class Requirement(db.Model):
     budget = db.Column(db.Integer)
     deadline = db.Column(db.String(50))
     description = db.Column(db.Text)
+    unlocked_by_shops = db.relationship('UnlockedLead', backref='requirement', lazy=True)
 
 class UnlockedLead(db.Model):
     __tablename__ = 'unlocked_lead'
