@@ -68,6 +68,12 @@ class UnlockedLead(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     shop_owner_id = db.Column(db.Integer, db.ForeignKey('users.id'))
     requirement_id = db.Column(db.Integer, db.ForeignKey('requirement.id'))
+    
+    # 🌟 Ye naye columns add karein jo aap niche function me use kar rahe hain:
+    amount = db.Column(db.String(100), nullable=True)
+    deadline = db.Column(db.String(100), nullable=True)
+    notes = db.Column(db.Text, nullable=True)
+    status = db.Column(db.String(50), default='Pending')
 
 class SiteSettings(db.Model):
     __tablename__ = 'site_settings'
