@@ -301,13 +301,12 @@ def unlock_lead(req_id):
         
     req = Requirement.query.get_or_404(req_id)
     
-    # 🔥 NEW LOGIC: Budget ko integer me badlein aur exact range cost nikalen
+    # 💰 Budget ke hisab se exact credit cost nikalna (Aapka Purana Logic - Safe & Unchanged)
     try:
         budget_num = int(''.join(filter(str.isdigit, str(req.budget)))) if req.budget else 0
     except ValueError:
         budget_num = 0
 
-    # Aapki batayi hui exact ranges backend par lagayi hain:
     if budget_num <= 2000:
         credit_cost = 50
     elif budget_num <= 5000:
@@ -330,11 +329,26 @@ def unlock_lead(req_id):
     # Wallet Balance verification
     if current_user.wallet_balance >= credit_cost:
         current_user.wallet_balance -= credit_cost
-        new_unlock = UnlockedLead(shop_owner_id=current_user.id, requirement_id=req.id)
+        
+        # 🔥 A. POPUP FORM SE AAYA HUA DATA NIKALEIN (Nayi Lines)
+        amount = request.form.get('amount')
+        deadline = request.form.get('deadline')
+        notes = request.form.get('notes')
+        
+        # 🔥 B. DATA KO UNLOCKED_LEAD TABLE ME HI SAVE KAREIN
+        # (Aapke purane model me hi hum ye naye parameters pass kar rahe hain)
+        new_unlock = UnlockedLead(
+            shop_owner_id=current_user.id, 
+            requirement_id=req.id,
+            amount=amount,        # Naya Column
+            deadline=deadline,    # Naya Column
+            notes=notes,          # Naya Column
+            status='Pending'      # Naya Column (Shuruat me status pending rahega)
+        )
         
         db.session.add(new_unlock)
         db.session.commit()
-        flash(f'Lead successfully unlock ho gayi hai! {credit_cost} Credits deduct hue hain.', 'success')
+        flash(f'Lead successfully unlock ho gayi hai aur Quotation bhej diya gaya hai! {credit_cost} Credits deduct hue hain.', 'success')
     else:
         flash('Aapke wallet me sufficiant credits nahi hain. Please recharge karein.', 'danger')
         
@@ -674,6 +688,23 @@ def update_quote_status(quote_id, status_value):
         flash(f"Status updated to {status_value}!", "success")
         
     return redirect(url_for('dashboard'))
+
+@app.route('/update_quote_status/<int:req_id>/<string:status_value>')
+@login_required
+def update_quote_status(req_id, status_value):
+    # Check karein ki kya dukanwale ne ye lead sach me unlock ki hui hai
+    unlocked_lead = UnlockedLead.query.filter_by(requirement_id=req_id, shop_owner_id=current_user.id).first()
+    
+    if unlocked_lead:
+        # Agar click valid hai toh status update karein
+        if status_value in ['Interested', 'Not Interested']:
+            unlocked_lead.status = status_value
+            db.session.commit()
+            flash(f"Response successfully updated to: {status_value}!", "success")
+    else:
+        flash("Lead ka koi records nahi mila!", "danger")
+        
+    return redirect(url_for('shop_dash'))
 
 @app.before_request
 def make_session_permanent():
