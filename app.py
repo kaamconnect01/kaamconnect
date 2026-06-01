@@ -221,8 +221,10 @@ def customer_dash():
         
         new_req = Requirement(
             customer_id=current_user.id,
-            category=request.form.get('category'), budget=request.form.get('budget'),
-            deadline=request.form.get('deadline'), description=request.form.get('description')
+            category=request.form.get('category'), 
+            budget=request.form.get('budget'),
+            deadline=request.form.get('deadline'), 
+            description=request.form.get('description')
         )
         db.session.add(new_req)
         db.session.commit()
@@ -230,6 +232,21 @@ def customer_dash():
         return redirect(url_for('customer_dash'))
         
     my_reqs = Requirement.query.filter_by(customer_id=current_user.id).order_by(Requirement.id.desc()).all()
+    
+    # 🌟 MAGIC CODE: Har quotation ke andar dukanwale ka data inject karna
+    for req in my_reqs:
+        if hasattr(req, 'unlocked_by_shops') and req.unlocked_by_shops:
+            for quote in req.unlocked_by_shops:
+                # Shop_owner_id se User table se dukanwale ki entry nikalna
+                shop_user = User.query.get(quote.shop_owner_id)
+                if shop_user:
+                    # Agar dukan ka naam database me alag se h to wo, nahi to uska normal name
+                    quote.shop_name = getattr(shop_user, 'shop_name', None) or getattr(shop_user, 'name', 'Shop Owner')
+                    quote.shop_mobile = getattr(shop_user, 'mobile', 'N/A')
+                else:
+                    quote.shop_name = "Shop Owner"
+                    quote.shop_mobile = "N/A"
+
     return render_template('customer_dash.html', my_reqs=my_reqs)
 
 @app.route('/shop/dashboard', methods=['GET', 'POST'])
