@@ -3,35 +3,35 @@
 <div class="container py-4">
     <div class="row justify-content-center">
         
-        <!-- ==========================================
-             SECTION 1: POST NEW REQUIREMENT FORM
-             ========================================== -->
         <div class="col-lg-10 col-md-12 mb-5">
             <div class="card shadow-sm border-0 p-4 rounded-4 bg-white">
-                <h4 class="fw-bold text-dark mb-4"><i class="fa-solid fa-plus-circle text-primary me-2"></i> Post Your Work Requirement</h4>
+                <h4 class="fw-bold text-dark mb-4">
+                    <i class="fa-solid fa-plus-circle text-primary me-2"></i> Get Quotes for Your Work
+                </h4>
+                
                 <form method="POST">
+                    <h6 class="text-primary fw-bold mb-3"><i class="fa-solid fa-user-lock"></i> Your Contact Info (Hidden)</h6>
                     
-                    <!-- Contact Info (Hidden/Read-only) -->
                     <div class="row g-3 mb-4 p-3 bg-light rounded-3 border border-light">
                         <div class="col-md-3">
                             <label class="small fw-bold text-muted mb-1">Name</label>
-                            <input type="text" name="name" class="form-control bg-white shadow-none form-control-sm" value="{{ current_user.name }}" required>
+                            <input type="text" name="name" class="form-control bg-white shadow-none" value="{{ current_user.name }}" required>
                         </div>
                         <div class="col-md-3">
                             <label class="small fw-bold text-muted mb-1">Mobile</label>
-                            <input type="text" class="form-control text-muted shadow-none bg-white form-control-sm" value="{{ current_user.mobile }}" readonly>
+                            <input type="text" class="form-control text-muted shadow-none bg-white" value="{{ current_user.mobile }}" readonly>
                         </div>
                         <div class="col-md-3">
                             <label class="small fw-bold text-muted mb-1">Email</label>
-                            <input type="email" name="email" class="form-control bg-white shadow-none form-control-sm" value="{{ current_user.email or '' }}">
+                            <input type="email" name="email" class="form-control bg-white shadow-none" value="{{ current_user.email or '' }}" placeholder="Email">
                         </div>
                         <div class="col-md-3">
                             <label class="small fw-bold text-muted mb-1">Address</label>
-                            <input type="text" name="address" class="form-control bg-white shadow-none form-control-sm" value="{{ current_user.address or '' }}" required>
+                            <input type="text" name="address" class="form-control bg-white shadow-none" value="{{ current_user.address or '' }}" required>
                         </div>
                     </div>
 
-                    <!-- Work Details -->
+                    <h6 class="text-primary fw-bold mb-3"><i class="fa-solid fa-list-check"></i> Work Requirements</h6>
                     <div class="row g-3 mb-4">
                         <div class="col-md-4">
                             <label class="small fw-bold text-dark mb-1">Category <span class="text-danger">*</span></label>
@@ -45,7 +45,7 @@
                         </div>
                         <div class="col-md-4">
                             <label class="small fw-bold text-dark mb-1">Estimated Budget (₹) <span class="text-danger">*</span></label>
-                            <input type="number" name="budget" class="form-control bg-light shadow-none" placeholder="e.g. 5000" required>
+                            <input type="number" name="budget" class="form-control bg-light shadow-none" placeholder="Budget (₹)" required>
                         </div>
                         <div class="col-md-4">
                             <label class="small fw-bold text-dark mb-1">Deadline <span class="text-danger">*</span></label>
@@ -53,7 +53,7 @@
                         </div>
                         <div class="col-12">
                             <label class="small fw-bold text-dark mb-1">Work Description <span class="text-danger">*</span></label>
-                            <textarea name="description" class="form-control bg-light shadow-none" rows="2" placeholder="Size, material, color, etc." required></textarea>
+                            <textarea name="description" class="form-control bg-light shadow-none" rows="3" placeholder="Provide full details about size, material, color, etc." required></textarea>
                         </div>
                     </div>
                     
@@ -62,9 +62,6 @@
             </div>
         </div>
 
-        <!-- ==========================================
-             SECTION 2: COMPACT ACTIVE POSTS & QUOTES
-             ========================================== -->
         <div class="col-lg-10 col-md-12">
             <h4 class="mb-4 fw-bold text-dark border-bottom pb-2">
                 <i class="fa-solid fa-folder-open text-primary me-2"></i> My Active Posts & Received Quotes
@@ -74,9 +71,8 @@
                 <div class="accordion shadow-sm rounded-4" id="jobsAccordion">
                     
                     {% for req in my_reqs %}
-                    <div class="accordion-item border-0 border-bottom mb-2 rounded-3 overflow-hidden bg-white">
+                    <div class="accordion-item border-0 border-bottom mb-3 rounded-3 overflow-hidden bg-white">
                         
-                        <!-- Accordion Header -->
                         <h2 class="accordion-header" id="heading{{ req.id }}">
                             <button class="accordion-button collapsed bg-white fw-bold d-flex flex-wrap gap-3 py-3" type="button" data-bs-toggle="collapse" data-bs-target="#collapse{{ req.id }}" aria-expanded="false" aria-controls="collapse{{ req.id }}">
                                 <span class="badge bg-primary px-3 py-2 rounded-pill">{{ req.category }}</span>
@@ -85,11 +81,9 @@
                             </button>
                         </h2>
                         
-                        <!-- Accordion Body -->
                         <div id="collapse{{ req.id }}" class="accordion-collapse collapse" aria-labelledby="heading{{ req.id }}" data-bs-parent="#jobsAccordion">
                             <div class="accordion-body bg-light p-4">
                                 
-                                <!-- Description & Edit/Delete -->
                                 <div class="d-flex justify-content-between align-items-start mb-4 bg-white p-3 rounded-3 shadow-sm border border-light">
                                     <div>
                                         <h6 class="fw-bold mb-1 text-dark">Work Details:</h6>
@@ -99,7 +93,7 @@
                                         <button class="btn btn-sm btn-outline-primary rounded-pill px-3" data-bs-toggle="modal" data-bs-target="#editReqModal{{ req.id }}">
                                             <i class="fa-solid fa-pen me-1"></i> Edit
                                         </button>
-                                        <form action="{{ url_for('delete_requirement', req_id=req.id) }}" method="POST" class="m-0" onsubmit="return confirm('Pakka delete karna chahte hain?');">
+                                        <form action="{{ url_for('delete_requirement', req_id=req.id) }}" method="POST" class="m-0" onsubmit="return confirm('Kya aap is requirement ko delete karna chahte hain?');">
                                             <button type="submit" class="btn btn-sm btn-outline-danger rounded-pill px-3">
                                                 <i class="fa-solid fa-trash me-1"></i> Delete
                                             </button>
@@ -107,7 +101,6 @@
                                     </div>
                                 </div>
 
-                                <!-- Quotes Table (Updated with Shop Name, Mobile and View button) -->
                                 <h6 class="fw-bold text-secondary mb-3"><i class="fa-solid fa-calculator text-warning me-2"></i> Shop Estimates (Compare Prices):</h6>
                                 
                                 {% if req.unlocked_by_shops %}
@@ -126,16 +119,13 @@
                                                 {% for quote in req.unlocked_by_shops %}
                                                 <tr>
                                                     <td>
-                                                        <div class="fw-bold text-dark">
-                                                            <!-- Agar model me shop_name na ho toh fallback ID pr jayega -->
-                                                            {{ quote.shop_name or quote.shop_owner_name or 'Shop Owner' }}
-                                                        </div>
+                                                        <div class="fw-bold text-dark">{{ quote.shop_name }}</div>
                                                         <small class="text-muted">ID: #{{ quote.shop_owner_id }}</small>
                                                     </td>
                                                     <td>
-                                                        {% if quote.shop_mobile or quote.shop_owner_mobile %}
-                                                            <a href="tel:{{ quote.shop_mobile or quote.shop_owner_mobile }}" class="btn btn-sm btn-outline-success rounded-pill px-3 fw-bold small">
-                                                                <i class="fa-solid fa-phone me-1"></i> {{ quote.shop_mobile or quote.shop_owner_mobile }}
+                                                        {% if quote.shop_mobile and quote.shop_mobile != 'N/A' %}
+                                                            <a href="tel:{{ quote.shop_mobile }}" class="btn btn-sm btn-outline-success rounded-pill px-3 fw-bold small">
+                                                                <i class="fa-solid fa-phone me-1"></i> {{ quote.shop_mobile }}
                                                             </a>
                                                         {% else %}
                                                             <span class="text-muted small">Not Available</span>
@@ -150,9 +140,6 @@
                                                     </td>
                                                 </tr>
 
-                                                <!-- ==========================================
-                                                     MODAL: DETAILED QUOTATION VIEW
-                                                     ========================================== -->
                                                 <div class="modal fade" id="viewQuoteModal{{ quote.id }}" tabindex="-1" aria-hidden="true">
                                                     <div class="modal-dialog modal-dialog-centered">
                                                         <div class="modal-content rounded-4 border-0 shadow-lg">
@@ -162,20 +149,22 @@
                                                             </div>
                                                             <div class="modal-body p-4 bg-light">
                                                                 
-                                                                <!-- Shopkeeper Info Card -->
                                                                 <div class="card border-0 shadow-sm rounded-3 p-3 bg-white mb-3">
                                                                     <h6 class="text-muted border-bottom pb-2 mb-2 small fw-bold text-uppercase">👨‍💼 Shopkeeper Details</h6>
-                                                                    <div class="mb-2"><strong>Shop/Owner Name:</strong> {{ quote.shop_name or quote.shop_owner_name or 'Not Available' }}</div>
+                                                                    <div class="mb-2"><strong>Shop/Owner Name:</strong> {{ quote.shop_name }}</div>
                                                                     <div class="mb-2"><strong>Shop ID:</strong> #{{ quote.shop_owner_id }}</div>
                                                                     <div>
                                                                         <strong>Mobile Number:</strong> 
-                                                                        <a href="tel:{{ quote.shop_mobile or quote.shop_owner_mobile }}" class="text-success fw-bold ms-1 text-decoration-none">
-                                                                            <i class="fa-solid fa-phone-flip me-1"></i> {{ quote.shop_mobile or quote.shop_owner_mobile or 'N/A' }}
-                                                                        </a>
+                                                                        {% if quote.shop_mobile and quote.shop_mobile != 'N/A' %}
+                                                                            <a href="tel:{{ quote.shop_mobile }}" class="text-success fw-bold ms-1 text-decoration-none">
+                                                                                <i class="fa-solid fa-phone-flip me-1"></i> {{ quote.shop_mobile }}
+                                                                            </a>
+                                                                        {% else %}
+                                                                            <span class="text-muted">N/A</span>
+                                                                        {% endif %}
                                                                     </div>
                                                                 </div>
 
-                                                                <!-- Estimate Info Card -->
                                                                 <div class="card border-0 shadow-sm rounded-3 p-3 bg-white">
                                                                     <h6 class="text-muted border-bottom pb-2 mb-2 small fw-bold text-uppercase">💰 Quotation / Offer</h6>
                                                                     <div class="mb-3 fs-5"><strong>Final Price:</strong> <span class="text-success fw-bold">₹{{ quote.amount }}</span></div>
@@ -195,22 +184,22 @@
 
                                                             </div>
                                                             <div class="modal-footer border-0 p-4 pt-0 bg-light rounded-bottom-4">
-                                                                <a href="tel:{{ quote.shop_mobile or quote.shop_owner_mobile }}" class="btn btn-success w-100 rounded-pill py-2 fw-bold shadow-sm">
-                                                                    <i class="fa-solid fa-phone me-1"></i> CALL SHOPKEEPER NOW
-                                                                </a>
+                                                                {% if quote.shop_mobile and quote.shop_mobile != 'N/A' %}
+                                                                    <a href="tel:{{ quote.shop_mobile }}" class="btn btn-success w-100 rounded-pill py-2 fw-bold shadow-sm">
+                                                                        <i class="fa-solid fa-phone me-1"></i> CALL SHOPKEEPER NOW
+                                                                    </a>
+                                                                {% endif %}
                                                             </div>
                                                         </div>
                                                     </div>
                                                 </div>
-                                                <!-- Modal End -->
-
                                                 {% endfor %}
                                             </tbody>
                                         </table>
                                     </div>
                                 {% else %}
                                     <div class="text-center py-4 bg-white rounded-3 border border-dashed">
-                                        <p class="text-muted small mb-0"><i class="fa-solid fa-clock-rotate-left me-1"></i> Abhi tak kisi dukanwale ne estimate nahi bheja hai. Jaise hi koi bhejega, yahan dikh jayega.</p>
+                                        <p class="text-muted small mb-0"><i class="fa-solid fa-clock-rotate-left me-1"></i> Abhi tak kisi dukanwale ne estimate nahi bheja hai.</p>
                                     </div>
                                 {% endif %}
                                 
@@ -218,7 +207,6 @@
                         </div>
                     </div>
 
-                    <!-- EDIT REQUIREMENT MODAL -->
                     <div class="modal fade" id="editReqModal{{ req.id }}" tabindex="-1" aria-hidden="true">
                         <div class="modal-dialog modal-dialog-centered">
                             <div class="modal-content rounded-4 border-0 shadow-lg">
