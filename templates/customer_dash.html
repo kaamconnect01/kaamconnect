@@ -36,6 +36,72 @@
                 </div>
                 <button type="submit" class="btn btn-primary w-100 py-3 rounded-pill fw-bold shadow-sm">PUBLISH REQUIREMENT</button>
             </form>
+
+            <div class="row justify-content-center mt-5">
+    <div class="col-md-8 col-sm-12">
+        <h3 class="mb-3 fw-bold text-dark"><i class="fa-solid fa-list-check me-2 text-primary"></i> Aapke Post Kiye Gaye Kaam</h3>
+        
+        {% for req in requirements %}
+        <div class="card shadow-sm border-0 rounded-4 mb-4 p-3 bg-white">
+            <div class="d-flex justify-content-between align-items-center border-bottom pb-2 mb-3">
+                <div>
+                    <span class="badge bg-primary px-3 rounded-pill">{{ req.category }}</span>
+                    <span class="text-muted small ms-2">📅 {{ req.deadline }}</span>
+                </div>
+                <h5 class="fw-bold text-success mb-0">Budget: ₹{{ req.budget }}</h5>
+            </div>
+            
+            <p class="text-secondary small mb-3"><strong>Details:</strong> {{ req.description }}</p>
+
+            <div class="bg-light p-3 rounded-3">
+                <h6 class="fw-bold text-dark mb-2 small"><i class="fa-solid fa-hand-holding-dollar me-1 text-warning"></i> Dukanon se mile Estimates:</h6>
+                
+                <div class="table-responsive">
+                    <table class="table table-sm table-hover align-middle mb-0 bg-white rounded-3 overflow-hidden shadow-sm">
+                        <thead class="table-dark small">
+                            <tr>
+                                <th>Shop ID</th>
+                                <th>Estimate Price</th>
+                                <th>Time Needed</th>
+                                <th>Notes</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody class="small">
+                            {% for unlock in req.unlocked_by_shops %}
+                            <tr>
+                                <td><span class="fw-bold text-secondary">#{{ unlock.shop_owner_id }}</span></td>
+                                <td class="fw-bold text-success">₹{{ unlock.amount or 'N/A' }}</td>
+                                <td><span class="badge bg-secondary">{{ unlock.deadline or 'N/A' }}</span></td>
+                                <td class="text-muted text-truncate" style="max-width: 150px;">{{ unlock.notes or '-' }}</td>
+                                <td>
+                                    {% if unlock.status == 'Interested' %}
+                                        <span class="badge bg-success">👍 Interested</span>
+                                    {% elif unlock.status == 'Not Interested' %}
+                                        <span class="badge bg-danger">❌ Not Interested</span>
+                                    {% else %}
+                                        <span class="badge bg-warning text-dark">⌛ Pending</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% else %}
+                            <tr>
+                                <td colspan="5" class="text-center text-muted py-2 small">Abhi kisi dukanwale ne estimate nahi bheja hai.</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        {% else %}
+        <div class="text-center py-4 bg-light rounded-4 border">
+            <p class="text-muted mb-0">Aapne abhi tak koi kaam post nahi kiya hai.</p>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+            
         </div>
 
         {% if my_reqs %}
