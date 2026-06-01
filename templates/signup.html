@@ -2,7 +2,7 @@
 {% block content %}
 <style>
     /* =========================================
-       PREMIUM APPLE-STYLE SIGNUP DESIGN (MOBILE RESPONSIVE)
+       PREMIUM APPLE-STYLE SIGNUP DESIGN (MOBILE OPTIMIZED)
        ========================================= */
     :root {
         --apple-blue: #0071e3;
@@ -40,6 +40,66 @@
 
     .form-side {
         padding: 40px;
+    }
+
+    /* Premium Identity Cards instead of Dropdown */
+    .role-card-group {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+    }
+    
+    .role-card {
+        border: 2px solid #e5e5ea;
+        border-radius: 16px;
+        padding: 16px;
+        cursor: pointer;
+        transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+        background-color: #ffffff;
+        display: flex;
+        align-items: center;
+        position: relative;
+    }
+    
+    .role-card:hover {
+        border-color: #b0b0b5;
+        background-color: #fafafa;
+    }
+    
+    /* Active State Style */
+    .role-card.active {
+        border-color: var(--apple-blue);
+        background-color: rgba(0, 113, 227, 0.04);
+        box-shadow: 0 4px 12px rgba(0, 113, 227, 0.08);
+    }
+    
+    .role-card input[type="radio"] {
+        position: absolute;
+        right: 20px;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 20px;
+        height: 20px;
+        accent-color: var(--apple-blue);
+        cursor: pointer;
+    }
+    
+    .role-icon-box {
+        width: 48px;
+        height: 48px;
+        border-radius: 12px;
+        background-color: #f2f2f7;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-right: 16px;
+        font-size: 1.25rem;
+        transition: all 0.3s ease;
+    }
+    
+    .role-card.active .role-icon-box {
+        background-color: var(--apple-blue);
+        color: white !important;
     }
 
     .form-control, .form-select {
@@ -91,31 +151,51 @@
         backdrop-filter: blur(10px);
     }
 
-    @keyframes fadeInRight {
-        0% { opacity: 0; transform: translateX(20px); }
-        100% { opacity: 1; transform: translateX(0); }
+    /* Enhanced Smooth Animations */
+    @keyframes fadeInUp {
+        0% { opacity: 0; transform: translateY(15px); }
+        100% { opacity: 1; transform: translateY(0); }
     }
     .dynamic-field-anim {
-        animation: fadeInRight 0.4s ease forwards;
+        animation: fadeInUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+
+    /* Mobile Responsive Tweaks */
+    @media (max-width: 991.98px) {
+        .form-side {
+            padding: 24px 20px;
+        }
+        .brand-side {
+            padding: 30px 20px;
+        }
+        .role-card {
+            padding: 12px;
+        }
+        .role-icon-box {
+            width: 40px;
+            height: 40px;
+            margin-right: 12px;
+            font-size: 1.1rem;
+        }
     }
 </style>
 
-<div class="container mt-4 mb-5">
+<div class="container mt-3 mb-5">
     <div class="row signup-container g-0 d-flex flex-column-reverse flex-lg-row">
         
         <div class="col-lg-5 brand-side">
             <div>
                 <h2 class="fw-bold mb-3" style="letter-spacing: -1px;">Kaamconnect</h2>
-                <p class="text-white-50">Join India's most premium & trusted ecosystem connecting verified customers, skilled professionals, and business owners.</p>
+                <p class="text-white-50 small">Join India's most premium & trusted ecosystem connecting verified customers, skilled professionals, and business owners.</p>
             </div>
 
-            <div class="my-4">
+            <div class="my-3">
                 <div class="trust-item">
                     <div class="d-flex align-items-center">
                         <i class="fa-solid fa-shield-halved text-primary fa-lg me-3"></i>
                         <div>
-                            <h6 class="mb-0 fw-bold text-white">100% Verified Profiles</h6>
-                            <small class="text-white-50">No fake leads or spam users.</small>
+                            <h6 class="mb-0 fw-bold text-white small">100% Verified Profiles</h6>
+                            <small class="text-white-50" style="font-size: 0.75rem;">No fake leads or spam users.</small>
                         </div>
                     </div>
                 </div>
@@ -123,8 +203,8 @@
                     <div class="d-flex align-items-center">
                         <i class="fa-solid fa-handshake text-success fa-lg me-3"></i>
                         <div>
-                            <h6 class="mb-0 fw-bold text-white">Zero Commission</h6>
-                            <small class="text-white-50">Keep 100% of your earnings directly.</small>
+                            <h6 class="mb-0 fw-bold text-white small">Zero Commission</h6>
+                            <small class="text-white-50" style="font-size: 0.75rem;">Keep 100% of your earnings directly.</small>
                         </div>
                     </div>
                 </div>
@@ -132,57 +212,90 @@
                     <div class="d-flex align-items-center">
                         <i class="fa-solid fa-bolt text-warning fa-lg me-3"></i>
                         <div>
-                            <h6 class="mb-0 fw-bold text-white">Multi-Service Network</h6>
-                            <small class="text-white-50">Electricians, Painters, Carpenters & more.</small>
+                            <h6 class="mb-0 fw-bold text-white small">Multi-Service Network</h6>
+                            <small class="text-white-50" style="font-size: 0.75rem;">Electricians, Painters, Carpenters & more.</small>
                         </div>
                     </div>
                 </div>
             </div>
 
             <div>
-                <small class="text-white-50"><i class="fa-solid fa-lock me-2"></i> Your data is fully encrypted & safe.</small>
+                <small class="text-white-50" style="font-size: 0.75rem;"><i class="fa-solid fa-lock me-2"></i> Your data is fully encrypted & safe.</small>
             </div>
         </div>
 
         <div class="col-lg-7 form-side">
             <div class="mb-4">
                 <h3 class="fw-bold text-dark" style="letter-spacing: -0.5px;">Create Account</h3>
-                <p class="text-muted small">Fill in the details to unlock direct marketplace access.</p>
+                <p class="text-muted small">Select your identity to customize your premium platform dashboard.</p>
             </div>
 
             <form method="POST">
+                
                 <div class="mb-4">
-                    <label class="form-label fw-bold small text-secondary">Choose Your Profile Role <span class="text-danger">*</span></label>
-                    <select name="role" id="roleSelector" class="form-select fw-bold text-primary" required onchange="toggleFields()">
-                        <option value="" disabled selected>Select your identity...</option>
-                        <option value="customer">Customer (Mujhe Kaam Karwana Hai)</option>
-                        <option value="shop_owner">Shop Owner / Contractor (Business Badhana Hai)</option>
-                        <option value="worker">Skilled Worker / Karigar (Job Chahiye)</option>
-                    </select>
+                    <label class="form-label fw-bold small text-secondary mb-3">Choose Your Profile Role <span class="text-danger">*</span></label>
+                    <div class="role-card-group">
+                        
+                        <div class="role-card" id="card_customer" onclick="selectRole('customer')">
+                            <div class="role-icon-box text-primary">
+                                <i class="fa-solid fa-user-tie"></i>
+                            </div>
+                            <div class="flex-grow-1 pe-4">
+                                <h6 class="fw-bold text-dark mb-0 small">Customer</h6>
+                                <p class="text-muted mb-0" style="font-size: 0.78rem;">Mujhe Ghar/Dukan ka Kaam Karwana Hai</p>
+                            </div>
+                            <input type="radio" name="role" id="role_customer" value="customer" required>
+                        </div>
+
+                        <div class="role-card" id="card_shop_owner" onclick="selectRole('shop_owner')">
+                            <div class="role-icon-box text-success">
+                                <i class="fa-solid fa-shop"></i>
+                            </div>
+                            <div class="flex-grow-1 pe-4">
+                                <h6 class="fw-bold text-dark mb-0 small">Shop Owner / Contractor</h6>
+                                <p class="text-muted mb-0" style="font-size: 0.78rem;">Business Badhana Hai & Workers Chahiye</p>
+                            </div>
+                            <input type="radio" name="role" id="role_shop_owner" value="shop_owner">
+                        </div>
+
+                        <div class="role-card" id="card_worker" onclick="selectRole('worker')">
+                            <div class="role-icon-box text-warning">
+                                <i class="fa-solid fa-helmet-safety"></i>
+                            </div>
+                            <div class="flex-grow-1 pe-4">
+                                <h6 class="fw-bold text-dark mb-0 small">Skilled Worker / Karigar</h6>
+                                <p class="text-muted mb-0" style="font-size: 0.78rem;">Daily ya Monthly Base par Job/Kaam Chahiye</p>
+                            </div>
+                            <input type="radio" name="role" id="role_worker" value="worker">
+                        </div>
+
+                    </div>
                 </div>
 
-                <div class="row g-3 mb-3">
-                    <div class="col-12">
-                        <label class="form-label small fw-bold text-secondary">Full Name</label>
-                        <div class="input-group has-icon">
-                            <span class="input-group-text"><i class="fa-solid fa-user"></i></span>
-                            <input type="text" name="name" class="form-control" required placeholder="Enter your full name">
+                <div id="commonCredentials" style="display: none;" class="dynamic-field-anim">
+                    <div class="row g-3 mb-3">
+                        <div class="col-12">
+                            <label class="form-label small fw-bold text-secondary">Full Name</label>
+                            <div class="input-group has-icon">
+                                <span class="input-group-text"><i class="fa-solid fa-user"></i></span>
+                                <input type="text" name="name" class="form-control" required placeholder="Enter your full name">
+                            </div>
                         </div>
-                    </div>
-                    
-                    <div class="col-md-6">
-                        <label class="form-label small fw-bold text-secondary">Mobile Number</label>
-                        <div class="input-group has-icon">
-                            <span class="input-group-text"><i class="fa-solid fa-phone"></i></span>
-                            <input type="text" name="mobile" class="form-control" required placeholder="10-digit mobile number">
+                        
+                        <div class="col-md-6">
+                            <label class="form-label small fw-bold text-secondary">Mobile Number</label>
+                            <div class="input-group has-icon">
+                                <span class="input-group-text"><i class="fa-solid fa-phone"></i></span>
+                                <input type="text" name="mobile" class="form-control" required placeholder="10-digit mobile number">
+                            </div>
                         </div>
-                    </div>
-                    
-                    <div class="col-md-6">
-                        <label class="form-label small fw-bold text-secondary">Password</label>
-                        <div class="input-group has-icon">
-                            <span class="input-group-text"><i class="fa-solid fa-lock"></i></span>
-                            <input type="password" name="password" class="form-control" required placeholder="Create strong password">
+                        
+                        <div class="col-md-6">
+                            <label class="form-label small fw-bold text-secondary">Password</label>
+                            <div class="input-group has-icon">
+                                <span class="input-group-text"><i class="fa-solid fa-lock"></i></span>
+                                <input type="password" name="password" class="form-control" required placeholder="Create strong password">
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -236,7 +349,9 @@
                     </div>
                 </div>
 
-                <button type="submit" class="btn apple-btn-primary w-100 py-3 mt-3 fw-bold">Create Account</button>
+                <div id="actionContainer" style="display: none;" class="dynamic-field-anim">
+                    <button type="submit" class="btn apple-btn-primary w-100 py-3 mt-2 fw-bold">Create Account</button>
+                </div>
                 
                 <div class="text-center mt-4">
                     <p class="text-muted small mb-0">Already have an account? <a href="{{ url_for('login') }}" class="text-primary fw-bold text-decoration-none">Sign in here</a></p>
@@ -248,14 +363,28 @@
 </div>
 
 <script>
-    function toggleFields() {
-        const role = document.getElementById('roleSelector').value;
+    function selectRole(role) {
+        // 1. Uncheck all radio inputs and remove active status from cards
+        document.querySelectorAll('.role-card').forEach(card => card.classList.remove('active'));
+        
+        // 2. Set the selected active card state
+        document.getElementById('role_' + role).checked = true;
+        document.getElementById('card_' + role).classList.add('active');
+
+        // 3. Elements mapping pointers
+        const commonCredentials = document.getElementById('commonCredentials');
         const proFields = document.getElementById('proFields');
         const workerFields = document.getElementById('workerFields');
+        const actionContainer = document.getElementById('actionContainer');
         
         const reqInputs = [document.getElementById('addressInput'), document.getElementById('expInput'), document.getElementById('expertInput')];
         const wageInput = document.getElementById('wageInput');
 
+        // Show core inputs immediately after any role selection
+        commonCredentials.style.display = 'block';
+        actionContainer.style.display = 'block';
+
+        // 4. Handle logical display updates per clean profile rule
         if (role === 'customer') {
             proFields.style.display = 'none';
             workerFields.style.display = 'none';
