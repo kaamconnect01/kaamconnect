@@ -71,8 +71,8 @@
                         <h2 class="accordion-header" id="heading{{ req.id }}">
                             <button class="accordion-button collapsed bg-white fw-bold d-flex flex-wrap gap-3 py-3" type="button" data-bs-toggle="collapse" data-bs-target="#collapse{{ req.id }}" aria-expanded="false" aria-controls="collapse{{ req.id }}">
                                 <span class="badge bg-primary px-3 py-2 rounded-pill">{{ req.category }}</span>
-                                <span class="text-success fs-6 ms-2">Budget: ₹{{ req.budget }}</span>
-                                <span class="text-muted ms-auto small me-3"><i class="fa-regular fa-clock me-1"></i> By {{ req.deadline }}</span>
+                                <span class="text-success fs-6 ms-2">My Budget: ₹{{ req.budget }}</span>
+                                <span class="text-muted ms-auto small me-3"><i class="fa-regular fa-clock me-1"></i> Deadline: {{ req.deadline }}</span>
                             </button>
                         </h2>
                         
@@ -96,7 +96,7 @@
                                     </div>
                                 </div>
 
-                                <h6 class="fw-bold text-secondary mb-3"><i class="fa-solid fa-handshake text-warning me-2"></i> Quotes from Shops:</h6>
+                                <h6 class="fw-bold text-secondary mb-3"><i class="fa-solid fa-calculator text-warning me-2"></i> Shop Estimates (Compare Prices):</h6>
                                 
                                 {% if req.unlocked_by_shops %}
                                     <div class="table-responsive bg-white rounded-3 shadow-sm border border-light">
@@ -104,10 +104,10 @@
                                             <thead class="table-light text-muted small">
                                                 <tr>
                                                     <th>Shop ID</th>
-                                                    <th>Estimate Amount</th>
-                                                    <th>Time Needed</th>
-                                                    <th>Notes</th>
-                                                    <th class="text-center">Action / Status</th>
+                                                    <th>Estimate Price</th>
+                                                    <th>Delivery/Time Needed</th>
+                                                    <th>Shopkeeper Notes</th>
+                                                    <th class="text-center">Status</th>
                                                 </tr>
                                             </thead>
                                             <tbody>
@@ -116,24 +116,13 @@
                                                     <td class="fw-bold text-primary">#{{ quote.shop_owner_id }}</td>
                                                     <td class="fw-bold text-success fs-6">₹{{ quote.amount }}</td>
                                                     <td class="text-muted small">{{ quote.deadline }}</td>
-                                                    <td class="text-muted small" style="max-width: 200px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" title="{{ quote.notes }}">
+                                                    <td class="text-muted small" style="max-width: 250px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" title="{{ quote.notes }}">
                                                         {{ quote.notes or '-' }}
                                                     </td>
                                                     <td class="text-center">
-                                                        {% if quote.status == 'Pending' or not quote.status %}
-                                                            <div class="d-flex justify-content-center gap-2">
-                                                                <a href="{{ url_for('update_quote_status', req_id=quote.id, status_value='Interested') }}" class="btn btn-sm btn-success rounded-pill px-3 fw-bold shadow-sm">
-                                                                    <i class="fa-solid fa-check me-1"></i> Accept
-                                                                </a>
-                                                                <a href="{{ url_for('update_quote_status', req_id=quote.id, status_value='Not Interested') }}" class="btn btn-sm btn-outline-danger rounded-pill px-3 fw-bold">
-                                                                    Reject
-                                                                </a>
-                                                            </div>
-                                                        {% elif quote.status == 'Interested' %}
-                                                            <span class="badge bg-success bg-opacity-10 text-success border border-success px-3 py-2 rounded-pill"><i class="fa-solid fa-check-circle me-1"></i> Accepted</span>
-                                                        {% else %}
-                                                            <span class="badge bg-danger bg-opacity-10 text-danger border border-danger px-3 py-2 rounded-pill"><i class="fa-solid fa-xmark-circle me-1"></i> Rejected</span>
-                                                        {% endif %}
+                                                        <span class="badge bg-success bg-opacity-10 text-success border border-success px-3 py-1 rounded-pill small">
+                                                            <i class="fa-solid fa-phone me-1"></i> Unlocked / Contacting
+                                                        </span>
                                                     </td>
                                                 </tr>
                                                 {% endfor %}
@@ -142,7 +131,7 @@
                                     </div>
                                 {% else %}
                                     <div class="text-center py-4 bg-white rounded-3 border border-dashed">
-                                        <p class="text-muted small mb-0"><i class="fa-solid fa-clock-rotate-left me-1"></i> Abhi tak kisi shop ne estimate nahi bheja hai. Please wait.</p>
+                                        <p class="text-muted small mb-0"><i class="fa-solid fa-clock-rotate-left me-1"></i> Abhi tak kisi dukanwale ne estimate nahi bheja hai. Jaise hi koi bhejega, yahan dikh jayega.</p>
                                     </div>
                                 {% endif %}
                                 
@@ -186,7 +175,7 @@
 
                     {% endfor %}
                 </div>
-                {% else %}
+            {% else %}
                 <div class="text-center py-5 bg-white shadow-sm rounded-4 border">
                     <i class="fa-solid fa-box-open fa-3x text-muted mb-3 opacity-50"></i>
                     <h5 class="fw-bold text-secondary">Aapne abhi tak koi kaam post nahi kiya hai.</h5>
