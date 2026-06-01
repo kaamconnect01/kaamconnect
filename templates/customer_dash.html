@@ -1,180 +1,190 @@
 {% extends 'base.html' %}
 {% block content %}
-<div class="row justify-content-center">
-    <div class="col-md-8 col-sm-12">
-        <h3 class="mb-3 fw-bold text-dark">Get Quotes for Your Work</h3>
-        <div class="card shadow-lg border-0 p-4 rounded-4 mb-5">
-            <form method="POST">
-                <h6 class="text-primary fw-bold mb-3"><i class="fa-solid fa-user-lock"></i> Your Contact Info (Hidden)</h6>
-                <div class="row g-3 mb-4 bg-light p-3 rounded">
-                    <div class="col-md-6"><input type="text" name="name" class="form-control bg-white" value="{{ current_user.name }}" required></div>
-                    <div class="col-md-6"><input type="text" class="form-control text-muted" value="{{ current_user.mobile }}" readonly></div>
-                    <div class="col-md-6"><input type="email" name="email" class="form-control bg-white" value="{{ current_user.email or '' }}" placeholder="Email"></div>
-                    <div class="col-md-6"><input type="text" name="address" class="form-control bg-white" value="{{ current_user.address or '' }}" required></div>
-                </div>
-
-                <h6 class="text-primary fw-bold mb-3"><i class="fa-solid fa-list-check"></i> Work Requirements</h6>
-                <div class="row g-3 mb-3">
-                    <div class="col-md-4">
-                        <select name="category" class="form-select bg-light" required>
-                            <option value="Flat Furniture">Flat Furniture</option>
-                            <option value="Bed">Bed</option>
-                            <option value="Sofa">Sofa</option>
-                            <option value="Modular Kitchen">Modular Kitchen</option>
-                            <option value="Other">Other</option>
-                        </select>
-                    </div>
-                    <div class="col-md-4">
-                        <input type="number" name="budget" class="form-control bg-light" placeholder="Budget (₹)" required>
-                    </div>
-                    <div class="col-md-4">
-                        <input type="date" name="deadline" class="form-control bg-light text-muted" required>
-                    </div>
-                    <div class="col-12">
-                        <textarea name="description" class="form-control bg-light" rows="3" placeholder="Provide full details about size, material, color, etc." required></textarea>
-                    </div>
-                </div>
-                <button type="submit" class="btn btn-primary w-100 py-3 rounded-pill fw-bold shadow-sm">PUBLISH REQUIREMENT</button>
-            </form>
-
-            <div class="row justify-content-center mt-5">
-    <div class="col-md-8 col-sm-12">
-        <h3 class="mb-3 fw-bold text-dark"><i class="fa-solid fa-list-check me-2 text-primary"></i> Aapke Post Kiye Gaye Kaam</h3>
+<div class="container py-4">
+    <div class="row justify-content-center">
         
-        {% for req in requirements %}
-        <div class="card shadow-sm border-0 rounded-4 mb-4 p-3 bg-white">
-            <div class="d-flex justify-content-between align-items-center border-bottom pb-2 mb-3">
-                <div>
-                    <span class="badge bg-primary px-3 rounded-pill">{{ req.category }}</span>
-                    <span class="text-muted small ms-2">📅 {{ req.deadline }}</span>
-                </div>
-                <h5 class="fw-bold text-success mb-0">Budget: ₹{{ req.budget }}</h5>
+        <div class="col-lg-10 col-md-12 mb-5">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h3 class="fw-bold text-dark mb-0">✨ Post Your Work Requirement</h3>
             </div>
             
-            <p class="text-secondary small mb-3"><strong>Details:</strong> {{ req.description }}</p>
-
-            <div class="bg-light p-3 rounded-3">
-                <h6 class="fw-bold text-dark mb-2 small"><i class="fa-solid fa-hand-holding-dollar me-1 text-warning"></i> Dukanon se mile Estimates:</h6>
-                
-                <div class="table-responsive">
-                    <table class="table table-sm table-hover align-middle mb-0 bg-white rounded-3 overflow-hidden shadow-sm">
-                        <thead class="table-dark small">
-                            <tr>
-                                <th>Shop ID</th>
-                                <th>Estimate Price</th>
-                                <th>Time Needed</th>
-                                <th>Notes</th>
-                                <th>Status</th>
-                            </tr>
-                        </thead>
-                        <tbody class="small">
-                            {% for unlock in req.unlocked_by_shops %}
-                            <tr>
-                                <td><span class="fw-bold text-secondary">#{{ unlock.shop_owner_id }}</span></td>
-                                <td class="fw-bold text-success">₹{{ unlock.amount or 'N/A' }}</td>
-                                <td><span class="badge bg-secondary">{{ unlock.deadline or 'N/A' }}</span></td>
-                                <td class="text-muted text-truncate" style="max-width: 150px;">{{ unlock.notes or '-' }}</td>
-                                <td>
-                                    {% if unlock.status == 'Interested' %}
-                                        <span class="badge bg-success">👍 Interested</span>
-                                    {% elif unlock.status == 'Not Interested' %}
-                                        <span class="badge bg-danger">❌ Not Interested</span>
-                                    {% else %}
-                                        <span class="badge bg-warning text-dark">⌛ Pending</span>
-                                    {% endif %}
-                                </td>
-                            </tr>
-                            {% else %}
-                            <tr>
-                                <td colspan="5" class="text-center text-muted py-2 small">Abhi kisi dukanwale ne estimate nahi bheja hai.</td>
-                            </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-        {% else %}
-        <div class="text-center py-4 bg-light rounded-4 border">
-            <p class="text-muted mb-0">Aapne abhi tak koi kaam post nahi kiya hai.</p>
-        </div>
-        {% endfor %}
-    </div>
-</div>
-            
-        </div>
-
-        {% if my_reqs %}
-        <h4 class="mb-3 fw-bold text-dark">My Active Posts</h4>
-        {% for req in my_reqs %}
-        <div class="card shadow-sm border-0 mb-3 border-start border-4 border-success">
-            <div class="card-body">
-                <div class="d-flex justify-content-between">
-                    <h5 class="text-dark fw-bold mb-1">{{ req.category }}</h5>
-                    <span class="badge bg-success px-2 py-1 fs-6">₹{{ req.budget }}</span>
-                </div>
-                <p class="text-muted mb-2 small">{{ req.description }}</p>
-                <span class="text-danger small fw-bold"><i class="fa-solid fa-clock me-1"></i>Complete by: {{ req.deadline }}</span>
-            </div>
-
-            <div class="card p-3 mb-3 shadow-sm border-0 rounded-4">
-                <h5 class="fw-bold text-primary">{{ req.category }}</h5>
-                <p class="text-muted mb-1">{{ req.description }}</p>
-                <div class="d-flex justify-content-between align-items-center mb-3">
-                    <span class="badge bg-light text-dark">Budget: ₹{{ req.budget }}</span>
-                    <span class="small text-secondary">Deadline: {{ req.deadline }}</span>
-                </div>
-
-                <div class="d-flex gap-2">
-                    <button class="btn btn-sm btn-outline-primary px-3 rounded-pill" data-bs-toggle="modal" data-bs-target="#editReqModal{{ req.id }}">
-                        <i class="fa-solid fa-pen-to-square me-1"></i> Edit Kaam
-                    </button>
+            <div class="card shadow-sm border-0 p-4 p-md-5 rounded-4 bg-white">
+                <form method="POST">
                     
-                    <form action="{{ url_for('delete_requirement', req_id=req.id) }}" method="POST" class="m-0" onsubmit="return confirm('Kya aap is kaam ki requirement ko pakka delete karna chahte hain?');">
-                        <button type="submit" class="btn btn-sm btn-outline-danger px-3 rounded-pill">
-                            <i class="fa-solid fa-trash me-1"></i> Delete
-                        </button>
-                    </form>
-                </div>
-            </div>
-
-            <div class="modal fade" id="editReqModal{{ req.id }}" tabindex="-1" aria-hidden="true">
-                <div class="modal-dialog modal-dialog-centered">
-                    <div class="modal-content rounded-4 border-0 shadow">
-                        <div class="modal-header border-0 bg-light">
-                            <h5 class="modal-title fw-bold">Edit Requirement</h5>
-                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    <h6 class="text-primary fw-bold mb-3"><i class="fa-solid fa-address-card me-2"></i>Your Contact Info</h6>
+                    <div class="row g-3 mb-4 p-3 bg-light rounded-3 border border-light">
+                        <div class="col-md-6">
+                            <label class="small fw-bold text-muted mb-1">Full Name</label>
+                            <input type="text" name="name" class="form-control bg-white shadow-none" value="{{ current_user.name }}" required>
                         </div>
-                        <form action="{{ url_for('edit_requirement', req_id=req.id) }}" method="POST">
-                            <div class="modal-body p-4">
-                                <div class="mb-3">
-                                    <label class="form-label small fw-bold">Category</label>
-                                    <input type="text" name="category" class="form-control" value="{{ req.category }}" required>
-                                </div>
-                                <div class="mb-3">
-                                    <label class="form-label small fw-bold">Budget (₹)</label>
-                                    <input type="number" name="budget" class="form-control" value="{{ req.budget }}" required>
-                                </div>
-                                <div class="mb-3">
-                                    <label class="form-label small fw-bold">Deadline</label>
-                                    <input type="text" name="deadline" class="form-control" value="{{ req.deadline }}" required>
-                                </div>
-                                <div class="mb-3">
-                                    <label class="form-label small fw-bold">Kaam ki Details (Description)</label>
-                                    <textarea name="description" class="form-control" rows="3" required>{{ req.description }}</textarea>
-                                </div>
+                        <div class="col-md-6">
+                            <label class="small fw-bold text-muted mb-1">Mobile Number</label>
+                            <input type="text" class="form-control text-muted shadow-none bg-white" value="{{ current_user.mobile }}" readonly>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="small fw-bold text-muted mb-1">Email Address (Optional)</label>
+                            <input type="email" name="email" class="form-control bg-white shadow-none" value="{{ current_user.email or '' }}" placeholder="Enter Email">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="small fw-bold text-muted mb-1">Full Address</label>
+                            <input type="text" name="address" class="form-control bg-white shadow-none" value="{{ current_user.address or '' }}" required>
+                        </div>
+                    </div>
+
+                    <h6 class="text-primary fw-bold mb-3"><i class="fa-solid fa-list-check me-2"></i>Work Details</h6>
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-4">
+                            <label class="small fw-bold text-dark mb-1">Category <span class="text-danger">*</span></label>
+                            <select name="category" class="form-select bg-light shadow-none" required>
+                                <option value="Flat Furniture">Flat Furniture</option>
+                                <option value="Bed">Bed</option>
+                                <option value="Sofa">Sofa</option>
+                                <option value="Modular Kitchen">Modular Kitchen</option>
+                                <option value="Other">Other</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="small fw-bold text-dark mb-1">Estimated Budget (₹) <span class="text-danger">*</span></label>
+                            <input type="number" name="budget" class="form-control bg-light shadow-none" placeholder="e.g. 5000" required>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="small fw-bold text-dark mb-1">Deadline <span class="text-danger">*</span></label>
+                            <input type="date" name="deadline" class="form-control bg-light shadow-none text-muted" required>
+                        </div>
+                        <div class="col-12">
+                            <label class="small fw-bold text-dark mb-1">Work Description <span class="text-danger">*</span></label>
+                            <textarea name="description" class="form-control bg-light shadow-none" rows="3" placeholder="Provide full details about size, material, color, etc." required></textarea>
+                        </div>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary w-100 py-3 rounded-pill fw-bold shadow-sm" style="background: linear-gradient(45deg, #0d6efd, #0b5ed7); border: none;">
+                        🚀 PUBLISH REQUIREMENT
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <div class="col-lg-10 col-md-12">
+            <h4 class="mb-4 fw-bold text-dark border-bottom pb-2">
+                <i class="fa-solid fa-folder-open text-primary me-2"></i> My Active Posts & Received Quotes
+            </h4>
+
+            {% if my_reqs %}
+                {% for req in my_reqs %}
+                <div class="card shadow-sm border-0 mb-4 rounded-4 overflow-hidden">
+                    
+                    <div class="card-header bg-white p-4 border-bottom-0 d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
+                        <div>
+                            <div class="d-flex align-items-center gap-2 mb-2">
+                                <span class="badge bg-primary px-3 py-2 rounded-pill shadow-sm">{{ req.category }}</span>
+                                <span class="badge bg-light text-dark border"><i class="fa-solid fa-clock text-danger me-1"></i> By {{ req.deadline }}</span>
                             </div>
-                            <div class="modal-footer border-0 p-4 pt-0">
-                                <button type="submit" class="btn btn-primary w-100 rounded-pill py-2 fw-bold">Save Changes</button>
+                            <h5 class="fw-bold text-dark mb-1">Budget: <span class="text-success">₹{{ req.budget }}</span></h5>
+                            <p class="text-muted small mb-0 mt-2">{{ req.description }}</p>
+                        </div>
+                        
+                        <div class="d-flex flex-row flex-md-column gap-2">
+                            <button class="btn btn-sm btn-outline-primary rounded-pill px-3 fw-bold" data-bs-toggle="modal" data-bs-target="#editReqModal{{ req.id }}">
+                                <i class="fa-solid fa-pen-to-square me-1"></i> Edit
+                            </button>
+                            <form action="{{ url_for('delete_requirement', req_id=req.id) }}" method="POST" class="m-0" onsubmit="return confirm('Kya aap is kaam ki requirement ko pakka delete karna chahte hain?');">
+                                <button type="submit" class="btn btn-sm btn-outline-danger rounded-pill px-3 fw-bold w-100">
+                                    <i class="fa-solid fa-trash me-1"></i> Delete
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+
+                    <div class="card-body bg-light p-4 border-top">
+                        <h6 class="fw-bold text-secondary mb-3">
+                            <i class="fa-solid fa-handshake text-warning me-2"></i> Received Estimates from Shops:
+                        </h6>
+                        
+                        {% if req.unlocked_leads %}
+                            <div class="row g-3">
+                                {% for quote in req.unlocked_leads %}
+                                <div class="col-md-6">
+                                    <div class="card border-0 bg-white shadow-sm rounded-3 h-100 border-start border-4 {% if quote.status == 'Interested' %}border-success{% elif quote.status == 'Not Interested' %}border-danger{% else %}border-warning{% endif %}">
+                                        <div class="card-body p-3">
+                                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                                <span class="fw-bold text-dark small"><i class="fa-solid fa-shop me-1 text-primary"></i> Shop ID: #{{ quote.shop_owner_id }}</span>
+                                                <h5 class="mb-0 text-success fw-bold">₹{{ quote.amount }}</h5>
+                                            </div>
+                                            
+                                            <p class="mb-2 text-muted small"><i class="fa-regular fa-clock me-1"></i> <strong>Time Needed:</strong> {{ quote.deadline }}</p>
+                                            
+                                            {% if quote.notes %}
+                                            <div class="bg-light p-2 rounded text-secondary small fst-italic mb-2 border">
+                                                "{{ quote.notes }}"
+                                            </div>
+                                            {% endif %}
+                                            
+                                            <div class="text-end mt-2">
+                                                {% if quote.status == 'Interested' %}
+                                                    <span class="badge bg-success bg-opacity-10 text-success border border-success"><i class="fa-solid fa-check me-1"></i> Interested</span>
+                                                {% elif quote.status == 'Not Interested' %}
+                                                    <span class="badge bg-danger bg-opacity-10 text-danger border border-danger"><i class="fa-solid fa-xmark me-1"></i> Not Interested</span>
+                                                {% else %}
+                                                    <span class="badge bg-warning bg-opacity-10 text-dark border border-warning"><i class="fa-solid fa-hourglass-half me-1"></i> Pending Reply</span>
+                                                {% endif %}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                {% endfor %}
                             </div>
-                        </form>
+                        {% else %}
+                            <div class="text-center py-3 bg-white rounded-3 border border-dashed">
+                                <p class="text-muted small mb-0"><i class="fa-solid fa-clock-rotate-left me-1"></i> Abhi tak kisi shop ne estimate nahi bheja hai. Please wait.</p>
+                            </div>
+                        {% endif %}
                     </div>
                 </div>
-            </div>
+
+                <div class="modal fade" id="editReqModal{{ req.id }}" tabindex="-1" aria-hidden="true">
+                    <div class="modal-dialog modal-dialog-centered">
+                        <div class="modal-content rounded-4 border-0 shadow-lg">
+                            <div class="modal-header border-0 bg-dark text-white">
+                                <h5 class="modal-title fw-bold"><i class="fa-solid fa-pen-to-square me-2"></i> Edit Requirement</h5>
+                                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <form action="{{ url_for('edit_requirement', req_id=req.id) }}" method="POST">
+                                <div class="modal-body p-4">
+                                    <div class="mb-3">
+                                        <label class="form-label small fw-bold">Category</label>
+                                        <input type="text" name="category" class="form-control bg-light" value="{{ req.category }}" required>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label small fw-bold">Budget (₹)</label>
+                                        <input type="number" name="budget" class="form-control bg-light" value="{{ req.budget }}" required>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label small fw-bold">Deadline</label>
+                                        <input type="text" name="deadline" class="form-control bg-light" value="{{ req.deadline }}" required>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label small fw-bold">Kaam ki Details</label>
+                                        <textarea name="description" class="form-control bg-light" rows="3" required>{{ req.description }}</textarea>
+                                    </div>
+                                </div>
+                                <div class="modal-footer border-0 p-4 pt-0">
+                                    <button type="submit" class="btn btn-primary w-100 rounded-pill py-2 fw-bold shadow-sm">Save Changes</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                {% endfor %}
+            {% else %}
+                <div class="text-center py-5 bg-white shadow-sm rounded-4 border">
+                    <i class="fa-solid fa-box-open fa-3x text-muted mb-3 opacity-50"></i>
+                    <h5 class="fw-bold text-secondary">Aapne abhi tak koi kaam post nahi kiya hai.</h5>
+                    <p class="text-muted small">Upar diye gaye form se apni pehli requirement post karein.</p>
+                </div>
+            {% endif %}
 
         </div>
-        {% endfor %}
-        {% endif %}
     </div>
 </div>
 {% endblock %}
