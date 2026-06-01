@@ -676,20 +676,7 @@ def submit_quotation(worker_id):
     return redirect(url_for('dashboard'))
 
 
-# 2. Status Update karne ka Route (Interested / Not Interested)
-@app.route('/update_quote_status/<int:quote_id>/<string:status_value>')
-@login_required
-def update_quote_status(quote_id, status_value):
-    quote = Quotation.query.get_or_404(quote_id)
-    
-    # Check ki sahi user change kar raha hai
-    if status_value in ['Interested', 'Not Interested']:
-        quote.status = status_value
-        db.session.commit()
-        flash(f"Status updated to {status_value}!", "success")
-        
-    return redirect(url_for('dashboard'))
-
+# Tikke rahega sirf ye ek route:
 @app.route('/update_quote_status/<int:req_id>/<string:status_value>')
 @login_required
 def update_quote_status(req_id, status_value):
