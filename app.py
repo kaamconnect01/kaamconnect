@@ -92,6 +92,18 @@ class PaymentRequest(db.Model):
     trx_id = db.Column(db.String(100), nullable=False)
     status = db.Column(db.String(20), default='Pending')
 
+class Quotation(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    shop_owner_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    worker_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=True) # Agar worker ko bhej rahe hain
+    job_id = db.Column(db.Integer, db.ForeignKey('job.id'), nullable=True)       # Agar kisi job post par bhej rahe hain
+    
+    amount = db.Column(db.Float, nullable=False)         # Estimate Amount
+    deadline = db.Column(db.String(100), nullable=False)   # Kam kitne din me hoga (e.g., "3 Days")
+    notes = db.Column(db.Text, nullable=True)            # Extra instructions/Notes
+    status = db.Column(db.String(20), default='Pending') # Pending, Interested, Not Interested
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
 @login_manager.user_loader
 def load_user(user_id):
     return User.query.get(int(user_id))
@@ -621,6 +633,47 @@ def get_unlock_cost(budget_str):
             return 200
     except:
         return 50  # Kisi bhi error ke case me minimum 50 credits safe rakhna
+
+# 1. Quotation Submit karne ka Route
+@app.route('/submit_quotation/<int:worker_id>', methods=['POST'])
+@login_required
+def submit_quotation(worker_id):
+    if current_user.role != 'shop_owner':
+        flash("Sirf Shop Owners hi quotation bhej sakte hain.", "danger")
+        return redirect(url_for('dashboard'))
+
+    amount = request.form.get('amount')
+    deadline = request.form.get('deadline')
+    notes = request.form.get('notes')
+
+    # Naya quotation record save karein
+    new_quote = Quotation(
+        shop_owner_id=current_user.id,
+        worker_id=worker_id,
+        amount=amount,
+        deadline=deadline,
+        notes=notes
+    )
+    db.session.add(new_quote)
+    db.session.commit()
+
+    flash("Quotation successfully submit ho gaya hai! User ko notify kar diya gaya hai.", "success")
+    return redirect(url_for('dashboard'))
+
+
+# 2. Status Update karne ka Route (Interested / Not Interested)
+@app.route('/update_quote_status/<int:quote_id>/<string:status_value>')
+@login_required
+def update_quote_status(quote_id, status_value):
+    quote = Quotation.query.get_or_404(quote_id)
+    
+    # Check ki sahi user change kar raha hai
+    if status_value in ['Interested', 'Not Interested']:
+        quote.status = status_value
+        db.session.commit()
+        flash(f"Status updated to {status_value}!", "success")
+        
+    return redirect(url_for('dashboard'))
 
 @app.before_request
 def make_session_permanent():
