@@ -46,6 +46,7 @@ class User(UserMixin, db.Model):
     is_available = db.Column(db.Boolean, default=True)
     last_deduction_month = db.Column(db.Integer, default=datetime.now().month)
     is_plan_active = db.Column(db.Boolean, default=True)
+    shop_name = db.Column(db.String(150), nullable=True)
 
     # CASCADES: Agar user delete ho, toh uska sab data delete ho jaye (500 error fix)
     requirements = db.relationship('Requirement', backref='customer_user', cascade='all, delete-orphan')
@@ -132,6 +133,9 @@ def signup():
         experience = request.form.get('experience')
         expertise = request.form.get('expertise')
         
+        # 🔥 YAHAN: Shop name form se get kiya hai
+        shop_name = request.form.get('shop_name')
+        
         # Safe Integer handling for per_day_amount (InvalidTextRepresentation Fix)
         per_day_raw = request.form.get('per_day_amount')
         per_day_amount = int(per_day_raw) if per_day_raw and per_day_raw.strip() else None
@@ -155,8 +159,9 @@ def signup():
             address=address,
             experience=experience,
             expertise=expertise,
+            shop_name=shop_name,        # 🔥 YAHAN: Naya user banate waqt shop_name save kiya hai
             per_day_amount=per_day_amount,
-            wallet_balance=50,           # 🔥 YAHAN 0 KO 50 KAR DIYA HAI
+            wallet_balance=50,          # 🔥 YAHAN 0 KO 50 KAR DIYA HAI
             is_available=True
         )
         
