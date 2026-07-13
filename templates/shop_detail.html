@@ -2,55 +2,75 @@
 {% block content %}
 <div class="container my-5">
     <div class="row justify-content-center">
-        <div class="col-md-9">
-            <!-- Main Shop Header Card -->
-            <div class="card shadow-sm border-0 bg-gradient p-4 mb-4 text-white" style="background: linear-gradient(135deg, #4f46e5, #06b6d4);">
-                <div class="d-flex flex-wrap align-items-center justify-content-between">
-                    <div>
-                        <span class="badge bg-white text-primary mb-2 fw-bold">VIP Verified Partner</span>
-                        <h2 class="fw-bold mb-1">{{ shop.address or 'Premium Shop' }}</h2>
-                        <p class="mb-0 opacity-75"><i class="bi bi-envelope"></i> {{ shop.email or 'No email provided' }}</p>
-                    </div>
-                    <div class="text-end mt-3 mt-md-0">
-                        <h4 class="fw-bold mb-0">⭐ {{ shop.experience or 'Expert' }}</h4>
-                        <small class="opacity-75">Market Experience</small>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Full Details Info Section -->
-            <div class="card shadow-sm border-0 p-4 mb-4">
-                <h4 class="fw-bold text-dark mb-4">📋 Business Profile</h4>
-                <div class="row g-3">
-                    <div class="col-sm-6">
-                        <label class="text-muted d-block small">Contact Number</label>
-                        <span class="fs-5 fw-semibold text-dark">{{ shop.mobile }}</span>
-                    </div>
-                    <div class="col-sm-6">
-                        <label class="text-muted d-block small">Work Category / Expertise</label>
-                        <span class="fs-5 fw-semibold text-dark text-capitalize">{{ shop.expertise or 'Not specified' }}</span>
+        <div class="col-lg-10">
+            
+            <div class="card shadow-lg border-0 rounded-4 mb-4 text-white overflow-hidden" style="background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 100%);">
+                <div class="card-body p-4 p-md-5">
+                    <div class="row align-items-center">
+                        <div class="col-md-8">
+                            <span class="badge bg-warning text-dark px-3 py-2 rounded-pill mb-3 fw-bold">⭐ VIP Verified Partner</span>
+                            
+                            <h1 class="fw-bold mb-2 text-white text-capitalize">{{ shop.shop_name or 'Premium Furniture Works' }}</h1>
+                            <h5 class="text-white-50 mb-3"><i class="bi bi-person-fill"></i> Managed by: <span class="text-light">{{ shop.name or 'Owner' }}</span></h5>
+                            
+                            <p class="mb-1 text-light"><i class="bi bi-envelope-at-fill text-warning me-2"></i> {{ shop.email or 'No email provided' }}</p>
+                            <p class="mb-0 text-light"><i class="bi bi-geo-alt-fill text-danger me-2"></i> {{ shop.address or 'Address not provided' }}</p>
+                        </div>
+                        <div class="col-md-4 text-md-end mt-4 mt-md-0 border-start-md border-secondary ps-md-4">
+                            <div class="bg-white bg-opacity-10 p-3 rounded-3 d-inline-block text-center w-100">
+                                <h2 class="fw-bold text-white mb-0">{{ shop.experience or '0' }}<span class="fs-5">+</span></h2>
+                                <span class="text-white-50 small text-uppercase letter-spacing-1">Years Experience</span>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
 
-            <!-- Photo Gallery Section -->
-            <div class="card shadow-sm border-0 p-4">
-                <h4 class="fw-bold text-dark mb-4">📸 Work Gallery / Photos</h4>
+            <div class="card shadow-sm border-0 rounded-4 p-4 p-md-5 mb-4">
+                <h4 class="fw-bold text-dark mb-4 border-bottom pb-3"><i class="bi bi-card-checklist text-primary me-2"></i> Business Profile</h4>
                 
-                <!-- Agar aapke paas database me shop ki photos ka array/list hai to loop chalao -->
+                <div class="row g-4">
+                    <div class="col-sm-6 col-md-4">
+                        <label class="text-muted d-block small mb-1">Contact Number</label>
+                        <div class="d-flex align-items-center">
+                            <i class="bi bi-telephone-fill text-success me-2 fs-5"></i>
+                            <span class="fs-5 fw-semibold text-dark">{{ shop.mobile }}</span>
+                        </div>
+                    </div>
+                    <div class="col-sm-6 col-md-4">
+                        <label class="text-muted d-block small mb-1">Work Category / Expertise</label>
+                        <div class="d-flex align-items-center">
+                            <i class="bi bi-tools text-primary me-2 fs-5"></i>
+                            <span class="fs-5 fw-semibold text-dark text-capitalize">{{ shop.expertise or 'General' }}</span>
+                        </div>
+                    </div>
+                    <div class="col-sm-6 col-md-4">
+                        <label class="text-muted d-block small mb-1">Status</label>
+                        <span class="badge bg-success bg-opacity-10 text-success border border-success px-3 py-2 rounded-pill">Available for Work</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card shadow-sm border-0 rounded-4 p-4 p-md-5">
+                <h4 class="fw-bold text-dark mb-4 border-bottom pb-3"><i class="bi bi-images text-primary me-2"></i> Work Gallery / Photos</h4>
+                
                 <div class="row g-3">
-                    <!-- Dummy placeholders jab tak aap sach me photo upload logic nahi banate -->
-                    <div class="col-6 col-md-4">
-                        <div class="ratio ratio-4x3 bg-light rounded d-flex align-items-center justify-content-center text-muted border text-center p-2">
-                            <span>No Work Photos Uploaded Yet</span>
+                    <div class="col-12">
+                        <div class="bg-light rounded-4 d-flex flex-column align-items-center justify-content-center text-muted border border-dashed text-center p-5">
+                            <i class="bi bi-camera text-secondary mb-3" style="font-size: 3rem; opacity: 0.5;"></i>
+                            <h5 class="text-dark fw-semibold">No Photos Uploaded Yet</h5>
+                            <p class="small mb-0">Shop owner will upload their work portfolio soon.</p>
                         </div>
                     </div>
                 </div>
             </div>
             
-            <div class="text-center mt-4">
-                <a href="{{ url_for('registered_shops') }}" class="btn btn-secondary rounded-pill px-4">← Back to All Shops</a>
+            <div class="text-center mt-5">
+                <a href="{{ url_for('registered_shops') }}" class="btn btn-outline-dark rounded-pill px-5 py-2 fw-bold">
+                    <i class="bi bi-arrow-left me-2"></i> Back to All Shops
+                </a>
             </div>
+
         </div>
     </div>
 </div>
