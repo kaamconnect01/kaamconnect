@@ -1,0 +1,57 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container my-5">
+    <div class="row justify-content-center">
+        <div class="col-md-9">
+            <!-- Main Shop Header Card -->
+            <div class="card shadow-sm border-0 bg-gradient p-4 mb-4 text-white" style="background: linear-gradient(135deg, #4f46e5, #06b6d4);">
+                <div class="d-flex flex-wrap align-items-center justify-content-between">
+                    <div>
+                        <span class="badge bg-white text-primary mb-2 fw-bold">VIP Verified Partner</span>
+                        <h2 class="fw-bold mb-1">{{ shop.address or 'Premium Shop' }}</h2>
+                        <p class="mb-0 opacity-75"><i class="bi bi-envelope"></i> {{ shop.email or 'No email provided' }}</p>
+                    </div>
+                    <div class="text-end mt-3 mt-md-0">
+                        <h4 class="fw-bold mb-0">⭐ {{ shop.experience or 'Expert' }}</h4>
+                        <small class="opacity-75">Market Experience</small>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Full Details Info Section -->
+            <div class="card shadow-sm border-0 p-4 mb-4">
+                <h4 class="fw-bold text-dark mb-4">📋 Business Profile</h4>
+                <div class="row g-3">
+                    <div class="col-sm-6">
+                        <label class="text-muted d-block small">Contact Number</label>
+                        <span class="fs-5 fw-semibold text-dark">{{ shop.mobile }}</span>
+                    </div>
+                    <div class="col-sm-6">
+                        <label class="text-muted d-block small">Work Category / Expertise</label>
+                        <span class="fs-5 fw-semibold text-dark text-capitalize">{{ shop.expertise or 'Not specified' }}</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Photo Gallery Section -->
+            <div class="card shadow-sm border-0 p-4">
+                <h4 class="fw-bold text-dark mb-4">📸 Work Gallery / Photos</h4>
+                
+                <!-- Agar aapke paas database me shop ki photos ka array/list hai to loop chalao -->
+                <div class="row g-3">
+                    <!-- Dummy placeholders jab tak aap sach me photo upload logic nahi banate -->
+                    <div class="col-6 col-md-4">
+                        <div class="ratio ratio-4x3 bg-light rounded d-flex align-items-center justify-content-center text-muted border text-center p-2">
+                            <span>No Work Photos Uploaded Yet</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="text-center mt-4">
+                <a href="{{ url_for('registered_shops') }}" class="btn btn-secondary rounded-pill px-4">← Back to All Shops</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
