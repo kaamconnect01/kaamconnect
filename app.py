@@ -722,6 +722,20 @@ def update_quote_status(req_id, status_value):
         
     return redirect(url_for('shop_dash'))
 
+@app.route('/shops')
+def registered_shops():
+    # Database se sirf un users ko nikalna jinka role 'shop_owner' ya 'shop' hai
+    # Agar aapne role ka naam kuch aur rakha hai, toh 'shop_owner' ki jagah wo likhein
+    shops = User.query.filter_by(role='shop_owner').all() 
+    return render_template('shops.html', shops=shops)
+
+@app.route('/shop/<int:shop_id>')
+def shop_detail(shop_id):
+    shop = User.query.get_or_404(shop_id)
+    # Agar aapke paas photos ka alag table hai (jaise ShopPhoto), toh use yahan load kar sakte hain:
+    # photos = ShopPhoto.query.filter_by(shop_owner_id=shop_id).all()
+    return render_template('shop_detail.html', shop=shop)
+
 @app.before_request
 def make_session_permanent():
     session.permanent = True
