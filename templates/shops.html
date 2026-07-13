@@ -1,41 +1,72 @@
 {% extends 'base.html' %}
 {% block content %}
 <div class="container my-5">
-    <h2 class="text-center mb-4 fw-bold text-primary">📍 Registered Shops & Portfolios</h2>
-    <p class="text-center text-muted mb-5">Find the best local furniture experts and technicians in Udaipur</p>
+    <h2 class="text-center mb-2 fw-bold text-primary">🏢 Registered Shops & Contractors</h2>
+    <p class="text-center text-muted mb-5">Browse top verified business profiles and furniture experts in Udaipur</p>
 
-    <div class="row g-4">
-        {% for shop in shops %}
-        <div class="col-md-4">
-            <!-- Colorful Border top decoration based on expertise -->
-            <div class="card h-100 shadow-sm border-0 border-top border-4 border-warning position-relative">
-                <div class="card-body p-4">
-                    <div class="d-flex align-items-center mb-3">
-                        <div class="bg-light p-3 rounded-circle me-3 text-warning fw-bold fs-4">
-                            {{ shop.expertise[0] | upper if shop.expertise else 'S' }}
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+            {% for shop in shops %}
+            <!-- Horizontal Long Card with colorful left border -->
+            <div class="card shadow-sm border-0 border-start border-4 border-primary mb-4 p-3 animate__animated animate__fadeInUp">
+                <div class="card-body">
+                    <div class="row align-items-center">
+                        
+                        <!-- Left side: Shop Icon & Main Details -->
+                        <div class="col-md-8">
+                            <div class="d-flex align-items-start">
+                                <div class="bg-light p-3 rounded text-primary me-3 d-none d-sm-block">
+                                    <i class="bi bi-patch-check-fill text-success fs-3"></i>
+                                </div>
+                                <div>
+                                    <!-- Dynamic Shop Name & Owner Name -->
+                                    <h4 class="fw-bold text-dark mb-1 text-capitalize">
+                                        {{ shop.shop_name if shop.shop_name else 'Premium Furniture Works' }}
+                                    </h4>
+                                    <p class="text-muted mb-2 small">
+                                        <i class="bi bi-person-fill"></i> Owner: {{ shop.address if shop.address else 'Verified Partner' }}
+                                    </p>
+                                    
+                                    <!-- Badges and Core Stats row -->
+                                    <div class="d-flex flex-wrap gap-2 my-2">
+                                        <span class="badge bg-soft-info text-primary px-3 py-2 rounded-pill bg-light border">
+                                            ⚙️ {{ shop.expertise or 'General Expert' }}
+                                        </span>
+                                        <span class="badge bg-soft-warning text-dark px-3 py-2 rounded-pill bg-light border">
+                                            ⏳ {{ shop.experience or '0' }} Years Exp.
+                                        </span>
+                                    </div>
+                                    
+                                    <!-- Full Address Details -->
+                                    <p class="text-secondary mb-0 mt-3 small">
+                                        <i class="bi bi-geo-alt-fill text-danger"></i> 
+                                        <strong>Address:</strong> {{ shop.email if shop.email else 'Udaipur, Rajasthan' }}
+                                    </p>
+                                </div>
+                            </div>
                         </div>
-                        <div>
-                            <h5 class="card-title mb-0 fw-bold text-dark">{{ shop.address or 'Local Expert' }}</h5>
-                            <small class="text-muted"><i class="bi bi-geo-alt-fill"></i> Udaipur</small>
+                        
+                        <!-- Right side: Quick Info & Explore Button -->
+                        <div class="col-md-4 text-md-end mt-3 mt-md-0 border-start-md ps-md-4">
+                            <div class="mb-3">
+                                <span class="text-muted d-block small">Status</span>
+                                <span class="badge bg-success text-white">Active Now</span>
+                            </div>
+                            <a href="{{ url_for('shop_detail', shop_id=shop.id) }}" class="btn btn-primary rounded-pill px-4 fw-bold w-100 w-md-auto">
+                                Explore More <i class="bi bi-arrow-right-short"></i>
+                            </a>
                         </div>
-                    </div>
-                    
-                    <hr class="text-muted opacity-25">
-                    
-                    <p class="mb-2"><strong>🛠️ Expertise:</strong> <span class="badge bg-info text-dark">{{ shop.expertise or 'General' }}</span></p>
-                    <p class="mb-3 text-secondary"><strong>⏳ Experience:</strong> {{ shop.experience or 'N/A' }}</p>
-                    
-                    <div class="d-grid mt-4">
-                        <a href="{{ url_for('shop_detail', shop_id=shop.id) }}" class="btn btn-outline-primary btn-sm rounded-pill fw-bold">Explore More →</a>
+                        
                     </div>
                 </div>
             </div>
+            {% else %}
+            <div class="text-center my-5 p-5 bg-white rounded shadow-sm">
+                <i class="bi bi-building-exclamation text-muted fs-1"></i>
+                <p class="text-muted fs-5 mt-3">Abhi tak koi dukan register nahi hui hai.</p>
+            </div>
+            {% endfor %}
         </div>
-        {% else %}
-        <div class="col-12 text-center my-5">
-            <p class="text-muted fs-5">Abhi tak koi dukan register nahi hui hai.</p>
-        </div>
-        {% endfor %}
     </div>
 </div>
 {% endblock %}
