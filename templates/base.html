@@ -23,14 +23,19 @@
         .desktop-nav-link { transition: all 0.2s ease-in-out; }
         .desktop-nav-link:hover { color: #ffc107 !important; transform: translateY(-1px); }
         
-        /* Mobile menu alignment fix */
-        @media (max-width: 991px) {
-            .navbar-collapse {
-                background-color: #212529; /* Dark bg for mobile menu */
-                padding: 15px;
-                border-radius: 8px;
-                margin-top: 10px;
-            }
+        /* Mobile Sidebar Custom Styling */
+        .offcanvas {
+            max-width: 80%; /* Screen ka 80% hissa cover karega */
+        }
+        .nav-link {
+            font-size: 1.1rem;
+            padding: 12px 20px !important;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+        
+        /* Desktop view par border hatane ke liye */
+        @media (min-width: 992px) {
+            .nav-link { border-bottom: none; font-size: 1rem; padding: 8px 16px !important; }
         }
     </style>
 </head>
@@ -39,8 +44,8 @@
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark sticky-top shadow-sm py-2">
         <div class="container d-flex align-items-center">
             
-            <!-- Mobile 3-line Button (Left side me set kiya gaya hai) -->
-            <button class="navbar-toggler me-3 border-0 shadow-none" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <!-- Mobile 3-line Button (Offcanvas Trigger) -->
+            <button class="navbar-toggler me-3 border-0 shadow-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#sidebarMenu" aria-controls="sidebarMenu" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
 
@@ -49,51 +54,69 @@
                 <i class="fa-solid fa-couch me-2 text-warning"></i>Kaamconnect
             </a>
 
-            <!-- Dropdown Menu (Mobile aur Desktop dono ke liye) -->
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav ms-auto align-items-lg-center gap-2 mt-3 mt-lg-0">
-                    <li class="nav-item">
-                        <a class="nav-link text-white-50 px-3 desktop-nav-link" href="{{ url_for('index') }}">Home</a>
-                    </li>
-                    
-                    <li class="nav-item">
-                        <a class="nav-link text-white px-3 desktop-nav-link fw-bold" href="{{ url_for('registered_shops') }}">🏢 Registered Shops</a>
-                    </li>
-                    
-                    {% if current_user.is_authenticated %}
+            <!-- 🔥 App-Style Left Sidebar (Offcanvas) -->
+            <div class="offcanvas offcanvas-start bg-dark text-white" tabindex="-1" id="sidebarMenu" aria-labelledby="sidebarMenuLabel">
+                
+                <!-- Sidebar Header (Sirf mobile me dikhega) -->
+                <div class="offcanvas-header border-bottom border-secondary d-lg-none py-3">
+                    <h5 class="offcanvas-title text-warning fw-bold d-flex align-items-center" id="sidebarMenuLabel">
+                        <i class="fa-solid fa-couch me-2"></i> Menu
+                    </h5>
+                    <!-- Close (X) Button -->
+                    <button type="button" class="btn-close btn-close-white shadow-none" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+                </div>
+
+                <!-- Sidebar Body (Menu Links) -->
+                <div class="offcanvas-body">
+                    <ul class="navbar-nav ms-auto align-items-lg-center gap-2 mt-2 mt-lg-0 w-100">
                         <li class="nav-item">
-                            <a class="nav-link text-white px-3 desktop-nav-link" href="
-                                {% if 'shop' in current_user.role|lower %}
-                                    {{ url_for('shop_dash') }}
-                                {% elif 'worker' in current_user.role|lower %}
-                                    {{ url_for('worker_dash') }}
-                                {% elif 'customer' in current_user.role|lower %}
-                                    {{ url_for('customer_dash') }}
-                                {% elif 'admin' in current_user.role|lower %}
-                                    {{ url_for('admin_dash') }}
-                                {% endif %}
-                            ">
-                                <i class="fa-solid fa-gauge me-1"></i> Dashboard
+                            <a class="nav-link text-white-50 desktop-nav-link" href="{{ url_for('index') }}">
+                                <i class="fa-solid fa-house me-2 d-lg-none"></i>Home
                             </a>
                         </li>
-                        <li class="nav-item mt-2 mt-lg-0">
-                            <a class="btn btn-danger btn-sm rounded-pill px-4 shadow-sm w-100 w-lg-auto" href="{{ url_for('logout') }}">
-                                <i class="fa-solid fa-right-from-bracket me-1"></i> Logout
+                        
+                        <li class="nav-item">
+                            <a class="nav-link text-white desktop-nav-link fw-bold" href="{{ url_for('registered_shops') }}">
+                                <i class="fa-solid fa-building me-2 d-lg-none"></i>🏢 Registered Shops
                             </a>
                         </li>
-                    {% else %}
-                        <li class="nav-item mt-2 mt-lg-0">
-                            <a class="btn btn-outline-light btn-sm rounded-pill px-4 me-lg-2 fw-bold w-100 w-lg-auto" href="{{ url_for('login') }}">
-                                <i class="fa-solid fa-right-to-bracket me-1"></i> Login
-                            </a>
-                        </li>
-                        <li class="nav-item mt-2 mt-lg-0">
-                            <a class="btn btn-primary btn-sm rounded-pill px-4 fw-bold shadow-sm w-100 w-lg-auto" href="{{ url_for('signup') }}">
-                                <i class="fa-solid fa-user-plus me-1"></i> Register
-                            </a>
-                        </li>
-                    {% endif %}
-                </ul>
+                        
+                        {% if current_user.is_authenticated %}
+                            <li class="nav-item">
+                                <a class="nav-link text-white desktop-nav-link" href="
+                                    {% if 'shop' in current_user.role|lower %}
+                                        {{ url_for('shop_dash') }}
+                                    {% elif 'worker' in current_user.role|lower %}
+                                        {{ url_for('worker_dash') }}
+                                    {% elif 'customer' in current_user.role|lower %}
+                                        {{ url_for('customer_dash') }}
+                                    {% elif 'admin' in current_user.role|lower %}
+                                        {{ url_for('admin_dash') }}
+                                    {% endif %}
+                                ">
+                                    <i class="fa-solid fa-gauge me-1"></i> Dashboard
+                                </a>
+                            </li>
+                            <!-- Mobile me button ko full width aur thoda margin diya hai -->
+                            <li class="nav-item mt-4 mt-lg-0 px-3 px-lg-0">
+                                <a class="btn btn-danger btn-sm rounded-pill px-4 shadow-sm w-100 w-lg-auto" href="{{ url_for('logout') }}">
+                                    <i class="fa-solid fa-right-from-bracket me-1"></i> Logout
+                                </a>
+                            </li>
+                        {% else %}
+                            <li class="nav-item mt-4 mt-lg-0 px-3 px-lg-0">
+                                <a class="btn btn-outline-light btn-sm rounded-pill px-4 me-lg-2 fw-bold w-100 w-lg-auto" href="{{ url_for('login') }}">
+                                    <i class="fa-solid fa-right-to-bracket me-1"></i> Login
+                                </a>
+                            </li>
+                            <li class="nav-item mt-3 mt-lg-0 px-3 px-lg-0">
+                                <a class="btn btn-primary btn-sm rounded-pill px-4 fw-bold shadow-sm w-100 w-lg-auto" href="{{ url_for('signup') }}">
+                                    <i class="fa-solid fa-user-plus me-1"></i> Register
+                                </a>
+                            </li>
+                        {% endif %}
+                    </ul>
+                </div>
             </div>
 
         </div>
