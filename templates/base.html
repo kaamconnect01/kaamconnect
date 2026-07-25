@@ -141,9 +141,19 @@
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
-    <!--Start of Tawk.to Script-->
+    <!-- Tawk.to Script Integration -->
 <script type="text/javascript">
-var Tawk_API=Tawk_API||{}, Tawk_LoadStart=new Date();
+var Tawk_API = Tawk_API || {}, Tawk_LoadStart = new Date();
+
+<!-- Agar user login hai, toh uska naam aur mobile automatic Tawk.to par chala jayega -->
+{% if current_user.is_authenticated %}
+Tawk_API.visitor = {
+    name: '{{ current_user.name }}',
+    email: '{{ current_user.email or "" }}',
+    phone: '{{ current_user.mobile }}'
+};
+{% endif %}
+
 (function(){
 var s1=document.createElement("script"),s0=document.getElementsByTagName("script")[0];
 s1.async=true;
@@ -153,7 +163,6 @@ s1.setAttribute('crossorigin','*');
 s0.parentNode.insertBefore(s1,s0);
 })();
 </script>
-<!--End of Tawk.to Script-->
     
 </body>
 </html>
