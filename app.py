@@ -48,7 +48,7 @@ class User(UserMixin, db.Model):
     last_deduction_month = db.Column(db.Integer, default=datetime.now().month)
     is_plan_active = db.Column(db.Boolean, default=True)
     shop_name = db.Column(db.String(150), nullable=True)
-    created_at = db.Column(db.DateTime, default=datetime.itcnow)
+    created_at = db.Column(db.DateTime, nullable=True)
 
     # CASCADES: Agar user delete ho, toh uska sab data delete ho jaye (500 error fix)
     requirements = db.relationship('Requirement', backref='customer_user', cascade='all, delete-orphan')
