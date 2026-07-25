@@ -3,6 +3,7 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
 from datetime import timedelta, datetime
+from zoneinfo import ZoneInfo
 import os
 
 app = Flask(__name__)
@@ -47,7 +48,7 @@ class User(UserMixin, db.Model):
     last_deduction_month = db.Column(db.Integer, default=datetime.now().month)
     is_plan_active = db.Column(db.Boolean, default=True)
     shop_name = db.Column(db.String(150), nullable=True)
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    created_at = db.Column(db.DateTime, default=datetime.itcnow)
 
     # CASCADES: Agar user delete ho, toh uska sab data delete ho jaye (500 error fix)
     requirements = db.relationship('Requirement', backref='customer_user', cascade='all, delete-orphan')
@@ -150,7 +151,10 @@ def signup():
         # Password ko securely hash karein
         hashed_password = generate_password_hash(password, method='scrypt')
         
-        # Naya user object create karein (with is_available=True)
+        # 🔥 Exact IST (Indian Standard Time) Current Time nikalne ke liye
+        ist_time = datetime.now(ZoneInfo("Asia/Kolkata"))
+        
+        # Naya user object create karein (with is_available=True and created_at)
         new_user = User(
             role=role,
             mobile=mobile,
@@ -163,7 +167,8 @@ def signup():
             shop_name=shop_name,        # 🔥 YAHAN: Naya user banate waqt shop_name save kiya hai
             per_day_amount=per_day_amount,
             wallet_balance=50,          # 🔥 YAHAN 0 KO 50 KAR DIYA HAI
-            is_available=True
+            is_available=True,
+            created_at=ist_time         # 🔥 YAHAN: Exact sahi India ka time save hoga!
         )
         
         db.session.add(new_user)
