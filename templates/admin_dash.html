@@ -78,6 +78,7 @@
       </div>
   </div>
 
+  <!-- SHOPS TAB -->
   <div class="tab-pane fade" id="shops">
       <div class="card border-0 shadow-sm p-3">
           <div class="table-responsive">
@@ -97,9 +98,11 @@
                           </td>
                           <td class="text-success fw-bold">₹{{ shop.wallet_balance }}</td>
                           <td>
-                              <button class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#editModal{{ shop.id }}"><i class="fa-solid fa-pen"></i></button>
+                              <!-- VIEW BUTTON -->
+                              <button class="btn btn-sm btn-outline-info" data-bs-toggle="modal" data-bs-target="#viewModal{{ shop.id }}" title="View Details"><i class="fa-solid fa-eye"></i></button>
+                              <button class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#editModal{{ shop.id }}" title="Edit"><i class="fa-solid fa-pen"></i></button>
                               <form action="{{ url_for('delete_user', user_id=shop.id) }}" method="POST" class="d-inline" onsubmit="return confirm('WARNING: This will delete ALL data related to this shop. Continue?');">
-                                  <button type="submit" class="btn btn-sm btn-outline-danger"><i class="fa-solid fa-trash"></i></button>
+                                  <button type="submit" class="btn btn-sm btn-outline-danger" title="Delete"><i class="fa-solid fa-trash"></i></button>
                               </form>
                           </td>
                       </tr>
@@ -110,6 +113,7 @@
       </div>
   </div>
 
+  <!-- WORKERS TAB -->
   <div class="tab-pane fade" id="workers">
        <div class="card border-0 shadow-sm p-3">
           <div class="table-responsive">
@@ -128,9 +132,11 @@
                               {% endif %}
                           </td>
                           <td>
-                              <button class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#editWorkerModal{{ worker.id }}"><i class="fa-solid fa-pen"></i></button>
+                              <!-- VIEW BUTTON -->
+                              <button class="btn btn-sm btn-outline-info" data-bs-toggle="modal" data-bs-target="#viewModal{{ worker.id }}" title="View Details"><i class="fa-solid fa-eye"></i></button>
+                              <button class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#editWorkerModal{{ worker.id }}" title="Edit"><i class="fa-solid fa-pen"></i></button>
                               <form action="{{ url_for('delete_user', user_id=worker.id) }}" method="POST" class="d-inline" onsubmit="return confirm('Delete worker?');">
-                                  <button type="submit" class="btn btn-sm btn-outline-danger"><i class="fa-solid fa-trash"></i></button>
+                                  <button type="submit" class="btn btn-sm btn-outline-danger" title="Delete"><i class="fa-solid fa-trash"></i></button>
                               </form>
                           </td>
                       </tr>
@@ -141,6 +147,7 @@
       </div>
   </div>
 
+  <!-- CUSTOMERS TAB -->
   <div class="tab-pane fade" id="customers-panel" role="tabpanel" aria-labelledby="customers-tab">
     <div class="card border-0 shadow-sm rounded-4 mt-3">
         <div class="card-body p-4">
@@ -181,6 +188,10 @@
                                 </span>
                             </td>
                             <td class="text-end">
+                                <!-- VIEW BUTTON -->
+                                <button class="btn btn-sm btn-outline-info rounded-pill me-1 shadow-sm" data-bs-toggle="modal" data-bs-target="#viewModal{{ customer.id }}">
+                                    <i class="fa-solid fa-eye"></i> View
+                                </button>
                                 <button class="btn btn-sm btn-outline-primary rounded-pill me-1 shadow-sm" data-bs-toggle="modal" data-bs-target="#editCustomerModal{{ customer.id }}">
                                     <i class="fa-solid fa-pen-to-square"></i> Edit
                                 </button>
@@ -207,11 +218,12 @@
     </div>
   </div>
 
+  <!-- DATABASE TAB -->
   <div class="tab-pane fade" id="alldata">
       <div class="card border-0 shadow-sm p-3">
           <div class="table-responsive">
               <table class="table table-sm text-center align-middle" style="font-size: 14px;">
-                  <thead class="table-dark"><tr><th>ID</th><th>Role</th><th>Name</th><th>Mobile</th><th>Joined Date</th></tr></thead>
+                  <thead class="table-dark"><tr><th>ID</th><th>Role</th><th>Name</th><th>Mobile</th><th>Joined Date</th><th>Action</th></tr></thead>
                   <tbody>
                       {% for user in all_users %}
                       <tr>
@@ -226,6 +238,9 @@
                                   <span class="text-muted">N/A</span>
                               {% endif %}
                           </td>
+                          <td>
+                              <button class="btn btn-sm btn-outline-info" data-bs-toggle="modal" data-bs-target="#viewModal{{ user.id }}"><i class="fa-solid fa-eye"></i></button>
+                          </td>
                       </tr>
                       {% endfor %}
                   </tbody>
@@ -235,6 +250,89 @@
   </div>
 </div>
 
+<!-- ================= VIEW DETAILS MODALS (For All Users) ================= -->
+{% set all_view_users = shop_owners + workers + customers %}
+{% for user in all_view_users %}
+<div class="modal fade" id="viewModal{{ user.id }}" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow rounded-4">
+            <div class="modal-header bg-light border-0">
+                <h5 class="modal-title fw-bold text-dark"><i class="fa-solid fa-user-shield text-primary me-2"></i> User Full Details</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body p-4">
+                <div class="text-center mb-3">
+                    <span class="badge bg-primary px-3 py-2 rounded-pill text-uppercase mb-2">{{ user.role }}</span>
+                    <h4 class="fw-bold text-dark mb-0">{{ user.name }}</h4>
+                    <small class="text-muted">User ID: #{{ user.id }}</small>
+                </div>
+                
+                <hr class="text-muted opacity-25">
+
+                <div class="row g-3">
+                    <div class="col-6">
+                        <span class="small text-muted d-block">Mobile Number</span>
+                        <strong class="text-dark"><i class="fa-solid fa-phone text-secondary me-1"></i>{{ user.mobile }}</strong>
+                    </div>
+                    <div class="col-6">
+                        <span class="small text-muted d-block">Email Address</span>
+                        <strong class="text-dark"><i class="fa-solid fa-envelope text-secondary me-1"></i>{{ user.email or 'Not Provided' }}</strong>
+                    </div>
+
+                    <div class="col-12">
+                        <span class="small text-muted d-block">Address / Location</span>
+                        <strong class="text-dark"><i class="fa-solid fa-location-dot text-secondary me-1"></i>{{ user.address or 'Not Provided' }}</strong>
+                    </div>
+
+                    {% if user.role == 'shop_owner' %}
+                    <div class="col-6">
+                        <span class="small text-muted d-block">Shop Name</span>
+                        <strong class="text-dark"><i class="fa-solid fa-shop text-secondary me-1"></i>{{ user.shop_name or 'Not Provided' }}</strong>
+                    </div>
+                    <div class="col-6">
+                        <span class="small text-muted d-block">Wallet Balance</span>
+                        <strong class="text-success"><i class="fa-solid fa-wallet me-1"></i>₹{{ user.wallet_balance }}</strong>
+                    </div>
+                    {% endif %}
+
+                    {% if user.role == 'worker' %}
+                    <div class="col-6">
+                        <span class="small text-muted d-block">Experience</span>
+                        <strong class="text-dark"><i class="fa-solid fa-briefcase text-secondary me-1"></i>{{ user.experience or 'Not Provided' }}</strong>
+                    </div>
+                    <div class="col-6">
+                        <span class="small text-muted d-block">Expertise / Skills</span>
+                        <strong class="text-dark"><i class="fa-solid fa-tools text-secondary me-1"></i>{{ user.expertise or 'Not Provided' }}</strong>
+                    </div>
+                    {% if user.per_day_amount %}
+                    <div class="col-6">
+                        <span class="small text-muted d-block">Per Day Charges</span>
+                        <strong class="text-success">₹{{ user.per_day_amount }}</strong>
+                    </div>
+                    {% endif %}
+                    {% endif %}
+
+                    <div class="col-12">
+                        <span class="small text-muted d-block">Signup Date & Time</span>
+                        <strong class="text-dark">
+                            {% if user.created_at %}
+                                {{ user.created_at.strftime('%d %b %Y, %I:%M %p') }}
+                            {% else %}
+                                N/A (Old User)
+                            {% endif %}
+                        </strong>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer border-0 bg-light rounded-bottom-4">
+                <button type="button" class="btn btn-secondary rounded-pill px-4" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endfor %}
+
+<!-- EDIT SHOPS MODAL -->
 {% for shop in shop_owners %}
 <div class="modal fade" id="editModal{{ shop.id }}" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
@@ -269,6 +367,7 @@
 </div>
 {% endfor %}
 
+<!-- EDIT WORKERS MODAL -->
 {% for worker in workers %}
 <div class="modal fade" id="editWorkerModal{{ worker.id }}" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
@@ -297,6 +396,7 @@
 </div>
 {% endfor %}
 
+<!-- EDIT CUSTOMERS MODAL -->
 {% for customer in customers %}
 <div class="modal fade text-start" id="editCustomerModal{{ customer.id }}" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
