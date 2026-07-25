@@ -151,8 +151,8 @@ def signup():
         # Password ko securely hash karein
         hashed_password = generate_password_hash(password, method='scrypt')
         
-        # 🔥 Exact IST (Indian Standard Time) Current Time nikalne ke liye
-        ist_time = datetime.now(ZoneInfo("Asia/Kolkata"))
+        # 🔥 FIX: Exact IST time nikal kar timezone info hata di, taaki DB me galat time save na ho
+        ist_time = datetime.now(ZoneInfo("Asia/Kolkata")).replace(tzinfo=None)
         
         # Naya user object create karein (with is_available=True and created_at)
         new_user = User(
