@@ -868,5 +868,16 @@ def make_session_permanent():
 with app.app_context():
     db.create_all()
 
+# --- Emergency Reset Code ---
+    reset_pass = os.environ.get('RESET_ADMIN_PASS')
+    reset_mobile = os.environ.get('RESET_ADMIN_MOBILE')
+    if reset_pass and reset_mobile:
+        admin = User.query.filter_by(role='admin').first()
+        if admin:
+            admin.mobile = reset_mobile
+            admin.password = generate_password_hash(reset_pass, method='scrypt')
+            db.session.commit()
+            print("⚡ ADMIN CREDENTIALS RESET SUCCESSFULLY VIA ENV VAR ⚡")
+
 if __name__ == '__main__':
     app.run(debug=False)
