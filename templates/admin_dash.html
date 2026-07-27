@@ -17,13 +17,16 @@
   <li class="nav-item">
       <button class="nav-link rounded-pill fw-bold" data-bs-toggle="tab" data-bs-target="#workers">Workers</button>
   </li>
-  
   <li class="nav-item">
       <button class="nav-link rounded-pill fw-bold" data-bs-toggle="tab" data-bs-target="#customers-panel">
           <i class="fa-solid fa-users me-1"></i> Customers
       </button>
   </li>
-  
+  <li class="nav-item">
+      <button class="nav-link rounded-pill fw-bold text-success" data-bs-toggle="tab" data-bs-target="#broadcast-panel">
+          <i class="fa-solid fa-bullhorn me-1"></i> Broadcast Mail
+      </button>
+  </li>
   <li class="nav-item">
       <button class="nav-link rounded-pill fw-bold text-danger" data-bs-toggle="tab" data-bs-target="#alldata">Database</button>
   </li>
@@ -216,6 +219,43 @@
             </div>
         </div>
     </div>
+  </div>
+
+  <!-- BROADCAST MAIL TAB (NEWLY ADDED) -->
+  <div class="tab-pane fade" id="broadcast-panel">
+      <div class="card border-0 shadow-sm p-4 rounded-4 mt-3">
+          <h5 class="fw-bold mb-3 text-dark"><i class="fa-solid fa-bullhorn text-success me-2"></i> Send Broadcast Notice / Mail with Attachments</h5>
+          <form action="{{ url_for('admin_send_broadcast') }}" method="POST" enctype="multipart/form-data">
+              
+              <div class="mb-3">
+                  <label class="form-label fw-bold text-muted">Target Audience (Kisko bhejna hai?):</label>
+                  <select name="target_role" class="form-control" required>
+                      <option value="all">Sare Users ko (All Users - Customers, Shop Owners, Workers)</option>
+                      <option value="shop_owner">Sirf Shop Owners ko</option>
+                      <option value="customer">Sirf Customers ko</option>
+                      <option value="worker">Sirf Workers ko</option>
+                  </select>
+              </div>
+              
+              <div class="mb-3">
+                  <label class="form-label fw-bold text-muted">Email Subject (Mail ka Title):</label>
+                  <input type="text" name="subject" class="form-control" placeholder="Jaise: 🚀 Exciting Update & New Features on Kaamconnect" required>
+              </div>
+              
+              <div class="mb-3">
+                  <label class="form-label fw-bold text-muted">Message / Notice (Aap kya likhna chahte hain?):</label>
+                  <textarea name="message" class="form-control" rows="6" placeholder="Yahan aap poora message, rules, offers ya notice detail mein likhein..." required></textarea>
+              </div>
+
+              <div class="mb-3">
+                  <label class="form-label fw-bold text-muted">Attach File (Optional - PDF, Image, Doc):</label>
+                  <input type="file" name="attachment" class="form-control">
+                  <small class="text-muted">Aap koi bhi poster, banner ya PDF file attach kar sakte hain.</small>
+              </div>
+              
+              <button type="submit" class="btn btn-success rounded-pill px-4 py-2 fw-bold">🚀 Send Broadcast Mail Now</button>
+          </form>
+      </div>
   </div>
 
   <!-- DATABASE TAB -->
