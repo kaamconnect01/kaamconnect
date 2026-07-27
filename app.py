@@ -234,7 +234,7 @@ def customer_dash():
         db.session.add(new_req)
         db.session.commit()
 
-        # Email Notification Logic via Brevo SMTP
+        # Email Notification Logic via Brevo SMTP (Safe with timeout=5 so it never crashes server)
         try:
             shop_owners = User.query.filter_by(role='shop_owner', is_available=True).all()
             recipient_emails = [shop.email for shop in shop_owners if shop.email]
@@ -265,13 +265,13 @@ def customer_dash():
                     msg['Subject'] = subject
                     msg.attach(MIMEText(body, 'html'))
 
-                    # Brevo SMTP Connection Details
-                    with smtplib.SMTP('smtp-relay.brevo.com', 587) as server:
+                    # Brevo SMTP Connection Details with timeout
+                    with smtplib.SMTP('smtp-relay.brevo.com', 587, timeout=5) as server:
                         server.starttls()
                         server.login(sender_email, sender_password)
                         server.sendmail(sender_email, recipient_emails, msg.as_string())
         except Exception as e:
-            print(f"Email bhejne me error: {e}")
+            print(f"Email bhejne me error (Aage ka process jaari hai): {e}")
 
         flash('Requirement published successfully!', 'success')
         return redirect(url_for('customer_dash'))
@@ -368,7 +368,7 @@ def unlock_lead(req_id):
         
     already_unlocked = UnlockedLead.query.filter_by(shop_owner_id=current_user.id, requirement_id=req.id).first()
     if already_unlocked:
-        flash('Yeh lead aapne pehle se hi unlock ki hui hai!', 'info')
+        flash('Yeh lead aapne pehle से hi unlock ki hui hai!', 'info')
         return redirect(url_for('shop_dash'))
 
     if current_user.wallet_balance >= credit_cost:
