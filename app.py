@@ -234,44 +234,51 @@ def customer_dash():
         db.session.add(new_req)
         db.session.commit()
 
-        # Email Notification Logic via Brevo SMTP (Safe with timeout=5 so it never crashes server)
+        # Email Notification Logic via Brevo HTTP API (Bypasses Render's SMTP port blocking)
         try:
             shop_owners = User.query.filter_by(role='shop_owner', is_available=True).all()
             recipient_emails = [shop.email for shop in shop_owners if shop.email]
 
             if recipient_emails:
-                sender_email = os.environ.get('MAIL_USERNAME')
-                sender_password = os.environ.get('MAIL_PASSWORD')
+                api_key = os.environ.get('BREVO_API_KEY')
+                sender_email = os.environ.get('MAIL_USERNAME', 'no-reply@kaamconnect.com')
                 
-                if sender_email and sender_password:
-                    subject = "🚨 Naya Kaam Aaya Hai! (Urgent)"
-                    body = f"""
-                    <html>
-                        <body>
-                            <h2 style="color: #d9534f;">Nayi Requirement Aayi Hai!</h2>
-                            <p>Kaamconnect par ek naya customer kaam lekar aaya hai.</p>
-                            <ul>
-                                <li><b>Category:</b> {new_req.category}</li>
-                                <li><b>Budget:</b> ₹{new_req.budget}</li>
-                            </ul>
-                            <p><b>Note:</b> Sirf pehle 3-4 log hi ise unlock kar sakte hain. Jaldi se apna dashboard check karein!</p>
-                            <a href="https://kaamconnect.com/shop/dashboard" style="background-color: #0275d8; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px;">Kaam Unlock Karein</a>
-                        </body>
-                    </html>
-                    """
-                    
-                    msg = MIMEMultipart()
-                    msg['From'] = f"Kaamconnect <{sender_email}>"
-                    msg['Subject'] = subject
-                    msg.attach(MIMEText(body, 'html'))
+                if api_key and sender_email:
+                    import urllib.request
+                    import json
 
-                    # Brevo SMTP Connection Details with timeout
-                    with smtplib.SMTP('smtp-relay.brevo.com', 587, timeout=5) as server:
-                        server.starttls()
-                        server.login(sender_email, sender_password)
-                        server.sendmail(sender_email, recipient_emails, msg.as_string())
+                    url = "https://api.brevo.com/v3/smtp/email"
+                    payload = {
+                        "sender": {"name": "Kaamconnect", "email": sender_email},
+                        "to": [{"email": email} for email in recipient_emails],
+                        "subject": "🚨 Naya Kaam Aaya Hai! (Urgent)",
+                        "htmlContent": f"""
+                        <html>
+                            <body>
+                                <h2 style="color: #d9534f;">Nayi Requirement Aayi Hai!</h2>
+                                <p>Kaamconnect par ek naya customer kaam lekar aaya hai.</p>
+                                <ul>
+                                    <li><b>Category:</b> {new_req.category}</li>
+                                    <li><b>Budget:</b> ₹{new_req.budget}</li>
+                                </ul>
+                                <p><b>Note:</b> Sirf pehle 3-4 log hi ise unlock kar sakte hain. Jaldi se apna dashboard check karein!</p>
+                                <a href="https://kaamconnect.com/shop/dashboard" style="background-color: #0275d8; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px;">Kaam Unlock Karein</a>
+                            </body>
+                        </html>
+                        """
+                    }
+                    headers = {
+                        "accept": "application/json",
+                        "api-key": api_key,
+                        "content-type": "application/json"
+                    }
+                    
+                    req_data = json.dumps(payload).encode('utf-8')
+                    req_obj = urllib.request.Request(url, data=req_data, headers=headers, method='POST')
+                    with urllib.request.urlopen(req_obj, timeout=5) as response:
+                        print("Email sent successfully via Brevo HTTP API")
         except Exception as e:
-            print(f"Email bhejne me error (Aage ka process jaari hai): {e}")
+            print(f"Email bhejne me error: {e}")
 
         flash('Requirement published successfully!', 'success')
         return redirect(url_for('customer_dash'))
