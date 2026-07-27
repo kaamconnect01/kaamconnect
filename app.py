@@ -823,6 +823,10 @@ def admin_send_broadcast():
         
     return redirect(url_for('admin_dash'))
 
+@app.route('/terms')
+def terms():
+    return render_template('terms.html')
+
 @app.route('/shops')
 def registered_shops():
     shops = User.query.filter_by(role='shop_owner').all() 
