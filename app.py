@@ -682,6 +682,87 @@ def update_quote_status(req_id, status_value):
         
     return redirect(url_for('shop_dash'))
 
+@app.route('/admin/send_broadcast', methods=['POST'])
+@login_required
+def admin_send_broadcast():
+    if current_user.role != 'admin':
+        return "Unauthorized", 403
+        
+    target_role = request.form.get('target_role') # 'all', 'shop_owner', 'customer', 'worker'
+    subject = request.form.get('subject')
+    message_body = request.form.get('message')
+    
+    # File Attachment Handling (Base64 encoding for Brevo API)
+    import base64
+    attachments_list = []
+    uploaded_file = request.files.get('attachment')
+    if uploaded_file and uploaded_file.filename:
+        file_bytes = uploaded_file.read()
+        encoded_file = base64.b64encode(file_bytes).decode('utf-8')
+        attachments_list.append({
+            "content": encoded_file,
+            "name": uploaded_file.filename
+        })
+
+    # Users filter karna target role ke hisaab se
+    if target_role == 'all':
+        users = User.query.filter(User.email != None).all()
+    else:
+        users = User.query.filter_by(role=target_role).filter(User.email != None).all()
+        
+    recipient_emails = [u.email for u in users if u.email]
+    
+    if recipient_emails:
+        try:
+            api_key = os.environ.get('BREVO_API_KEY')
+            sender_email = os.environ.get('MAIL_USERNAME', 'no-reply@kaamconnect.com')
+            
+            if api_key and sender_email:
+                import urllib.request
+                import json
+
+                url = "https://api.brevo.com/v3/smtp/email"
+                payload = {
+                    "sender": {"name": "Kaamconnect Admin", "email": sender_email},
+                    "to": [{"email": email} for email in recipient_emails],
+                    "subject": subject,
+                    "htmlContent": f"""
+                    <html>
+                        <body>
+                            <div style="font-family: Arial, sans-serif; padding: 20px; border: 1px solid #ddd; border-radius: 5px;">
+                                <h2 style="color: #0275d8;">📢 Important Notice from Kaamconnect</h2>
+                                <p>{message_body.replace(chr(10), '<br>')}</p>
+                                <hr style="border: none; border-top: 1px solid #eee; margin: 20px 0;">
+                                <p style="font-size: 12px; color: #777;">Aapko yeh email Kaamconnect Admin ki taraf se bheja gaya hai.</p>
+                            </div>
+                        </body>
+                    </html>
+                    """
+                }
+                
+                # Agar file attach ki gayi hai toh payload mein add kar do
+                if attachments_list:
+                    payload["attachment"] = attachments_list
+
+                headers = {
+                    "accept": "application/json",
+                    "api-key": api_key,
+                    "content-type": "application/json"
+                }
+                
+                req_data = json.dumps(payload).encode('utf-8')
+                req_obj = urllib.request.Request(url, data=req_data, headers=headers, method='POST')
+                
+                # Timeout 15 seconds rakha hai taki badi file hone par bhi error na aaye
+                with urllib.request.urlopen(req_obj, timeout=15) as response:
+                    flash(f'Broadcast email successfully {len(recipient_emails)} logo ko bhej di gayi hai!', 'success')
+        except Exception as e:
+            flash(f'Email bhejne mein error aaya: {e}', 'danger')
+    else:
+        flash('Is category mein koi valid email address nahi mila.', 'warning')
+        
+    return redirect(url_for('admin_dash'))
+
 @app.route('/shops')
 def registered_shops():
     shops = User.query.filter_by(role='shop_owner').all() 
