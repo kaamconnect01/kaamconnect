@@ -136,6 +136,63 @@ def get_unlock_cost(budget_str):
     except:
         return 50
 
+# ================= ADMIN NOTIFICATION FUNCTION =================
+def notify_admin_new_user(user):
+    try:
+        api_key = os.environ.get('BREVO_API_KEY')
+        admin_email = os.environ.get('ADMIN_EMAIL') or os.environ.get('MAIL_USERNAME')
+        sender_email = os.environ.get('MAIL_USERNAME', 'no-reply@kaamconnect.com')
+        
+        if api_key and admin_email:
+            import urllib.request
+            import json
+
+            url = "https://api.brevo.com/v3/smtp/email"
+            
+            # Role ke hisaab se extra details format karna
+            extra_info = ""
+            if user.role == 'shop_owner':
+                extra_info = f"<li><b>Shop Name:</b> {getattr(user, 'shop_name', 'N/A')}</li>"
+            elif user.role == 'worker':
+                extra_info = f"<li><b>Expertise/Skills:</b> {getattr(user, 'expertise', 'N/A')}</li>"
+
+            payload = {
+                "sender": {"name": "Kaamconnect System", "email": sender_email},
+                "to": [{"email": admin_email}],
+                "subject": f"🚨 Naya User Signup Hua Hai! ({user.role.upper()})",
+                "htmlContent": f"""
+                <html>
+                    <body>
+                        <div style="font-family: Arial, sans-serif; padding: 20px; border: 1px solid #ddd; border-radius: 5px;">
+                            <h2 style="color: #28a745;">🎉 Naya User Register Hua Hai!</h2>
+                            <p>Kaamconnect par ek naya user judaa hai. Details niche di gayi hain:</p>
+                            <ul>
+                                <li><b>Role:</b> <span style="color: #007bff; text-transform: uppercase;">{user.role}</span></li>
+                                <li><b>Name:</b> {user.name}</li>
+                                <li><b>Mobile Number:</b> {user.mobile}</li>
+                                <li><b>Email Address:</b> {user.email or 'N/A'}</li>
+                                <li><b>Address:</b> {getattr(user, 'address', 'N/A')}</li>
+                                {extra_info}
+                            </ul>
+                            <p style="font-size: 12px; color: #777; margin-top: 20px;">Yeh Kaamconnect automated notification system hai.</p>
+                        </div>
+                    </body>
+                </html>
+                """
+            }
+            headers = {
+                "accept": "application/json",
+                "api-key": api_key,
+                "content-type": "application/json"
+            }
+            
+            req_data = json.dumps(payload).encode('utf-8')
+            req_obj = urllib.request.Request(url, data=req_data, headers=headers, method='POST')
+            with urllib.request.urlopen(req_obj, timeout=5) as response:
+                print("Admin ko new user notification mail chali gayi hai.")
+    except Exception as e:
+        print(f"Admin notification mail bhejne me error: {e}")
+
 # ================= ROUTES =================
 @app.route('/')
 def index():
@@ -174,6 +231,9 @@ def signup():
         
         db.session.add(new_user)
         db.session.commit()
+        
+        # 👉 Admin ko naye user ki notification email bhejne ke liye function call
+        notify_admin_new_user(new_user)
         
         login_user(new_user)
 
@@ -375,7 +435,7 @@ def unlock_lead(req_id):
         
     already_unlocked = UnlockedLead.query.filter_by(shop_owner_id=current_user.id, requirement_id=req.id).first()
     if already_unlocked:
-        flash('Yeh lead aapne pehle से hi unlock ki hui hai!', 'info')
+        flash('Yeh lead aapne pehle se hi unlock ki hui hai!', 'info')
         return redirect(url_for('shop_dash'))
 
     if current_user.wallet_balance >= credit_cost:
@@ -762,63 +822,6 @@ def admin_send_broadcast():
         flash('Is category mein koi valid email address nahi mila.', 'warning')
         
     return redirect(url_for('admin_dash'))
-
-def notify_admin_new_user(user):
-    try:
-        api_key = os.environ.get('BREVO_API_KEY')
-        # Admin email wahi hoga jo MAIL_USERNAME hai ya aap alag se environment variable bhi bana sakte hain
-        admin_email = os.environ.get('ADMIN_EMAIL') or os.environ.get('MAIL_USERNAME')
-        sender_email = os.environ.get('MAIL_USERNAME', 'no-reply@kaamconnect.com')
-        
-        if api_key and admin_email:
-            import urllib.request
-            import json
-
-            url = "https://api.brevo.com/v3/smtp/email"
-            
-            # Role ke hisaab se extra details format karna
-            extra_info = ""
-            if user.role == 'shop_owner':
-                extra_info = f"<li><b>Shop Name:</b> {getattr(user, 'shop_name', 'N/A')}</li>"
-            elif user.role == 'worker':
-                extra_info = f"<li><b>Expertise/Skills:</b> {getattr(user, 'expertise', 'N/A')}</li>"
-
-            payload = {
-                "sender": {"name": "Kaamconnect System", "email": sender_email},
-                "to": [{"email": admin_email}],
-                "subject": f"🚨 Naya User Signup Hua Hai! ({user.role.upper()})",
-                "htmlContent": f"""
-                <html>
-                    <body>
-                        <div style="font-family: Arial, sans-serif; padding: 20px; border: 1px solid #ddd; border-radius: 5px;">
-                            <h2 style="color: #28a745;">🎉 Naya User Register Hua Hai!</h2>
-                            <p>Kaamconnect par ek naya user judaa hai. Details niche di gayi hain:</p>
-                            <ul>
-                                <li><b>Role:</b> <span style="color: #007bff; text-transform: uppercase;">{user.role}</span></li>
-                                <li><b>Name:</b> {user.name}</li>
-                                <li><b>Mobile Number:</b> {user.mobile}</li>
-                                <li><b>Email Address:</b> {user.email or 'N/A'}</li>
-                                <li><b>Address:</b> {getattr(user, 'address', 'N/A')}</li>
-                                {extra_info}
-                            </ul>
-                            <p style="font-size: 12px; color: #777; margin-top: 20px;">Yeh Kaamconnect automated notification system hai.</p>
-                        </div>
-                    </body>
-                </html>
-                """
-            }
-            headers = {
-                "accept": "application/json",
-                "api-key": api_key,
-                "content-type": "application/json"
-            }
-            
-            req_data = json.dumps(payload).encode('utf-8')
-            req_obj = urllib.request.Request(url, data=req_data, headers=headers, method='POST')
-            with urllib.request.urlopen(req_obj, timeout=5) as response:
-                print("Admin ko new user notification mail chali gayi hai.")
-    except Exception as e:
-        print(f"Admin notification mail bhejne me error: {e}")
 
 @app.route('/shops')
 def registered_shops():
