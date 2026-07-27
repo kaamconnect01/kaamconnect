@@ -6,17 +6,12 @@ from datetime import timedelta, datetime
 from zoneinfo import ZoneInfo
 import os
 
-# Brevo SMTP & Email Sending Imports
-import smtplib
-from email.mime.text import MIMEText
-from email.mime.multipart import MIMEMultipart
-
 app = Flask(__name__)
-app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'super_secret_key_for_local')
-app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(hours=8)
-app.config['REMEMBER_COOKIE_DURATION'] = timedelta(hours=8)
+app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'super_secret_key_for_local_kaamconnect')
+app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(days=30)
+app.config['REMEMBER_COOKIE_DURATION'] = timedelta(days=30)
 
-# DB Connection & SSL Drop Fix
+# DB Connection & SSL Fix
 db_url = os.environ.get('DATABASE_URL', 'sqlite:///portal.db')
 if db_url.startswith("postgres://"):
     db_url = db_url.replace("postgres://", "postgresql://", 1)
@@ -26,8 +21,6 @@ app.config['SQLALCHEMY_ENGINE_OPTIONS'] = {
     "pool_pre_ping": True,
     "pool_recycle": 300,
 }
-# Auto-Logout Fix (Session lasts 30 days)
-app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(days=30)
 
 db = SQLAlchemy(app)
 
@@ -44,9 +37,9 @@ class User(UserMixin, db.Model):
     mobile = db.Column(db.String(15), unique=True, nullable=False)
     password = db.Column(db.String(200), nullable=False)
     email = db.Column(db.String(100), nullable=True)
-    address = db.Column(db.Text, nullable=True)          # Fixed for customer signup
-    experience = db.Column(db.String(50), nullable=True)  # Fixed for customer signup
-    expertise = db.Column(db.String(100), nullable=True)  # Fixed for customer signup
+    address = db.Column(db.Text, nullable=True)
+    experience = db.Column(db.String(50), nullable=True)
+    expertise = db.Column(db.String(100), nullable=True)
     wallet_balance = db.Column(db.Integer, default=0)
     per_day_amount = db.Column(db.Integer, nullable=True)
     is_available = db.Column(db.Boolean, default=True)
@@ -68,7 +61,7 @@ class Requirement(db.Model):
     budget = db.Column(db.Integer)
     deadline = db.Column(db.String(50))
     description = db.Column(db.Text)
-    unlocked_by_shops = db.relationship('UnlockedLead', backref='requirement', lazy=True)
+    unlocked_by_shops = db.relationship('UnlockedLead', backref='requirement', cascade='all, delete-orphan', lazy=True)
 
 class UnlockedLead(db.Model):
     __tablename__ = 'unlocked_lead'
@@ -121,7 +114,7 @@ class Quotation(db.Model):
 def load_user(user_id):
     return User.query.get(int(user_id))
 
-# --- HELPER FUNCTION (Moved to top so it's defined before routing) ---
+# --- HELPER FUNCTION ---
 def get_unlock_cost(budget_str):
     try:
         if not budget_str: return 50 
@@ -133,7 +126,7 @@ def get_unlock_cost(budget_str):
         elif budget <= 20000: return 120
         elif budget <= 35000: return 140
         else: return 200
-    except:
+    except Exception:
         return 50
 
 # ================= ADMIN NOTIFICATION FUNCTION =================
@@ -149,7 +142,6 @@ def notify_admin_new_user(user):
 
             url = "https://api.brevo.com/v3/smtp/email"
             
-            # Role ke hisaab se extra details format karna
             extra_info = ""
             if user.role == 'shop_owner':
                 extra_info = f"<li><b>Shop Name:</b> {getattr(user, 'shop_name', 'N/A')}</li>"
@@ -159,7 +151,7 @@ def notify_admin_new_user(user):
             payload = {
                 "sender": {"name": "Kaamconnect System", "email": sender_email},
                 "to": [{"email": admin_email}],
-                "subject": f"🚨 Naya User Signup Hua Hai! ({user.role.upper()})",
+                "subject": f"🚀 Naya User Signup Hua Hai! ({user.role.upper()})",
                 "htmlContent": f"""
                 <html>
                     <body>
@@ -189,9 +181,9 @@ def notify_admin_new_user(user):
             req_data = json.dumps(payload).encode('utf-8')
             req_obj = urllib.request.Request(url, data=req_data, headers=headers, method='POST')
             with urllib.request.urlopen(req_obj, timeout=5) as response:
-                print("Admin ko new user notification mail chali gayi hai.")
+                print("Admin notification mail sent.")
     except Exception as e:
-        print(f"Admin notification mail bhejne me error: {e}")
+        print(f"Admin notification mail error: {e}")
 
 # ================= ROUTES =================
 @app.route('/')
@@ -201,18 +193,22 @@ def index():
 @app.route('/signup', methods=['GET', 'POST'])
 def signup():
     if request.method == 'POST':
-        role = request.form.get('role')
-        mobile = request.form.get('mobile')
-        password = request.form.get('password')
-        name = request.form.get('name')
-        email = request.form.get('email')
-        address = request.form.get('address')
-        experience = request.form.get('experience')
-        expertise = request.form.get('expertise')
-        shop_name = request.form.get('shop_name')
+        role = request.form.get('role', 'customer').strip()
+        mobile = request.form.get('mobile', '').strip()
+        password = request.form.get('password', '').strip()
+        name = request.form.get('name', '').strip()
+        email = request.form.get('email', '').strip()
+        address = request.form.get('address', '').strip()
+        experience = request.form.get('experience', '').strip()
+        expertise = request.form.get('expertise', '').strip()
+        shop_name = request.form.get('shop_name', '').strip()
         
         per_day_raw = request.form.get('per_day_amount')
-        per_day_amount = int(per_day_raw) if per_day_raw and per_day_raw.strip() else None
+        per_day_amount = int(per_day_raw) if per_day_raw and per_day_raw.strip().isdigit() else None
+
+        if not mobile or not password or not name:
+            flash('Please fill all mandatory fields.', 'danger')
+            return redirect(url_for('signup', role=role))
 
         user_exists = User.query.filter_by(mobile=mobile).first()
         if user_exists:
@@ -232,9 +228,7 @@ def signup():
         db.session.add(new_user)
         db.session.commit()
         
-        # 👉 Admin ko naye user ki notification email bhejne ke liye function call
         notify_admin_new_user(new_user)
-        
         login_user(new_user)
 
         if new_user.role == 'shop_owner':
@@ -253,8 +247,8 @@ def signup():
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
-        mobile = request.form.get('mobile')
-        password = request.form.get('password')
+        mobile = request.form.get('mobile', '').strip()
+        password = request.form.get('password', '').strip()
         user = User.query.filter_by(mobile=mobile).first()
         
         if user and check_password_hash(user.password, password):
@@ -277,7 +271,7 @@ def logout():
 @app.route('/customer/dashboard', methods=['GET', 'POST'])
 @login_required
 def customer_dash():
-    if current_user.role != 'customer': return "Unauthorized", 401
+    if current_user.role != 'customer': return "Unauthorized", 403
     
     if request.method == 'POST':
         current_user.name = request.form.get('name')
@@ -294,7 +288,7 @@ def customer_dash():
         db.session.add(new_req)
         db.session.commit()
 
-        # Email Notification Logic via Brevo HTTP API (Bypasses Render's SMTP port blocking)
+        # Brevo HTTP Email Notification
         try:
             shop_owners = User.query.filter_by(role='shop_owner', is_available=True).all()
             recipient_emails = [shop.email for shop in shop_owners if shop.email]
@@ -311,7 +305,7 @@ def customer_dash():
                     payload = {
                         "sender": {"name": "Kaamconnect", "email": sender_email},
                         "to": [{"email": email} for email in recipient_emails],
-                        "subject": "🚨 Naya Kaam Aaya Hai! (Urgent)",
+                        "subject": "📢 Naya Kaam Aaya Hai! (Urgent)",
                         "htmlContent": f"""
                         <html>
                             <body>
@@ -322,7 +316,6 @@ def customer_dash():
                                     <li><b>Budget:</b> ₹{new_req.budget}</li>
                                 </ul>
                                 <p><b>Note:</b> Sirf pehle 3-4 log hi ise unlock kar sakte hain. Jaldi se apna dashboard check karein!</p>
-                                <a href="https://kaamconnect.com/shop/dashboard" style="background-color: #0275d8; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px;">Kaam Unlock Karein</a>
                             </body>
                         </html>
                         """
@@ -465,7 +458,7 @@ def unlock_lead(req_id):
 @app.route('/buy_credits_page')
 @login_required
 def buy_credits_page():
-    if current_user.role != 'shop_owner': return "Unauthorized", 401
+    if current_user.role != 'shop_owner': return "Unauthorized", 403
     settings = SiteSettings.query.first()
     upi_id = settings.admin_upi if settings else "admin@upi"
     return render_template('buy_credits.html', upi_id=upi_id)
@@ -473,8 +466,20 @@ def buy_credits_page():
 @app.route('/submit_payment', methods=['POST'])
 @login_required
 def submit_payment():
-    amount = request.form.get('amount')
-    trx_id = request.form.get('trx_id')
+    if current_user.role != 'shop_owner': return "Unauthorized", 403
+    
+    amount_raw = request.form.get('amount', '').strip()
+    trx_id = request.form.get('trx_id', '').strip()
+
+    if not amount_raw.isdigit() or not trx_id:
+        flash("Please enter a valid amount and transaction ID.", "danger")
+        return redirect(url_for('buy_credits_page'))
+
+    amount = int(amount_raw)
+    if amount <= 0:
+        flash("Amount must be greater than zero.", "danger")
+        return redirect(url_for('buy_credits_page'))
+
     new_req = PaymentRequest(shop_owner_id=current_user.id, amount=amount, trx_id=trx_id, status='Pending')
     db.session.add(new_req)
     db.session.commit()
@@ -484,7 +489,7 @@ def submit_payment():
 @app.route('/worker/dashboard', methods=['GET', 'POST'])
 @login_required
 def worker_dash():
-    if current_user.role != 'worker': return "Unauthorized", 401
+    if current_user.role != 'worker': return "Unauthorized", 403
     
     if request.method == 'POST':
         current_user.name = request.form.get('name')
@@ -503,7 +508,7 @@ def worker_dash():
 @app.route('/admin/dashboard')
 @login_required
 def admin_dash():
-    if current_user.role != 'admin': return "Unauthorized", 401
+    if current_user.role != 'admin': return "Unauthorized", 403
     
     shop_owners = User.query.filter_by(role='shop_owner').all()
     workers = User.query.filter_by(role='worker').all()
@@ -533,23 +538,33 @@ def admin_dash():
                            pending_requests=pending_requests, 
                            admin_upi=admin_upi)
 
-@app.route('/admin/delete_user/<int:user_id>', methods=['GET', 'POST'])
+@app.route('/admin/delete_user/<int:user_id>', methods=['POST'])
 @login_required
 def delete_user(user_id):
-    if current_user.role != 'admin': return "Unauthorized", 401
+    if current_user.role != 'admin': return "Unauthorized", 403
     
+    if user_id == current_user.id:
+        flash('Aap apne khud ke Admin account ko delete nahi kar sakte!', 'danger')
+        return redirect(url_for('admin_dash'))
+
     user = User.query.get(user_id)
     
     if user:
         try:
+            # Clean up connected Quotations safely
+            Quotation.query.filter((Quotation.shop_owner_id == user.id) | (Quotation.worker_id == user.id)).delete(synchronize_session=False)
+
             if user.role == 'customer':
                 user_reqs = Requirement.query.filter_by(customer_id=user.id).all()
                 for req in user_reqs:
                     UnlockedLead.query.filter_by(requirement_id=req.id).delete(synchronize_session=False)
+                    Quotation.query.filter_by(requirement_id=req.id).delete(synchronize_session=False)
                 Requirement.query.filter_by(customer_id=user.id).delete(synchronize_session=False)
             
             elif user.role == 'shop_owner':
                 UnlockedLead.query.filter_by(shop_owner_id=user.id).delete(synchronize_session=False)
+                Vacancy.query.filter_by(shop_owner_id=user.id).delete(synchronize_session=False)
+                PaymentRequest.query.filter_by(shop_owner_id=user.id).delete(synchronize_session=False)
                 
             db.session.delete(user)
             db.session.commit()
@@ -562,25 +577,32 @@ def delete_user(user_id):
             
     return redirect(url_for('admin_dash'))
 
-@app.route('/admin/edit_user/<int:user_id>', methods=['GET', 'POST'])
+@app.route('/admin/edit_user/<int:user_id>', methods=['POST'])
 @login_required
 def edit_user(user_id):
-    if current_user.role != 'admin': return "Unauthorized", 401
+    if current_user.role != 'admin': return "Unauthorized", 403
     
     user = User.query.get(user_id)
     
     if user and request.method == 'POST':
-        if 'name' in request.form:
-            user.name = request.form.get('name')
-        if 'mobile' in request.form:
-            user.mobile = request.form.get('mobile')
-        if 'email' in request.form:
-            user.email = request.form.get('email')
-        if 'address' in request.form:
-            user.address = request.form.get('address')
+        if request.form.get('name'):
+            user.name = request.form.get('name').strip()
+        if request.form.get('mobile'):
+            user.mobile = request.form.get('mobile').strip()
+        if request.form.get('email'):
+            user.email = request.form.get('email').strip()
+        if request.form.get('address'):
+            user.address = request.form.get('address').strip()
+            
+        new_password = request.form.get('password')
+        if new_password and new_password.strip():
+            user.password = generate_password_hash(new_password.strip(), method='scrypt')
             
         if user.role == 'shop_owner' and 'wallet_balance' in request.form:
-            user.wallet_balance = request.form.get('wallet_balance', user.wallet_balance)
+            try:
+                user.wallet_balance = int(request.form.get('wallet_balance', user.wallet_balance))
+            except ValueError:
+                pass
             
         db.session.commit()
         flash(f'{user.name} ki details successfully update ho gayi hain.', 'success')
@@ -590,12 +612,12 @@ def edit_user(user_id):
 @app.route('/admin/update_upi', methods=['POST'])
 @login_required
 def update_upi():
-    if current_user.role != 'admin': return "Unauthorized", 401
+    if current_user.role != 'admin': return "Unauthorized", 403
     settings = SiteSettings.query.first()
     if not settings:
         settings = SiteSettings()
         db.session.add(settings)
-    settings.admin_upi = request.form.get('upi_id')
+    settings.admin_upi = request.form.get('upi_id', 'admin@upi').strip()
     db.session.commit()
     flash('Admin UPI Updated Successfully.', 'success')
     return redirect(url_for('admin_dash'))
@@ -603,12 +625,19 @@ def update_upi():
 @app.route('/approve_payment/<int:req_id>/<action>', methods=['POST'])
 @login_required
 def approve_payment(req_id, action):
-    if current_user.role != 'admin': return "Unauthorized", 401
+    if current_user.role != 'admin': return "Unauthorized", 403
     req = PaymentRequest.query.get_or_404(req_id)
+    
+    # Anti-Double Processing Safeguard
+    if req.status != 'Pending':
+        flash('Yeh payment request pehle hi process ho chuki hai.', 'warning')
+        return redirect(url_for('admin_dash'))
+
     shop_owner = User.query.get(req.shop_owner_id)
     
     if action == 'approve':
-        shop_owner.wallet_balance += req.amount
+        if shop_owner:
+            shop_owner.wallet_balance += req.amount
         req.status = 'Approved'
         flash(f'Payment Approved. ₹{req.amount} added to Shop Owner.', 'success')
     else:
@@ -618,29 +647,22 @@ def approve_payment(req_id, action):
     db.session.commit()
     return redirect(url_for('admin_dash'))
 
-# --- HELPER ROUTES ---
+# --- HELPER & SYSTEM ROUTES ---
 @app.route('/create_admin')
 def create_admin():
     if not User.query.filter_by(role='admin').first():
-        hashed_pw = generate_password_hash('admin123')
+        hashed_pw = generate_password_hash('admin123', method='scrypt')
         admin = User(role='admin', name='Super Admin', mobile='9999999999', password=hashed_pw, address='Head Office')
         db.session.add(admin)
         db.session.commit()
         return "Admin account created successfully! Mobile: 9999999999, Pass: admin123"
-    return "Admin already exists!"
+    return "Admin already exists! Disabled for security.", 403
 
 @app.route('/reset_db_danger_123')
 def reset_db_safely():
-    db.drop_all()
-    db.create_all()
-    return "Database Successfull Reset! Pura kachra saaf. URL se /create_admin pe jao abhi."
+    return "Database reset feature is locked for production security.", 403
 
-with app.app_context():
-    db.create_all()
-
-# =======================================================
-# NAYE ROUTES: EDIT & DELETE FUNCTIONALITIES
-# =======================================================
+# ================= EDIT & DELETE FUNCTIONALITIES =================
 @app.route('/delete_requirement/<int:req_id>', methods=['POST'])
 @login_required
 def delete_requirement(req_id):
@@ -683,7 +705,7 @@ def worker_hide_profile():
     
     current_user.is_available = False
     db.session.commit()
-    flash('Aapki availability marketplace se hata di gayi hai! Jab aapko fir se kaam chahiye ho, toh profile edit karke save kar dein.', 'success')
+    flash('Aapki availability marketplace se hata di gayi hai!', 'success')
     return redirect(url_for('worker_dash'))
 
 @app.route('/update_worker_profile', methods=['POST']) 
@@ -696,7 +718,6 @@ def update_worker_profile():
     current_user.experience = request.form.get('experience')
     current_user.expertise = request.form.get('expertise')
     current_user.per_day_amount = request.form.get('per_day_amount')
-    
     current_user.is_available = True 
     
     db.session.commit()
@@ -708,9 +729,13 @@ def update_worker_profile():
 def submit_quotation(worker_id):
     if current_user.role != 'shop_owner':
         flash("Sirf Shop Owners hi quotation bhej sakte hain.", "danger")
-        return redirect(url_for('dashboard'))
+        return redirect(url_for('shop_dash'))
 
-    amount = request.form.get('amount')
+    try:
+        amount = float(request.form.get('amount', 0))
+    except ValueError:
+        amount = 0.0
+
     deadline = request.form.get('deadline')
     notes = request.form.get('notes')
 
@@ -724,12 +749,15 @@ def submit_quotation(worker_id):
     db.session.add(new_quote)
     db.session.commit()
 
-    flash("Quotation successfully submit ho gaya hai! User ko notify kar diya gaya hai.", "success")
-    return redirect(url_for('dashboard'))
+    flash("Quotation successfully submit ho gaya hai!", "success")
+    return redirect(url_for('shop_dash'))
 
-@app.route('/update_quote_status/<int:req_id>/<string:status_value>')
+@app.route('/update_quote_status/<int:req_id>/<string:status_value>', methods=['POST', 'GET'])
 @login_required
 def update_quote_status(req_id, status_value):
+    if current_user.role.lower() != 'shop_owner':
+        return "Unauthorized", 403
+
     unlocked_lead = UnlockedLead.query.filter_by(requirement_id=req_id, shop_owner_id=current_user.id).first()
     
     if unlocked_lead:
@@ -738,7 +766,7 @@ def update_quote_status(req_id, status_value):
             db.session.commit()
             flash(f"Response successfully updated to: {status_value}!", "success")
     else:
-        flash("Lead ka koi records nahi mila!", "danger")
+        flash("Lead ka koi record nahi mila!", "danger")
         
     return redirect(url_for('shop_dash'))
 
@@ -748,11 +776,10 @@ def admin_send_broadcast():
     if current_user.role != 'admin':
         return "Unauthorized", 403
         
-    target_role = request.form.get('target_role') # 'all', 'shop_owner', 'customer', 'worker'
+    target_role = request.form.get('target_role')
     subject = request.form.get('subject')
     message_body = request.form.get('message')
     
-    # File Attachment Handling (Base64 encoding for Brevo API)
     import base64
     attachments_list = []
     uploaded_file = request.files.get('attachment')
@@ -764,7 +791,6 @@ def admin_send_broadcast():
             "name": uploaded_file.filename
         })
 
-    # Users filter karna target role ke hisaab se
     if target_role == 'all':
         users = User.query.filter(User.email != None).all()
     else:
@@ -800,7 +826,6 @@ def admin_send_broadcast():
                     """
                 }
                 
-                # Agar file attach ki gayi hai toh payload mein add kar do
                 if attachments_list:
                     payload["attachment"] = attachments_list
 
@@ -813,7 +838,6 @@ def admin_send_broadcast():
                 req_data = json.dumps(payload).encode('utf-8')
                 req_obj = urllib.request.Request(url, data=req_data, headers=headers, method='POST')
                 
-                # Timeout 15 seconds rakha hai taki badi file hone par bhi error na aaye
                 with urllib.request.urlopen(req_obj, timeout=15) as response:
                     flash(f'Broadcast email successfully {len(recipient_emails)} logo ko bhej di gayi hai!', 'success')
         except Exception as e:
@@ -840,6 +864,9 @@ def shop_detail(shop_id):
 @app.before_request
 def make_session_permanent():
     session.permanent = True
+
+with app.app_context():
+    db.create_all()
 
 if __name__ == '__main__':
     app.run(debug=False)
