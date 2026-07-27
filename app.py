@@ -43,12 +43,12 @@ class User(UserMixin, db.Model):
     name = db.Column(db.String(100), nullable=False)
     mobile = db.Column(db.String(15), unique=True, nullable=False)
     password = db.Column(db.String(200), nullable=False)
-    email = db.Column(db.String(100))
-    address = db.Column(db.Text)
-    experience = db.Column(db.String(50))
-    expertise = db.Column(db.String(100))
+    email = db.Column(db.String(100), nullable=True)
+    address = db.Column(db.Text, nullable=True)          # Fixed for customer signup
+    experience = db.Column(db.String(50), nullable=True)  # Fixed for customer signup
+    expertise = db.Column(db.String(100), nullable=True)  # Fixed for customer signup
     wallet_balance = db.Column(db.Integer, default=0)
-    per_day_amount = db.Column(db.Integer)
+    per_day_amount = db.Column(db.Integer, nullable=True)
     is_available = db.Column(db.Boolean, default=True)
     last_deduction_month = db.Column(db.Integer, default=datetime.now().month)
     is_plan_active = db.Column(db.Boolean, default=True)
@@ -120,6 +120,21 @@ class Quotation(db.Model):
 @login_manager.user_loader
 def load_user(user_id):
     return User.query.get(int(user_id))
+
+# --- HELPER FUNCTION (Moved to top so it's defined before routing) ---
+def get_unlock_cost(budget_str):
+    try:
+        if not budget_str: return 50 
+        budget = int(''.join(filter(str.isdigit, str(budget_str))))
+        
+        if budget <= 2000: return 50
+        elif budget <= 5000: return 70
+        elif budget <= 10000: return 90
+        elif budget <= 20000: return 120
+        elif budget <= 35000: return 140
+        else: return 200
+    except:
+        return 50
 
 # ================= ROUTES =================
 @app.route('/')
@@ -620,20 +635,6 @@ def update_worker_profile():
     db.session.commit()
     flash('Aapka profile successfully update aur activate ho gaya hai.', 'success')
     return redirect(url_for('worker_dash'))
-
-def get_unlock_cost(budget_str):
-    try:
-        if not budget_str: return 50 
-        budget = int(''.join(filter(str.isdigit, str(budget_str))))
-        
-        if budget <= 2000: return 50
-        elif budget <= 5000: return 70
-        elif budget <= 10000: return 90
-        elif budget <= 20000: return 120
-        elif budget <= 35000: return 140
-        else: return 200
-    except:
-        return 50
 
 @app.route('/submit_quotation/<int:worker_id>', methods=['POST'])
 @login_required
