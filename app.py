@@ -6,7 +6,7 @@ from datetime import timedelta, datetime
 from zoneinfo import ZoneInfo
 import os
 
-# Email Sending Imports
+# Brevo SMTP & Email Sending Imports
 import smtplib
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
@@ -219,7 +219,7 @@ def customer_dash():
         db.session.add(new_req)
         db.session.commit()
 
-        # Email Notification Logic via Environment Variables
+        # Email Notification Logic via Brevo SMTP
         try:
             shop_owners = User.query.filter_by(role='shop_owner', is_available=True).all()
             recipient_emails = [shop.email for shop in shop_owners if shop.email]
@@ -250,7 +250,8 @@ def customer_dash():
                     msg['Subject'] = subject
                     msg.attach(MIMEText(body, 'html'))
 
-                    with smtplib.SMTP('smtp.gmail.com', 587) as server:
+                    # Brevo SMTP Connection Details
+                    with smtplib.SMTP('smtp-relay.brevo.com', 587) as server:
                         server.starttls()
                         server.login(sender_email, sender_password)
                         server.sendmail(sender_email, recipient_emails, msg.as_string())
