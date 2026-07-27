@@ -6,6 +6,11 @@ from datetime import timedelta, datetime
 from zoneinfo import ZoneInfo
 import os
 
+# Email Sending Imports
+import smtplib
+from email.mime.text import MIMEText
+from email.mime.multipart import MIMEMultipart
+
 app = Flask(__name__)
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'super_secret_key_for_local')
 app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(hours=8)
@@ -50,7 +55,6 @@ class User(UserMixin, db.Model):
     shop_name = db.Column(db.String(150), nullable=True)
     created_at = db.Column(db.DateTime, nullable=True)
 
-    # CASCADES: Agar user delete ho, toh uska sab data delete ho jaye (500 error fix)
     requirements = db.relationship('Requirement', backref='customer_user', cascade='all, delete-orphan')
     vacancies = db.relationship('Vacancy', backref='shop_owner_user', cascade='all, delete-orphan')
     unlocked_leads = db.relationship('UnlockedLead', backref='shop_owner_user', cascade='all, delete-orphan')
@@ -72,7 +76,6 @@ class UnlockedLead(db.Model):
     shop_owner_id = db.Column(db.Integer, db.ForeignKey('users.id'))
     requirement_id = db.Column(db.Integer, db.ForeignKey('requirement.id'))
     
-    # 🌟 Ye naye columns add karein jo aap niche function me use kar rahe hain:
     amount = db.Column(db.String(100), nullable=True)
     deadline = db.Column(db.String(100), nullable=True)
     notes = db.Column(db.Text, nullable=True)
@@ -104,14 +107,14 @@ class PaymentRequest(db.Model):
 
 class Quotation(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    shop_owner_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
-    worker_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=True) # Agar worker ko bhej rahe hain
+    shop_owner_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+    worker_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=True)
     requirement_id = db.Column(db.Integer, db.ForeignKey('requirement.id'), nullable=True)
     
-    amount = db.Column(db.Float, nullable=False)         # Estimate Amount
-    deadline = db.Column(db.String(100), nullable=False)   # Kam kitne din me hoga (e.g., "3 Days")
-    notes = db.Column(db.Text, nullable=True)            # Extra instructions/Notes
-    status = db.Column(db.String(20), default='Pending') # Pending, Interested, Not Interested
+    amount = db.Column(db.Float, nullable=False)
+    deadline = db.Column(db.String(100), nullable=False)
+    notes = db.Column(db.Text, nullable=True)
+    status = db.Column(db.String(20), default='Pending')
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
 @login_manager.user_loader
@@ -134,63 +137,39 @@ def signup():
         address = request.form.get('address')
         experience = request.form.get('experience')
         expertise = request.form.get('expertise')
-        
-        # 🔥 YAHAN: Shop name form se get kiya hai
         shop_name = request.form.get('shop_name')
         
-        # Safe Integer handling for per_day_amount (InvalidTextRepresentation Fix)
         per_day_raw = request.form.get('per_day_amount')
         per_day_amount = int(per_day_raw) if per_day_raw and per_day_raw.strip() else None
 
-        # Check karein ki number pehle se register na ho
         user_exists = User.query.filter_by(mobile=mobile).first()
         if user_exists:
             flash('Mobile number pehle se registered hai!', 'danger')
             return redirect(url_for('signup', role=role))
 
-        # Password ko securely hash karein
         hashed_password = generate_password_hash(password, method='scrypt')
-        
-        # 🔥 FIX: Exact IST time nikal kar timezone info hata di, taaki DB me galat time save na ho
         ist_time = datetime.now(ZoneInfo("Asia/Kolkata")).replace(tzinfo=None)
         
-        # Naya user object create karein (with is_available=True and created_at)
         new_user = User(
-            role=role,
-            mobile=mobile,
-            password=hashed_password,
-            name=name,
-            email=email,
-            address=address,
-            experience=experience,
-            expertise=expertise,
-            shop_name=shop_name,        # 🔥 YAHAN: Naya user banate waqt shop_name save kiya hai
-            per_day_amount=per_day_amount,
-            wallet_balance=50,          # 🔥 YAHAN 0 KO 50 KAR DIYA HAI
-            is_available=True,
-            created_at=ist_time         # 🔥 YAHAN: Exact sahi India ka time save hoga!
+            role=role, mobile=mobile, password=hashed_password, name=name,
+            email=email, address=address, experience=experience, expertise=expertise,
+            shop_name=shop_name, per_day_amount=per_day_amount,
+            wallet_balance=50, is_available=True, created_at=ist_time
         )
         
         db.session.add(new_user)
-        db.session.commit() # DB me save ho gaya
+        db.session.commit()
         
-        # 🔥 FIRST TIME AUTO-LOGIN: User ko password bina daale turant login karwayein
         login_user(new_user)
 
-        # 🔥 WELCOME POPUP TRIGGER (Sirf Shop Owner ke liye)
         if new_user.role == 'shop_owner':
             session['show_welcome_popup'] = True
         
         flash('Account successfully ban gaya hai aur aap login ho chuke hain!', 'success')
         
-        # Role ke hisab se sahi dashboard par redirect karein
-        if new_user.role == 'customer':
-            return redirect(url_for('customer_dash'))
-        elif new_user.role == 'shop_owner':
-            return redirect(url_for('shop_dash'))
-        elif new_user.role == 'worker':
-            return redirect(url_for('worker_dash'))
-            
+        if new_user.role == 'customer': return redirect(url_for('customer_dash'))
+        elif new_user.role == 'shop_owner': return redirect(url_for('shop_dash'))
+        elif new_user.role == 'worker': return redirect(url_for('worker_dash'))
         return redirect(url_for('index'))
         
     role = request.args.get('role', 'customer')
@@ -239,19 +218,55 @@ def customer_dash():
         )
         db.session.add(new_req)
         db.session.commit()
+
+        # Email Notification Logic via Environment Variables
+        try:
+            shop_owners = User.query.filter_by(role='shop_owner', is_available=True).all()
+            recipient_emails = [shop.email for shop in shop_owners if shop.email]
+
+            if recipient_emails:
+                sender_email = os.environ.get('MAIL_USERNAME')
+                sender_password = os.environ.get('MAIL_PASSWORD')
+                
+                if sender_email and sender_password:
+                    subject = "🚨 Naya Kaam Aaya Hai! (Urgent)"
+                    body = f"""
+                    <html>
+                        <body>
+                            <h2 style="color: #d9534f;">Nayi Requirement Aayi Hai!</h2>
+                            <p>Kaamconnect par ek naya customer kaam lekar aaya hai.</p>
+                            <ul>
+                                <li><b>Category:</b> {new_req.category}</li>
+                                <li><b>Budget:</b> ₹{new_req.budget}</li>
+                            </ul>
+                            <p><b>Note:</b> Sirf pehle 3-4 log hi ise unlock kar sakte hain. Jaldi se apna dashboard check karein!</p>
+                            <a href="https://kaamconnect.com/shop/dashboard" style="background-color: #0275d8; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px;">Kaam Unlock Karein</a>
+                        </body>
+                    </html>
+                    """
+                    
+                    msg = MIMEMultipart()
+                    msg['From'] = f"Kaamconnect <{sender_email}>"
+                    msg['Subject'] = subject
+                    msg.attach(MIMEText(body, 'html'))
+
+                    with smtplib.SMTP('smtp.gmail.com', 587) as server:
+                        server.starttls()
+                        server.login(sender_email, sender_password)
+                        server.sendmail(sender_email, recipient_emails, msg.as_string())
+        except Exception as e:
+            print(f"Email bhejne me error: {e}")
+
         flash('Requirement published successfully!', 'success')
         return redirect(url_for('customer_dash'))
         
     my_reqs = Requirement.query.filter_by(customer_id=current_user.id).order_by(Requirement.id.desc()).all()
     
-    # 🌟 MAGIC CODE: Har quotation ke andar dukanwale ka data inject karna
     for req in my_reqs:
         if hasattr(req, 'unlocked_by_shops') and req.unlocked_by_shops:
             for quote in req.unlocked_by_shops:
-                # Shop_owner_id se User table se dukanwale ki entry nikalna
                 shop_user = User.query.get(quote.shop_owner_id)
                 if shop_user:
-                    # Agar dukan ka naam database me alag se h to wo, nahi to uska normal name
                     quote.shop_name = getattr(shop_user, 'shop_name', None) or getattr(shop_user, 'name', 'Shop Owner')
                     quote.shop_mobile = getattr(shop_user, 'mobile', 'N/A')
                 else:
@@ -266,12 +281,7 @@ def shop_dash():
     if current_user.role.lower() != 'shop_owner': 
         return redirect(url_for('login'))
     
-    # =========================================================
-    # 🔥 NEW SYSTEM: SUBSCRIPTION AUTO-DEDUCTION LOGIC
-    # =========================================================
     current_month = datetime.now().month
-
-    # 1. Mahina badal gaya hai, toh deduction check karo (Auto-Deduct on 1st)
     if current_user.last_deduction_month != current_month:
         if current_user.wallet_balance >= 200:
             current_user.wallet_balance -= 200
@@ -280,25 +290,18 @@ def shop_dash():
             db.session.commit()
             flash("Naye mahine ka Platform Fee (200 Credits) auto-deduct ho gaya hai. Aapka account active hai!", "success")
         else:
-            # Balance nahi hai toh turant account LOCK
             current_user.is_plan_active = False
             db.session.commit()
 
-    # 2. Agar account Blocked tha, aur dukaandar ne ab recharge kar liya (Balance >= 200)
     if not current_user.is_plan_active and current_user.wallet_balance >= 200:
         current_user.wallet_balance -= 200
         current_user.last_deduction_month = current_month
         current_user.is_plan_active = True
         db.session.commit()
-        
-        # 🔥 YEH NAYI LINE ADD KI HAI (Success popup dikhane ke liye)
         session['show_reactivation_popup'] = True
-        
         flash("Recharge successful! Aapka account dobara chalu ho gaya hai.", "success")
-    # =========================================================
 
     if request.method == 'POST':
-        # SECURITY CHECK: Agar plan inactive hai, toh vacancy post mat karne do
         if not current_user.is_plan_active:
             flash("Aapka plan inactive hai. Nayi vacancy dalne ke liye pehle recharge karein.", "danger")
             return redirect(url_for('shop_dash'))
@@ -315,7 +318,6 @@ def shop_dash():
             flash('Job Vacancy Published Successfully!', 'success')
         return redirect(url_for('shop_dash'))
 
-    # Puraana Data Fetching Logic (Same to Same)
     requirements = Requirement.query.order_by(Requirement.id.desc()).all()
     customers = {u.id: u for u in User.query.filter_by(role='customer').all()} 
     unlocked_leads = [lead.requirement_id for lead in UnlockedLead.query.filter_by(shop_owner_id=current_user.id).all()]
@@ -336,49 +338,37 @@ def unlock_lead(req_id):
         
     req = Requirement.query.get_or_404(req_id)
     
-    # 💰 Budget ke hisab se exact credit cost nikalna (Aapka Purana Logic - Safe & Unchanged)
     try:
         budget_num = int(''.join(filter(str.isdigit, str(req.budget)))) if req.budget else 0
     except ValueError:
         budget_num = 0
 
-    if budget_num <= 2000:
-        credit_cost = 50
-    elif budget_num <= 5000:
-        credit_cost = 70
-    elif budget_num <= 10000:
-        credit_cost = 90
-    elif budget_num <= 20000:
-        credit_cost = 120
-    elif budget_num <= 35000:
-        credit_cost = 140
-    else:
-        credit_cost = 200
+    if budget_num <= 2000: credit_cost = 50
+    elif budget_num <= 5000: credit_cost = 70
+    elif budget_num <= 10000: credit_cost = 90
+    elif budget_num <= 20000: credit_cost = 120
+    elif budget_num <= 35000: credit_cost = 140
+    else: credit_cost = 200
         
-    # Check karein ki dukanwala isse pehle se unlock toh nahi kar chuka hai
     already_unlocked = UnlockedLead.query.filter_by(shop_owner_id=current_user.id, requirement_id=req.id).first()
     if already_unlocked:
         flash('Yeh lead aapne pehle se hi unlock ki hui hai!', 'info')
         return redirect(url_for('shop_dash'))
 
-    # Wallet Balance verification
     if current_user.wallet_balance >= credit_cost:
         current_user.wallet_balance -= credit_cost
         
-        # 🔥 A. POPUP FORM SE AAYA HUA DATA NIKALEIN (Nayi Lines)
         amount = request.form.get('amount')
         deadline = request.form.get('deadline')
         notes = request.form.get('notes')
         
-        # 🔥 B. DATA KO UNLOCKED_LEAD TABLE ME HI SAVE KAREIN
-        # (Aapke purane model me hi hum ye naye parameters pass kar rahe hain)
         new_unlock = UnlockedLead(
             shop_owner_id=current_user.id, 
             requirement_id=req.id,
-            amount=amount,        # Naya Column
-            deadline=deadline,    # Naya Column
-            notes=notes,          # Naya Column
-            status='Pending'      # Naya Column (Shuruat me status pending rahega)
+            amount=amount,       
+            deadline=deadline,   
+            notes=notes,          
+            status='Pending'      
         )
         
         db.session.add(new_unlock)
@@ -434,8 +424,6 @@ def admin_dash():
     
     shop_owners = User.query.filter_by(role='shop_owner').all()
     workers = User.query.filter_by(role='worker').all()
-    
-    # 🔥 NAYA CODE: Sirf Customers ka data nikalna
     customers = User.query.filter_by(role='customer').order_by(User.id.desc()).all()
     
     all_users = User.query.all()
@@ -443,7 +431,6 @@ def admin_dash():
     total_vacancies = Vacancy.query.count()
     pending_requests = PaymentRequest.query.filter_by(status='Pending').all()
     
-    # 🔥 NAYA CODE: Har customer ne kitni requirements daali hain, uska count dictionary me save karna
     customer_req_counts = {}
     for c in customers:
         count = Requirement.query.filter_by(customer_id=c.id).count()
@@ -452,7 +439,6 @@ def admin_dash():
     settings = SiteSettings.query.first()
     admin_upi = settings.admin_upi if settings else "admin@upi"
     
-    # render_template me customers aur customer_req_counts variables ko add kar diya
     return render_template('admin_dash.html', 
                            shop_owners=shop_owners, 
                            workers=workers, 
@@ -473,30 +459,22 @@ def delete_user(user_id):
     
     if user:
         try:
-            # Agar delete hone wala user CUSTOMER hai:
             if user.role == 'customer':
-                # Uski saari requirements (jobs) nikal lo
                 user_reqs = Requirement.query.filter_by(customer_id=user.id).all()
                 for req in user_reqs:
-                    # synchronize_session=False add kiya hai taaki strict delete ho bina session conflict ke
                     UnlockedLead.query.filter_by(requirement_id=req.id).delete(synchronize_session=False)
-                
-                # Fir customer ki saari requirements delete karo
                 Requirement.query.filter_by(customer_id=user.id).delete(synchronize_session=False)
             
-            # Agar delete hone wala user SHOP OWNER hai:
             elif user.role == 'shop_owner':
-                # Usne jitni leads unlock ki thi, unka record hatao
                 UnlockedLead.query.filter_by(shop_owner_id=user.id).delete(synchronize_session=False)
                 
-            # Ab aakhir mein safely User ko delete kar do
             db.session.delete(user)
             db.session.commit()
             flash('User aur usse juda saara data successfully delete ho gaya.', 'success')
             
         except Exception as e:
-            db.session.rollback() # Error aane par database ko safe rakho
-            print(f"Delete Error aaya hai: {e}") # Yeh aapko Render logs mein dikh jayega agar kuch fasa toh
+            db.session.rollback() 
+            print(f"Delete Error aaya hai: {e}") 
             flash('Error: Data delete nahi ho paya. System Error aaya hai.', 'danger')
             
     return redirect(url_for('admin_dash'))
@@ -508,9 +486,7 @@ def edit_user(user_id):
     
     user = User.query.get(user_id)
     
-    # Sirf tabhi update chalega jab request POST hogi (Form submit hone par)
     if user and request.method == 'POST':
-        # SAFE UPDATE
         if 'name' in request.form:
             user.name = request.form.get('name')
         if 'mobile' in request.form:
@@ -520,7 +496,6 @@ def edit_user(user_id):
         if 'address' in request.form:
             user.address = request.form.get('address')
             
-        # Shop Owner ke liye special wallet balance handler
         if user.role == 'shop_owner' and 'wallet_balance' in request.form:
             user.wallet_balance = request.form.get('wallet_balance', user.wallet_balance)
             
@@ -573,7 +548,6 @@ def create_admin():
 
 @app.route('/reset_db_danger_123')
 def reset_db_safely():
-    # CAUTION: Yeh route hit karne par sab delete hoke naya ban jayega!
     db.drop_all()
     db.create_all()
     return "Database Successfull Reset! Pura kachra saaf. URL se /create_admin pe jao abhi."
@@ -584,25 +558,20 @@ with app.app_context():
 # =======================================================
 # NAYE ROUTES: EDIT & DELETE FUNCTIONALITIES
 # =======================================================
-
-# 1. Customer: Requirement Delete karne ke liye
 @app.route('/delete_requirement/<int:req_id>', methods=['POST'])
 @login_required
 def delete_requirement(req_id):
-    if current_user.role != 'customer':
-        return "Unauthorized", 403
+    if current_user.role != 'customer': return "Unauthorized", 403
     req = Requirement.query.filter_by(id=req_id, customer_id=current_user.id).first_or_404()
     db.session.delete(req)
     db.session.commit()
     flash('Aapki requirement successfully delete ho gayi hai!', 'success')
     return redirect(url_for('customer_dash'))
 
-# 2. Customer: Requirement Edit karne ke liye
 @app.route('/edit_requirement/<int:req_id>', methods=['POST'])
 @login_required
 def edit_requirement(req_id):
-    if current_user.role != 'customer':
-        return "Unauthorized", 403
+    if current_user.role != 'customer': return "Unauthorized", 403
     req = Requirement.query.filter_by(id=req_id, customer_id=current_user.id).first_or_404()
     
     req.category = request.form.get('category')
@@ -614,35 +583,30 @@ def edit_requirement(req_id):
     flash('Aapki requirement successfully update ho gayi hai!', 'success')
     return redirect(url_for('customer_dash'))
 
-# 3. Shop Owner: Vacancy Delete karne ke liye (Aapke model ka naam Vacancy hai)
 @app.route('/delete_vacancy/<int:vac_id>', methods=['POST'])
 @login_required
 def delete_vacancy(vac_id):
-    if current_user.role.lower() != 'shop_owner':
-        return "Unauthorized", 403
+    if current_user.role.lower() != 'shop_owner': return "Unauthorized", 403
     vac = Vacancy.query.filter_by(id=vac_id, shop_owner_id=current_user.id).first_or_404()
     db.session.delete(vac)
     db.session.commit()
     flash('Job Vacancy successfully hata di gayi hai!', 'success')
     return redirect(url_for('shop_dash'))
 
-# 4. Worker: Availability Chhipane/Hane ke liye (Jab kaam mil jaye)
 @app.route('/worker/hide_profile', methods=['POST'])
 @login_required
 def worker_hide_profile():
-    if current_user.role != 'worker':
-        return "Unauthorized", 403
+    if current_user.role != 'worker': return "Unauthorized", 403
     
-    current_user.is_available = False  # Isse worker marketplace se hide ho jayega
+    current_user.is_available = False
     db.session.commit()
     flash('Aapki availability marketplace se hata di gayi hai! Jab aapko fir se kaam chahiye ho, toh profile edit karke save kar dein.', 'success')
     return redirect(url_for('worker_dash'))
 
-@app.route('/update_worker_profile', methods=['POST']) # Is route ka naam aapki app me jo ho wo check kar lena (jaise edit_profile ya update_profile)
+@app.route('/update_worker_profile', methods=['POST']) 
 @login_required
 def update_worker_profile():
-    if current_user.role != 'worker':
-        return "Unauthorized", 403
+    if current_user.role != 'worker': return "Unauthorized", 403
         
     current_user.name = request.form.get('name')
     current_user.address = request.form.get('address')
@@ -650,40 +614,26 @@ def update_worker_profile():
     current_user.expertise = request.form.get('expertise')
     current_user.per_day_amount = request.form.get('per_day_amount')
     
-    current_user.is_available = True  # Form save karte hi worker fir se AVAILABLE ho jayega!
+    current_user.is_available = True 
     
     db.session.commit()
     flash('Aapka profile successfully update aur activate ho gaya hai.', 'success')
     return redirect(url_for('worker_dash'))
 
-# =======================================================
-# UTILITY FUNCTION: BUDGET KE HISAB SE CREDIT CALCULATE KARNA
-# =======================================================
 def get_unlock_cost(budget_str):
     try:
-        # Budget string se saare comma aur extra space hatakar number me badlein
-        if not budget_str:
-            return 50  # Minimum cost agar budget khali ho
-        
-        # Agar budget string me text ho (jaise "₹2,000"), toh sirf digits nikalne ke liye:
+        if not budget_str: return 50 
         budget = int(''.join(filter(str.isdigit, str(budget_str))))
         
-        if budget <= 2000:
-            return 50
-        elif budget <= 5000:
-            return 70
-        elif budget <= 10000:
-            return 90
-        elif budget <= 20000:
-            return 120
-        elif budget <= 35000:
-            return 140
-        else:
-            return 200
+        if budget <= 2000: return 50
+        elif budget <= 5000: return 70
+        elif budget <= 10000: return 90
+        elif budget <= 20000: return 120
+        elif budget <= 35000: return 140
+        else: return 200
     except:
-        return 50  # Kisi bhi error ke case me minimum 50 credits safe rakhna
+        return 50
 
-# 1. Quotation Submit karne ka Route
 @app.route('/submit_quotation/<int:worker_id>', methods=['POST'])
 @login_required
 def submit_quotation(worker_id):
@@ -695,7 +645,6 @@ def submit_quotation(worker_id):
     deadline = request.form.get('deadline')
     notes = request.form.get('notes')
 
-    # Naya quotation record save karein
     new_quote = Quotation(
         shop_owner_id=current_user.id,
         worker_id=worker_id,
@@ -709,16 +658,12 @@ def submit_quotation(worker_id):
     flash("Quotation successfully submit ho gaya hai! User ko notify kar diya gaya hai.", "success")
     return redirect(url_for('dashboard'))
 
-
-# Tikke rahega sirf ye ek route:
 @app.route('/update_quote_status/<int:req_id>/<string:status_value>')
 @login_required
 def update_quote_status(req_id, status_value):
-    # Check karein ki kya dukanwale ne ye lead sach me unlock ki hui hai
     unlocked_lead = UnlockedLead.query.filter_by(requirement_id=req_id, shop_owner_id=current_user.id).first()
     
     if unlocked_lead:
-        # Agar click valid hai toh status update karein
         if status_value in ['Interested', 'Not Interested']:
             unlocked_lead.status = status_value
             db.session.commit()
@@ -730,22 +675,17 @@ def update_quote_status(req_id, status_value):
 
 @app.route('/shops')
 def registered_shops():
-    # Database se sirf un users ko nikalna jinka role 'shop_owner' ya 'shop' hai
-    # Agar aapne role ka naam kuch aur rakha hai, toh 'shop_owner' ki jagah wo likhein
     shops = User.query.filter_by(role='shop_owner').all() 
     return render_template('shops.html', shops=shops)
 
 @app.route('/shop/<int:shop_id>')
 def shop_detail(shop_id):
     shop = User.query.get_or_404(shop_id)
-    # Agar aapke paas photos ka alag table hai (jaise ShopPhoto), toh use yahan load kar sakte hain:
-    # photos = ShopPhoto.query.filter_by(shop_owner_id=shop_id).all()
     return render_template('shop_detail.html', shop=shop)
 
 @app.before_request
 def make_session_permanent():
     session.permanent = True
-
 
 if __name__ == '__main__':
     app.run(debug=False)
