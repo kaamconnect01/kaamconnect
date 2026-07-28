@@ -2,115 +2,82 @@
 {% block content %}
 <style>
     /* =========================================
-       ULTRA-PREMIUM SHOP CARDS REDESIGN
+       CLEAN PREMIUM SHOP CARDS REDESIGN
        ========================================= */
-    :root {
-        --primary-indigo: #4f46e5;
-        --indigo-glow: rgba(79, 70, 229, 0.15);
-    }
-
     body {
         background-color: #f8fafc;
         color: #1e293b;
         font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-        min-height: 100vh;
-    }
-
-    /* Top Banner / Ad Slot */
-    .banner-slot-container {
-        width: 100%;
-        min-height: 90px;
-        background: linear-gradient(135deg, #e0eafc 0%, #cfdef3 100%);
-        border: 2px dashed #94a3b8;
-        border-radius: 20px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        color: #64748b;
-        font-weight: 600;
-        font-size: 0.9rem;
-        box-shadow: 0 4px 15px rgba(0,0,0,0.03);
-        transition: all 0.3s ease;
-    }
-    .banner-slot-container:hover {
-        border-color: var(--primary-indigo);
-        color: var(--primary-indigo);
-    }
-
-    /* Subtle Floating Keyframe Animation for Cards */
-    @keyframes subtleFloat {
-        0% { transform: translateY(0px); }
-        50% { transform: translateY(-4px); }
-        100% { transform: translateY(0px); }
     }
 
     .premium-shop-card {
         background: #ffffff;
-        border-radius: 24px !important;
+        border-radius: 20px;
         border: 1px solid #e2e8f0;
-        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.03);
-        transition: all 0.3s cubic-bezier(0.165, 0.84, 0.44, 1);
-        animation: subtleFloat 6s ease-in-out infinite;
-    }
-
-    .premium-shop-card:nth-child(even) {
-        animation-delay: 3s;
+        box-shadow: 0 4px 25px rgba(0, 0, 0, 0.03);
+        transition: all 0.25s ease;
     }
 
     .premium-shop-card:hover {
-        transform: translateY(-6px);
-        box-shadow: 0 20px 40px var(--indigo-glow) !important;
+        transform: translateY(-3px);
+        box-shadow: 0 12px 30px rgba(79, 70, 229, 0.08);
         border-color: #cbd5e1;
     }
 
-    /* Shop Icon Box */
     .shop-icon-box {
-        width: 60px;
-        height: 60px;
-        border-radius: 18px;
+        width: 52px;
+        height: 52px;
+        border-radius: 14px;
         background: linear-gradient(135deg, #eef2ff 0%, #e0e7ff 100%);
-        color: var(--primary-indigo);
+        color: #4f46e5;
         display: flex;
         align-items: center;
         justify-content: center;
         flex-shrink: 0;
-        box-shadow: inset 0 2px 4px rgba(255, 255, 255, 0.6);
     }
 
-    /* Action Button */
-    .btn-explore-premium {
+    .btn-explore {
         background: linear-gradient(135deg, #4f46e5 0%, #4338ca 100%);
-        color: #ffffff;
+        color: white;
         border-radius: 50px;
-        font-weight: 700;
         padding: 10px 24px;
+        font-weight: 700;
+        font-size: 0.85rem;
         border: none;
-        box-shadow: 0 4px 15px rgba(79, 70, 229, 0.3);
+        box-shadow: 0 4px 15px rgba(79, 70, 229, 0.25);
         transition: all 0.2s ease;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
     }
 
-    .btn-explore-premium:hover {
-        background: linear-gradient(135deg, #4338ca 0%, #3730a3 100%);
-        color: #ffffff;
-        box-shadow: 0 6px 20px rgba(79, 70, 229, 0.45);
-        transform: scale(1.02);
+    .btn-explore:hover {
+        background: linear-gradient(135deg, #4338ca 100%, #3730a3 100%);
+        color: white;
+        box-shadow: 0 6px 20px rgba(79, 70, 229, 0.35);
+        transform: translateY(-1px);
+    }
+
+    .address-box {
+        background: #f8fafc;
+        border: 1px solid #f1f5f9;
+        border-radius: 12px;
+        padding: 12px 16px;
+        font-size: 0.9rem;
+        color: #475569;
+        line-height: 1.5;
     }
 </style>
 
 <div class="container py-4 py-md-5">
     
-    <!-- Top Advertisement / Banner Slot -->
-    <div class="mb-4">
-        <div class="banner-slot-container">
-            <i class="fa-solid fa-rectangle-ad me-2 fs-5"></i> 📢 Banner Space / Advertisement Slot (Reserved)
-        </div>
-    </div>
-
     <!-- Header Section -->
-    <div class="text-center mb-5">
+    <div class="text-center mb-4 mb-md-5">
         <span class="badge bg-primary bg-opacity-10 text-primary border border-primary-subtle px-3 py-1 rounded-pill mb-2 fw-bold" style="font-size: 0.75rem;">VERIFIED BUSINESS DIRECTORY</span>
-        <h2 class="fw-bold text-dark display-6 mb-2">🏢 Registered Shops & Contractors</h2>
-        <p class="text-muted small px-3">Browse top verified business profiles, master artisans, and furniture experts in Udaipur[cite: 4].</p>
+        <h2 class="fw-bold text-dark display-6 mb-1">🏢 Registered Shops & Contractors</h2>
+        <p class="text-muted small px-3">Browse top verified business profiles, master artisans, and furniture experts.</p>
     </div>
 
     <!-- Cards List Container -->
@@ -119,55 +86,56 @@
             
             {% for shop in shops %}
             <!-- Premium Shop Card -->
-            <div class="card premium-shop-card mb-4">
-                <div class="card-body p-4 p-md-4">
+            <div class="card premium-shop-card mb-4 p-3 p-md-4">
+                <div class="card-body p-0">
                     
-                    <div class="d-flex flex-column flex-md-row align-items-start align-items-md-center justify-content-between gap-3 mb-3">
-                        <div class="d-flex align-items-center">
-                            <div class="shop-icon-box me-3 shadow-sm">
-                                <i class="fa-solid fa-store fs-4"></i>
+                    <!-- Top Row: Icon, Title & Status -->
+                    <div class="d-flex align-items-start justify-content-between gap-3 mb-3">
+                        <div class="d-flex align-items-center gap-3">
+                            <div class="shop-icon-box shadow-sm">
+                                <i class="fa-solid fa-store fs-5"></i>
                             </div>
                             <div>
-                                <h4 class="fw-bold text-dark mb-1 text-capitalize">
-                                    {{ shop.shop_name if shop.shop_name else 'Premium Furniture Works' }}[cite: 4]
+                                <h4 class="fw-bold text-dark mb-1 text-capitalize fs-5">
+                                    {{ shop.shop_name if shop.shop_name else 'Premium Furniture Works' }}
                                 </h4>
                                 <p class="text-secondary mb-0 small fw-medium">
-                                    <i class="fa-solid fa-user-tie text-primary me-1"></i> {{ shop.name or 'Verified Partner' }}[cite: 4]
+                                    <i class="fa-solid fa-user-tie text-primary me-1"></i> {{ shop.name or 'Verified Partner' }}
                                 </p>
                             </div>
                         </div>
                         
-                        <!-- Status Badge -->
-                        <span class="badge bg-success bg-opacity-10 text-success border border-success-subtle rounded-pill px-3 py-2 fw-bold align-self-start align-self-md-center" style="font-size: 0.75rem;">
-                            <i class="fa-solid fa-circle-check me-1"></i> Active Partner
+                        <span class="badge bg-success bg-opacity-10 text-success border border-success-subtle rounded-pill px-3 py-2 fw-bold" style="font-size: 0.75rem; white-space: nowrap;">
+                            <i class="fa-solid fa-circle-check me-1"></i> Active
                         </span>
                     </div>
                     
-                    <!-- Badges Row (Expertise & Experience) -->
-                    <div class="d-flex flex-wrap gap-2 mb-3 pt-1">
-                        <span class="badge bg-light text-primary border px-3 py-2 rounded-pill fw-semibold shadow-sm">
-                            <i class="fa-solid fa-screwdriver-wrench me-1"></i> {{ shop.expertise or 'General Expert' }}[cite: 4]
+                    <!-- Badges Row -->
+                    <div class="d-flex flex-wrap gap-2 mb-3">
+                        <span class="badge bg-light text-primary border px-3 py-2 rounded-pill fw-semibold shadow-sm" style="font-size: 0.8rem;">
+                            <i class="fa-solid fa-screwdriver-wrench me-1"></i> {{ shop.expertise or 'General Expert' }}
                         </span>
-                        <span class="badge bg-light text-dark border px-3 py-2 rounded-pill fw-semibold shadow-sm">
-                            <i class="fa-solid fa-clock me-1 text-warning"></i> {{ shop.experience or '0' }} Years Experience[cite: 4]
+                        <span class="badge bg-light text-dark border px-3 py-2 rounded-pill fw-semibold shadow-sm" style="font-size: 0.8rem;">
+                            <i class="fa-solid fa-clock me-1 text-warning"></i> {{ shop.experience or '0' }} Years Experience
                         </span>
                     </div>
-                    
-                    <hr class="text-muted opacity-25 my-3">
-                    
-                    <!-- Bottom Section: Location & Explore Button -->
-                    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
-                        <div class="text-muted small pe-md-3">
-                            <i class="fa-solid fa-location-dot text-danger me-1"></i> 
-                            <span class="fw-bold text-dark">Location:</span> 
-                            {{ shop.address or 'Address not provided' }}[cite: 4]
+
+                    <!-- Clean Address Section -->
+                    <div class="address-box mb-3">
+                        <div class="d-flex align-items-start">
+                            <i class="fa-solid fa-location-dot text-danger mt-1 me-2 flex-shrink-0"></i>
+                            <div>
+                                <span class="fw-bold text-dark d-block mb-1">Shop Address:</span>
+                                <span style="white-space: pre-line;">{{ shop.address or 'Address not provided' }}</span>
+                            </div>
                         </div>
-                        
-                        <div class="flex-shrink-0 w-100 w-md-auto">
-                            <a href="{{ url_for('shop_detail', shop_id=(shop.shop_id if shop.shop_id else shop.id)) }}" class="btn btn-explore-premium w-100 d-flex align-items-center justify-content-center">
-                                Explore Profile <i class="fa-solid fa-arrow-right ms-2"></i>
-                            </a>
-                        </div>
+                    </div>
+                    
+                    <!-- Bottom Action Bar -->
+                    <div class="d-flex justify-content-end pt-2 border-top">
+                        <a href="{{ url_for('shop_detail', shop_id=(shop.shop_id if shop.shop_id else shop.id)) }}" class="btn-explore">
+                            Explore Profile <i class="fa-solid fa-arrow-right"></i>
+                        </a>
                     </div>
 
                 </div>
@@ -176,9 +144,9 @@
             {% else %}
             <!-- Empty State -->
             <div class="text-center my-5 p-5 bg-white rounded-4 shadow-sm border border-2 border-dashed">
-                <i class="fa-solid fa-shop-slash text-muted opacity-50 mb-3" style="font-size: 4rem;"></i>
+                <i class="fa-solid fa-shop-slash text-muted opacity-50 mb-3" style="font-size: 3.5rem;"></i>
                 <h4 class="text-dark fw-bold">No Shops Found</h4>
-                <p class="text-muted small mb-0">Abhi tak network mein koi dukan register nahi hui hai[cite: 4].</p>
+                <p class="text-muted small mb-0">Abhi tak network mein koi dukan register nahi hui hai.</p>
             </div>
             {% endfor %}
             
