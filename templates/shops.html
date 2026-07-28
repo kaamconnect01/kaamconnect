@@ -2,128 +2,104 @@
 {% block content %}
 <style>
     /* =========================================
-       ULTIMATE GAME-PHYSICS SCREENSAVER SHOPS
+       ULTRA-PREMIUM SHOP CARDS REDESIGN
        ========================================= */
+    :root {
+        --primary-indigo: #4f46e5;
+        --indigo-glow: rgba(79, 70, 229, 0.15);
+    }
+
     body {
         background-color: #f8fafc;
         color: #1e293b;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
         min-height: 100vh;
-        overflow-x: hidden;
     }
 
-    /* Future Banner Slot Wrapper */
+    /* Top Banner / Ad Slot */
     .banner-slot-container {
         width: 100%;
-        min-height: 100px;
+        min-height: 90px;
         background: linear-gradient(135deg, #e0eafc 0%, #cfdef3 100%);
         border: 2px dashed #94a3b8;
-        border-radius: 24px;
+        border-radius: 20px;
         display: flex;
         align-items: center;
         justify-content: center;
         color: #64748b;
         font-weight: 600;
-        font-size: 0.95rem;
-        box-shadow: 0 4px 20px rgba(0,0,0,0.03);
+        font-size: 0.9rem;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.03);
         transition: all 0.3s ease;
     }
     .banner-slot-container:hover {
-        border-color: #4f46e5;
-        color: #4f46e5;
+        border-color: var(--primary-indigo);
+        color: var(--primary-indigo);
     }
 
-    /* Extra Large & Wide Screensaver Universe Container */
-    .bubble-universe-container {
-        position: relative;
-        width: 100%;
-        height: 800px; /* Badi height aur space */
-        background: #ffffff;
-        border-radius: 32px;
-        border: 2px solid #e2e8f0;
-        box-shadow: 0 25px 60px rgba(0, 0, 0, 0.06);
-        overflow: hidden;
+    /* Subtle Floating Keyframe Animation for Cards */
+    @keyframes subtleFloat {
+        0% { transform: translateY(0px); }
+        50% { transform: translateY(-4px); }
+        100% { transform: translateY(0px); }
     }
 
-    /* Circular Shop Bubble (Ball Game Feel) */
-    .shop-bubble {
-        width: 170px;
-        height: 170px;
-        border-radius: 50%;
+    .premium-shop-card {
         background: #ffffff;
-        border: 3px solid #4f46e5;
+        border-radius: 24px !important;
+        border: 1px solid #e2e8f0;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.03);
+        transition: all 0.3s cubic-bezier(0.165, 0.84, 0.44, 1);
+        animation: subtleFloat 6s ease-in-out infinite;
+    }
+
+    .premium-shop-card:nth-child(even) {
+        animation-delay: 3s;
+    }
+
+    .premium-shop-card:hover {
+        transform: translateY(-6px);
+        box-shadow: 0 20px 40px var(--indigo-glow) !important;
+        border-color: #cbd5e1;
+    }
+
+    /* Shop Icon Box */
+    .shop-icon-box {
+        width: 60px;
+        height: 60px;
+        border-radius: 18px;
+        background: linear-gradient(135deg, #eef2ff 0%, #e0e7ff 100%);
+        color: var(--primary-indigo);
         display: flex;
-        flex-direction: column;
         align-items: center;
         justify-content: center;
-        text-align: center;
-        cursor: grab;
-        padding: 14px;
-        position: absolute;
-        box-shadow: 0 12px 35px rgba(79, 70, 229, 0.2);
-        user-select: none;
-        touch-action: none;
-        transition: border-color 0.2s ease, box-shadow 0.2s ease;
-        z-index: 2;
+        flex-shrink: 0;
+        box-shadow: inset 0 2px 4px rgba(255, 255, 255, 0.6);
     }
 
-    .shop-bubble:active {
-        cursor: grabbing;
-    }
-
-    .shop-bubble:hover {
-        border-color: #06b6d4;
-        box-shadow: 0 18px 45px rgba(6, 182, 212, 0.35);
-        z-index: 100;
-    }
-
-    .shop-bubble i {
-        font-size: 1.8rem;
-        color: #4f46e5;
-        margin-bottom: 4px;
-    }
-
-    .shop-bubble-title {
-        font-size: 0.85rem;
+    /* Action Button */
+    .btn-explore-premium {
+        background: linear-gradient(135deg, #4f46e5 0%, #4338ca 100%);
+        color: #ffffff;
+        border-radius: 50px;
         font-weight: 700;
-        color: #0f172a;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        max-width: 130px;
-        margin-bottom: 2px;
+        padding: 10px 24px;
+        border: none;
+        box-shadow: 0 4px 15px rgba(79, 70, 229, 0.3);
+        transition: all 0.2s ease;
     }
 
-    /* Hover Details Popup Card */
-    .bubble-hover-card {
-        position: absolute;
-        bottom: 125%;
-        left: 50%;
-        transform: translateX(-50%) scale(0.9);
-        width: 270px;
-        background: #ffffff;
-        border: 1px solid #e2e8f0;
-        border-radius: 20px;
-        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
-        padding: 18px;
-        opacity: 0;
-        visibility: hidden;
-        transition: all 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-        z-index: 1000;
-        text-align: left;
-        pointer-events: none;
-    }
-
-    .shop-bubble:hover .bubble-hover-card {
-        opacity: 1;
-        visibility: visible;
-        transform: translateX(-50%) scale(1);
-        pointer-events: auto;
+    .btn-explore-premium:hover {
+        background: linear-gradient(135deg, #4338ca 0%, #3730a3 100%);
+        color: #ffffff;
+        box-shadow: 0 6px 20px rgba(79, 70, 229, 0.45);
+        transform: scale(1.02);
     }
 </style>
 
-<div class="container-fluid px-3 px-md-4 my-4">
+<div class="container py-4 py-md-5">
     
-    <!-- Top Space / Banner Slot (Reserved for future advertisements) -->
+    <!-- Top Advertisement / Banner Slot -->
     <div class="mb-4">
         <div class="banner-slot-container">
             <i class="fa-solid fa-rectangle-ad me-2 fs-5"></i> 📢 Banner Space / Advertisement Slot (Reserved)
@@ -131,257 +107,82 @@
     </div>
 
     <!-- Header Section -->
-    <div class="text-center mb-4">
-        <span class="badge bg-primary bg-opacity-10 text-primary border border-primary-subtle px-3 py-1 rounded-pill mb-2 fw-bold" style="font-size: 0.75rem;">INTERACTIVE GAME PHYSICS UNIVERSE</span>
+    <div class="text-center mb-5">
+        <span class="badge bg-primary bg-opacity-10 text-primary border border-primary-subtle px-3 py-1 rounded-pill mb-2 fw-bold" style="font-size: 0.75rem;">VERIFIED BUSINESS DIRECTORY</span>
         <h2 class="fw-bold text-dark display-6 mb-2">🏢 Registered Shops & Contractors</h2>
-        <p class="text-muted small px-3">Circles ko ball ki tarah kisi bhi taraf phenkein (Bounce & Fling Physics), hover karke details dekhein, ya click karke explore karein!</p>
+        <p class="text-muted small px-3">Browse top verified business profiles, master artisans, and furniture experts in Udaipur[cite: 4].</p>
     </div>
 
-    <!-- Expanded Bubble Universe Container -->
-    <div class="bubble-universe-container" id="bubbleUniverse">
-        
-        {% for shop in shops %}
-        <!-- Circular Floating Shop Bubble -->
-        <div class="shop-bubble" data-url="{{ url_for('shop_detail', shop_id=(shop.shop_id if shop.shop_id else shop.id)) }}">
-            <div class="position-absolute top-0 end-0 translate-middle p-1 bg-success border border-white rounded-circle shadow-sm" style="width: 14px; height: 14px;" title="Active"></div>
+    <!-- Cards List Container -->
+    <div class="row justify-content-center">
+        <div class="col-lg-8 col-md-10">
             
-            <i class="fa-solid fa-store"></i>
-            <span class="shop-bubble-title">{{ shop.shop_name if shop.shop_name else 'Premium Shop' }}</span>
-            <span class="badge bg-light text-primary border px-2 py-1 mt-1" style="font-size: 0.65rem;">{{ shop.expertise or 'Expert' }}</span>
+            {% for shop in shops %}
+            <!-- Premium Shop Card -->
+            <div class="card premium-shop-card mb-4">
+                <div class="card-body p-4 p-md-4">
+                    
+                    <div class="d-flex flex-column flex-md-row align-items-start align-items-md-center justify-content-between gap-3 mb-3">
+                        <div class="d-flex align-items-center">
+                            <div class="shop-icon-box me-3 shadow-sm">
+                                <i class="fa-solid fa-store fs-4"></i>
+                            </div>
+                            <div>
+                                <h4 class="fw-bold text-dark mb-1 text-capitalize">
+                                    {{ shop.shop_name if shop.shop_name else 'Premium Furniture Works' }}[cite: 4]
+                                </h4>
+                                <p class="text-secondary mb-0 small fw-medium">
+                                    <i class="fa-solid fa-user-tie text-primary me-1"></i> {{ shop.name or 'Verified Partner' }}[cite: 4]
+                                </p>
+                            </div>
+                        </div>
+                        
+                        <!-- Status Badge -->
+                        <span class="badge bg-success bg-opacity-10 text-success border border-success-subtle rounded-pill px-3 py-2 fw-bold align-self-start align-self-md-center" style="font-size: 0.75rem;">
+                            <i class="fa-solid fa-circle-check me-1"></i> Active Partner
+                        </span>
+                    </div>
+                    
+                    <!-- Badges Row (Expertise & Experience) -->
+                    <div class="d-flex flex-wrap gap-2 mb-3 pt-1">
+                        <span class="badge bg-light text-primary border px-3 py-2 rounded-pill fw-semibold shadow-sm">
+                            <i class="fa-solid fa-screwdriver-wrench me-1"></i> {{ shop.expertise or 'General Expert' }}[cite: 4]
+                        </span>
+                        <span class="badge bg-light text-dark border px-3 py-2 rounded-pill fw-semibold shadow-sm">
+                            <i class="fa-solid fa-clock me-1 text-warning"></i> {{ shop.experience or '0' }} Years Experience[cite: 4]
+                        </span>
+                    </div>
+                    
+                    <hr class="text-muted opacity-25 my-3">
+                    
+                    <!-- Bottom Section: Location & Explore Button -->
+                    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
+                        <div class="text-muted small pe-md-3">
+                            <i class="fa-solid fa-location-dot text-danger me-1"></i> 
+                            <span class="fw-bold text-dark">Location:</span> 
+                            {{ shop.address or 'Address not provided' }}[cite: 4]
+                        </div>
+                        
+                        <div class="flex-shrink-0 w-100 w-md-auto">
+                            <a href="{{ url_for('shop_detail', shop_id=(shop.shop_id if shop.shop_id else shop.id)) }}" class="btn btn-explore-premium w-100 d-flex align-items-center justify-content-center">
+                                Explore Profile <i class="fa-solid fa-arrow-right ms-2"></i>
+                            </a>
+                        </div>
+                    </div>
 
-            <!-- Hover Details Card -->
-            <div class="bubble-hover-card">
-                <div class="d-flex align-items-center mb-2 pb-2 border-bottom">
-                    <div class="bg-primary bg-opacity-10 text-primary p-2 rounded-3 me-2">
-                        <i class="fa-solid fa-store"></i>
-                    </div>
-                    <div>
-                        <h6 class="fw-bold text-dark mb-0 text-truncate" style="max-width: 175px;">{{ shop.shop_name if shop.shop_name else 'Premium Shop' }}</h6>
-                        <span class="text-muted" style="font-size: 0.7rem;">Verified Node</span>
-                    </div>
-                </div>
-                <p class="mb-1 text-muted small"><i class="fa-solid fa-user-tie text-primary me-1"></i> <span class="text-dark fw-semibold">{{ shop.name or 'Verified Partner' }}</span></p>
-                <p class="mb-1 text-muted small"><i class="fa-solid fa-screwdriver-wrench text-warning me-1"></i> <span class="text-dark fw-semibold">{{ shop.expertise or 'Expert' }}</span> ({{ shop.experience or '0' }} Yrs)</p>
-                <p class="mb-2 text-muted small text-truncate"><i class="fa-solid fa-location-dot text-danger me-1"></i> <span class="text-dark">{{ shop.address or 'Address not provided' }}</span></p>
-                <div class="btn btn-primary w-100 rounded-pill py-1 fw-bold shadow-sm text-center" style="font-size: 0.75rem;">
-                    Click Bubble to Explore <i class="fa-solid fa-arrow-right ms-1"></i>
                 </div>
             </div>
+            
+            {% else %}
+            <!-- Empty State -->
+            <div class="text-center my-5 p-5 bg-white rounded-4 shadow-sm border border-2 border-dashed">
+                <i class="fa-solid fa-shop-slash text-muted opacity-50 mb-3" style="font-size: 4rem;"></i>
+                <h4 class="text-dark fw-bold">No Shops Found</h4>
+                <p class="text-muted small mb-0">Abhi tak network mein koi dukan register nahi hui hai[cite: 4].</p>
+            </div>
+            {% endfor %}
+            
         </div>
-        
-        {% else %}
-        <!-- Empty State -->
-        <div class="text-center py-5 w-100 h-100 d-flex flex-column align-items-center justify-content-center">
-            <i class="fa-solid fa-shop-slash text-muted opacity-50 mb-3" style="font-size: 3.5rem;"></i>
-            <h4 class="text-dark fw-bold">No Shops Found</h4>
-            <p class="text-muted small mb-0">Abhi tak network me koi dukan register nahi hui hai.</p>
-        </div>
-        {% endfor %}
-
     </div>
 </div>
-
-<script>
-    document.addEventListener("DOMContentLoaded", function() {
-        const container = document.getElementById('bubbleUniverse');
-        const bubbles = document.querySelectorAll('.shop-bubble');
-        if (!container || bubbles.length === 0) return;
-
-        const bubbleData = [];
-        const bubbleSize = 170;
-        const radius = bubbleSize / 2;
-
-        // Initialize scattered positions and random speeds
-        bubbles.forEach((bubble) => {
-            let x = Math.random() * (container.clientWidth - bubbleSize);
-            let y = Math.random() * (container.clientHeight - bubbleSize);
-            let vx = (Math.random() - 0.5) * 3;
-            let vy = (Math.random() - 0.5) * 3;
-
-            bubble.style.left = x + 'px';
-            bubble.style.top = y + 'px';
-
-            bubbleData.push({ el: bubble, x, y, vx, vy, isDragging: false });
-        });
-
-        let activeBubble = null;
-        let offsetX = 0, offsetY = 0;
-        let lastX = 0, lastY = 0;
-        let lastTime = 0;
-        let totalMoved = 0;
-
-        // Drag & Fling Physics Handling
-        bubbleData.forEach((data) => {
-            const bubble = data.el;
-
-            const onDragStart = (clientX, clientY) => {
-                if (event.target.closest('.bubble-hover-card')) return;
-                data.isDragging = true;
-                activeBubble = data;
-                totalMoved = 0;
-                data.vx = 0;
-                data.vy = 0;
-                
-                const rect = container.getBoundingClientRect();
-                offsetX = clientX - rect.left - data.x;
-                offsetY = clientY - rect.top - data.y;
-                
-                lastX = clientX;
-                lastY = clientY;
-                lastTime = performance.now();
-                bubble.style.zIndex = 3000;
-            };
-
-            bubble.addEventListener('mousedown', (e) => onDragStart(e.clientX, e.clientY));
-            bubble.addEventListener('touchstart', (e) => {
-                const touch = e.touches[0];
-                onDragStart(touch.clientX, touch.clientY);
-            }, { passive: true });
-        });
-
-        const onDragMove = (clientX, clientY) => {
-            if (!activeBubble) return;
-            const rect = container.getBoundingClientRect();
-            let newX = clientX - rect.left - offsetX;
-            let newY = clientY - rect.top - offsetY;
-
-            totalMoved += Math.abs(clientX - (activeBubble.x + rect.left + offsetX)) + Math.abs(clientY - (activeBubble.y + rect.top + offsetY));
-
-            activeBubble.x = Math.max(0, Math.min(container.clientWidth - bubbleSize, newX));
-            activeBubble.y = Math.max(0, Math.min(container.clientHeight - bubbleSize, newY));
-
-            // Track velocity for throw/fling
-            const now = performance.now();
-            const dt = now - lastTime;
-            if (dt > 50) {
-                activeBubble.vx = (clientX - lastX) / dt * 15;
-                activeBubble.vy = (clientY - lastY) / dt * 15;
-                lastX = clientX;
-                lastY = clientY;
-                lastTime = now;
-            }
-        };
-
-        window.addEventListener('mousemove', (e) => onDragMove(e.clientX, e.clientY));
-        window.addEventListener('touchmove', (e) => {
-            if (!activeBubble) return;
-            const touch = e.touches[0];
-            onDragMove(touch.clientX, touch.clientY);
-        }, { passive: true });
-
-        const onDragEnd = () => {
-            if (activeBubble) {
-                activeBubble.el.style.zIndex = '';
-
-                // Cap maximum throw velocity
-                activeBubble.vx = Math.max(-12, Math.min(12, activeBubble.vx));
-                activeBubble.vy = Math.max(-12, Math.min(12, activeBubble.vy));
-
-                // If hardly moved, treat as click to open shop page
-                if (totalMoved < 10) {
-                    const targetUrl = activeBubble.el.getAttribute('data-url');
-                    if (targetUrl) {
-                        window.location.href = targetUrl;
-                    }
-                }
-                activeBubble = null;
-            }
-        };
-
-        window.addEventListener('mouseup', onDragEnd);
-        window.addEventListener('touchend', onDragEnd);
-
-        // Game Physics Engine Loop (Wall Bounce + Elastic Ball-to-Ball Collisions)
-        function animate() {
-            const maxX = container.clientWidth - bubbleSize;
-            const maxY = container.clientHeight - bubbleSize;
-
-            // Update positions & wall bouncing
-            bubbleData.reverse().forEach(data => {
-                if (!data.isDragging) {
-                    data.x += data.vx;
-                    data.y += data.vy;
-
-                    // Friction / Air resistance
-                    data.vx *= 0.99;
-                    data.vy *= 0.99;
-
-                    // Left & Right Wall Bounce
-                    if (data.x <= 0) { 
-                        data.x = 0; 
-                        data.vx *= -1; 
-                    } else if (data.x >= maxX) { 
-                        data.x = maxX; 
-                        data.vx *= -1; 
-                    }
-
-                    // Top & Bottom Wall Bounce
-                    if (data.y <= 0) { 
-                        data.y = 0; 
-                        data.vy *= -1; 
-                    } else if (data.y >= maxY) { 
-                        data.y = maxY; 
-                        data.vy *= -1; 
-                    }
-                }
-            });
-
-            // Circle-to-Circle Elastic Collisions (Billiard Ball Physics)
-            for (let i = 0; i < bubbleData.length; i++) {
-                for (let j = i + 1; j < bubbleData.length; j++) {
-                    let b1 = bubbleData[i];
-                    let b2 = bubbleData[j];
-
-                    let x1 = b1.x + radius, y1 = b1.y + radius;
-                    let x2 = b2.x + radius, y2 = b2.y + radius;
-
-                    let dx = x2 - x1;
-                    let dy = y2 - y1;
-                    let dist = Math.sqrt(dx * dx + dy * dy);
-                    let minDist = bubbleSize;
-
-                    if (dist < minDist && dist > 0) {
-                        let overlap = (minDist - dist) / 2;
-                        let nx = dx / dist;
-                        let ny = dy / dist;
-
-                        // Position separation to prevent sticking
-                        if (!b1.isDragging) {
-                            b1.x -= nx * overlap;
-                            b1.y -= ny * overlap;
-                        }
-                        if (!b2.isDragging) {
-                            b2.x += nx * overlap;
-                            b2.y += ny * overlap;
-                        }
-
-                        // Elastic velocity exchange
-                        let kx = b1.vx - b2.vx;
-                        let ky = b1.vy - b2.vy;
-                        let p = 2 * (nx * kx + ny * ky) / 2;
-
-                        if (!b1.isDragging) {
-                            b1.vx -= p * nx * 0.95;
-                            b1.vy -= p * ny * 0.95;
-                        }
-                        if (!b2.isDragging) {
-                            b2.vx += p * nx * 0.95;
-                            b2.vy += p * ny * 0.95;
-                        }
-                    }
-                }
-            }
-
-            // Apply DOM coordinates
-            bubbleData.forEach(data => {
-                data.el.style.left = data.x + 'px';
-                data.el.style.top = data.y + 'px';
-            });
-
-            requestAnimationFrame(animate);
-        }
-
-        requestAnimationFrame(animate);
-    });
-</script>
 {% endblock %}
