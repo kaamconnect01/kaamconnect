@@ -1,126 +1,271 @@
 {% extends 'base.html' %}
 {% block content %}
 <style>
-    /* Premium App-Style Card CSS */
-    .premium-shop-card { 
-        transition: all 0.3s ease; 
-        border-radius: 24px !important; /* Ekdum round corners */
-        border: 1px solid rgba(0,0,0,0.04);
-        background: #ffffff;
-    }
-    
-    .premium-shop-card:hover { 
-        transform: translateY(-5px); 
-        box-shadow: 0 15px 30px rgba(0,0,0,0.08) !important; 
+    /* =========================================
+       FUTURISTIC NEON FLOATING BUBBLE REDESIGN
+       ========================================= */
+    :root {
+        --neon-cyan: #00f2fe;
+        --neon-blue: #4facfe;
+        --neon-purple: #a855f7;
+        --neon-glow: rgba(0, 242, 254, 0.6);
     }
 
-    /* Icon box for premium look */
-    .shop-icon-box {
-        width: 55px;
-        height: 55px;
-        border-radius: 16px;
-        background: linear-gradient(135deg, #e0eafc 0%, #cfdef3 100%);
+    body {
+        background: radial-gradient(circle at center, #0f172a 0%, #090d16 100%);
+        color: #f8fafc;
+        min-height: 100vh;
+        overflow-x: hidden;
+    }
+
+    /* Universe / Constellation Container */
+    .bubble-universe-container {
+        position: relative;
+        width: 100%;
+        min-height: 75vh;
+        background: rgba(15, 23, 42, 0.4);
+        border-radius: 32px;
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        box-shadow: inset 0 0 50px rgba(0, 0, 0, 0.8), 0 20px 40px rgba(0, 0, 0, 0.4);
+        backdrop-filter: blur(12px);
+        padding: 40px 20px;
+        overflow: hidden;
         display: flex;
+        flex-wrap: wrap;
         align-items: center;
         justify-content: center;
-        flex-shrink: 0;
+        gap: 35px;
     }
 
-    /* Mobile view specific spacing (Left/Right gap) */
-    @media (max-width: 767px) {
-        .mobile-card-wrapper {
-            padding-left: 12px;
-            padding-right: 12px;
-        }
-        .shop-title {
-            font-size: 1.15rem;
-        }
+    /* Floating & Pulsing Animations */
+    @keyframes floatRandom1 {
+        0% { transform: translateY(0px) translateX(0px) rotate(0deg); }
+        50% { transform: translateY(-15px) translateX(10px) rotate(2deg); }
+        100% { transform: translateY(0px) translateX(0px) rotate(0deg); }
+    }
+
+    @keyframes floatRandom2 {
+        0% { transform: translateY(0px) translateX(0px) rotate(0deg); }
+        50% { transform: translateY(12px) translateX(-12px) rotate(-2deg); }
+        100% { transform: translateY(0px) translateX(0px) rotate(0deg); }
+    }
+
+    @keyframes neonPulse {
+        0% { box-shadow: 0 0 15px rgba(0, 242, 254, 0.4), inset 0 0 10px rgba(0, 242, 254, 0.2); }
+        50% { box-shadow: 0 0 30px rgba(168, 85, 247, 0.8), inset 0 0 20px rgba(168, 85, 247, 0.4); border-color: #a855f7; }
+        100% { box-shadow: 0 0 15px rgba(0, 242, 254, 0.4), inset 0 0 10px rgba(0, 242, 254, 0.2); }
+    }
+
+    /* Circular Shop Bubble */
+    .shop-bubble {
+        width: 130px;
+        height: 130px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, rgba(30, 41, 59, 0.9) 0%, rgba(15, 23, 42, 0.95) 100%);
+        border: 2px solid var(--neon-cyan);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        cursor: pointer;
+        padding: 12px;
+        position: relative;
+        animation: neonPulse 3s infinite ease-in-out, floatRandom1 6s infinite ease-in-out;
+        transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), background 0.3s ease;
+        z-index: 2;
+    }
+
+    .shop-bubble:nth-child(even) {
+        animation: neonPulse 3.5s infinite ease-in-out, floatRandom2 7s infinite ease-in-out;
+    }
+
+    .shop-bubble:hover {
+        transform: scale(1.18) translateY(-5px);
+        background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+        border-color: #fff;
+        z-index: 10;
+    }
+
+    .shop-bubble i {
+        font-size: 1.6rem;
+        color: var(--neon-cyan);
+        margin-bottom: 4px;
+        filter: drop-shadow(0 0 8px var(--neon-cyan));
+    }
+
+    .shop-bubble-title {
+        font-size: 0.72rem;
+        font-weight: 700;
+        color: #ffffff;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-width: 100px;
+        margin-bottom: 2px;
+    }
+
+    .shop-bubble-sub {
+        font-size: 0.58rem;
+        color: #94a3b8;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-width: 90px;
+    }
+
+    /* Interactive Popup Card Modal Style */
+    .bubble-popup-overlay {
+        position: fixed;
+        top: 0; left: 0; width: 100%; height: 100%;
+        background: rgba(9, 13, 22, 0.8);
+        backdrop-filter: blur(8px);
+        display: none;
+        align-items: center;
+        justify-content: center;
+        z-index: 9999;
+        animation: fadeIn 0.2s ease forwards;
+    }
+
+    .bubble-popup-card {
+        background: #1e293b;
+        border: 2px solid var(--neon-cyan);
+        border-radius: 24px;
+        padding: 30px;
+        width: 90%;
+        max-width: 420px;
+        box-shadow: 0 0 40px rgba(0, 242, 254, 0.3);
+        position: relative;
+        color: #fff;
+        text-align: left;
+        transform: scale(0.9);
+        animation: popScale 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+    }
+
+    @keyframes popScale {
+        to { transform: scale(1); }
+    }
+
+    .close-popup-btn {
+        position: absolute;
+        top: 15px; right: 20px;
+        background: transparent;
+        border: none;
+        color: #94a3b8;
+        font-size: 1.4rem;
+        cursor: pointer;
+        transition: color 0.2s;
+    }
+    .close-popup-btn:hover { color: #fff; }
+
+    .neon-badge {
+        background: rgba(0, 242, 254, 0.1);
+        color: var(--neon-cyan);
+        border: 1px solid rgba(0, 242, 254, 0.3);
+        padding: 4px 12px;
+        border-radius: 50px;
+        font-size: 0.75rem;
+        font-weight: 600;
+    }
+
+    .btn-neon-action {
+        background: linear-gradient(135deg, var(--neon-cyan) 0%, var(--neon-blue) 100%);
+        color: #0f172a;
+        font-weight: 800;
+        border-radius: 50px;
+        border: none;
+        padding: 12px 24px;
+        box-shadow: 0 0 20px rgba(0, 242, 254, 0.4);
+        transition: all 0.2s ease;
+    }
+    .btn-neon-action:hover {
+        background: #fff;
+        box-shadow: 0 0 30px #fff;
+        color: #0f172a;
+        transform: scale(1.02);
     }
 </style>
 
 <div class="container my-4 my-md-5">
+    <!-- Header Section -->
     <div class="text-center mb-4 mb-md-5">
-        <h2 class="fw-bold text-dark fs-3">🏢 Registered Shops & Contractors</h2>
-        <p class="text-muted small px-3">Browse top verified business profiles and furniture experts in Udaipur</p>
+        <span class="badge px-3 py-1 rounded-pill mb-2" style="background: rgba(0, 242, 254, 0.1); color: #00f2fe; border: 1px solid rgba(0,242,254,0.3); font-size: 0.75rem; letter-spacing: 1px;">INTERACTIVE UNIVERSE</span>
+        <h2 class="fw-bold text-white display-6 mb-2" style="text-shadow: 0 0 20px rgba(0,242,254,0.4);">🏢 Registered Shops & Contractors</h2>
+        <p class="text-secondary small px-3">Tap any glowing floating node to explore verified furniture experts & business profiles</p>
     </div>
 
-    <div class="row justify-content-center">
-        <!-- Mobile wrapper added for perfect side spacing -->
-        <div class="col-lg-8 col-md-10 mobile-card-wrapper">
-            
-            {% for shop in shops %}
-            <!-- Premium Card Start -->
-            <div class="card premium-shop-card shadow-sm mb-4">
-                <div class="card-body p-4">
-                    
-                    <!-- Top Section: Icon & Title -->
-                    <div class="d-flex align-items-start mb-3">
-                        <!-- Icon (Ab mobile me bhi dikhega) -->
-                        <div class="shop-icon-box text-primary me-3 shadow-sm">
-                            <i class="fa-solid fa-store fs-4"></i>
-                        </div>
-                        
-                        <div class="flex-grow-1">
-                            <div class="d-flex justify-content-between align-items-start">
-                                <div>
-                                    <h4 class="fw-bold text-dark mb-1 text-capitalize shop-title">
-                                        {{ shop.shop_name if shop.shop_name else 'Premium Furniture Works' }}
-                                    </h4>
-                                    <p class="text-secondary mb-0 small fw-medium">
-                                        <i class="fa-solid fa-user-tie text-primary me-1"></i> {{ shop.name or 'Verified Partner' }}
-                                    </p>
-                                </div>
-                                <!-- Active Badge -->
-                                <span class="badge bg-success bg-opacity-10 text-success border border-success-subtle rounded-pill px-2 py-1 ms-2" style="font-size: 0.7rem;">
-                                    Active
-                                </span>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <!-- Middle Section: Badges -->
-                    <div class="d-flex flex-wrap gap-2 mb-3">
-                        <span class="badge bg-light text-primary border px-3 py-2 rounded-pill fw-medium shadow-sm">
-                            🛠️ {{ shop.expertise or 'General Expert' }}
-                        </span>
-                        <span class="badge bg-light text-dark border px-3 py-2 rounded-pill fw-medium shadow-sm">
-                            ⏳ {{ shop.experience or '0' }} Yrs
-                        </span>
-                    </div>
-                    
-                    <hr class="text-muted opacity-25">
-                    
-                    <!-- Bottom Section: Location & Button -->
-                    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
-                        <!-- Location -->
-                        <div class="text-muted small pe-md-3">
-                            <i class="fa-solid fa-location-dot text-danger me-1"></i> 
-                            <span class="fw-medium text-dark">Location:</span> 
-                            {{ shop.address or 'Address not provided' }}
-                        </div>
-                        
-                        <!-- Action Button -->
-                        <div class="flex-shrink-0">
-                            <a href="{{ url_for('shop_detail', shop_id=shop.id) }}" class="btn btn-primary rounded-pill px-4 py-2 fw-bold w-100 shadow-sm d-flex align-items-center justify-content-center">
-                                Explore <i class="fa-solid fa-arrow-right ms-2"></i>
-                            </a>
-                        </div>
-                    </div>
-                    
-                </div>
-            </div>
-            <!-- Premium Card End -->
-            
-            {% else %}
-            <!-- Empty State -->
-            <div class="text-center my-5 p-5 bg-white rounded-4 shadow-sm border" style="border-radius: 24px !important;">
-                <i class="fa-solid fa-shop-slash text-muted opacity-50" style="font-size: 4rem;"></i>
-                <h4 class="text-dark fw-bold mt-3">No Shops Found</h4>
-                <p class="text-muted mb-0">Abhi tak koi dukan register nahi hui hai.</p>
-            </div>
-            {% endfor %}
-            
+    <!-- Bubble Universe Grid Container -->
+    <div class="bubble-universe-container">
+        
+        {% for shop in shops %}
+        <!-- Circular Floating Shop Bubble -->
+        <div class="shop-bubble" onclick="openShopModal('{{ shop.shop_id if shop.shop_id else shop.id }}', '{{ shop.shop_name if shop.shop_name else "Premium Furniture Works" }}', '{{ shop.name or "Verified Partner" }}', '{{ shop.expertise or "General Expert" }}', '{{ shop.experience or "0" }}', '{{ shop.address or "Address not provided" }}', '{{ url_for("shop_detail", shop_id=(shop.shop_id if shop.shop_id else shop.id)) }}')">
+            <div class="position-absolute top-0 end-0 translate-middle p-1 bg-success border border-light rounded-circle" style="width: 12px; height: 12px;" title="Active"></div>
+            <i class="fa-solid fa-store"></i>
+            <span class="shop-bubble-title">{{ shop.shop_name if shop.shop_name else 'Premium Shop' }}</span>
+            <span class="shop-bubble-sub">{{ shop.expertise or 'Expert' }}</span>
         </div>
+        
+        {% else %}
+        <!-- Empty State Inside Universe -->
+        <div class="text-center py-5 w-100">
+            <i class="fa-solid fa-satellite-dish text-secondary opacity-50 mb-3" style="font-size: 4rem;"></i>
+            <h4 class="text-white fw-bold">No Active Nodes Found</h4>
+            <p class="text-secondary small mb-0">Abhi tak network me koi dukan register nahi hui hai.</p>
+        </div>
+        {% endfor %}
+
     </div>
 </div>
+
+<!-- Interactive Floating Popup Modal -->
+<div class="bubble-popup-overlay" id="shopPopupModal" onclick="closeShopModalOutside(event)">
+    <div class="bubble-popup-card">
+        <button class="close-popup-btn" onclick="closeShopModal()"><i class="fa-solid fa-xmark"></i></button>
+        
+        <div class="d-flex align-items-center mb-3">
+            <div class="p-3 rounded-4 me-3 text-dark" style="background: linear-gradient(135deg, #00f2fe 0%, #4facfe 100%);">
+                <i class="fa-solid fa-store fs-3"></i>
+            </div>
+            <div>
+                <span class="neon-badge mb-1 d-inline-block">Verified Node</span>
+                <h4 class="fw-bold text-white mb-0 text-capitalize" id="modalShopName">Shop Name</h4>
+            </div>
+        </div>
+
+        <div class="bg-dark bg-opacity-50 p-3 rounded-4 mb-3 border border-secondary border-opacity-25">
+            <p class="mb-2 text-secondary small"><i class="fa-solid fa-user-tie text-info me-2"></i> Owner: <span class="text-white fw-semibold" id="modalOwnerName">-</span></p>
+            <p class="mb-2 text-secondary small"><i class="fa-solid fa-screwdriver-wrench text-warning me-2"></i> Expertise: <span class="text-white fw-semibold" id="modalExpertise">-</span></p>
+            <p class="mb-2 text-secondary small"><i class="fa-solid fa-clock text-success me-2"></i> Experience: <span class="text-white fw-semibold" id="modalExperience">-</span> Years</p>
+            <p class="mb-0 text-secondary small"><i class="fa-solid fa-location-dot text-danger me-2"></i> Location: <span class="text-white fw-semibold" id="modalAddress">-</span></p>
+        </div>
+
+        <a href="#" id="modalExploreBtn" class="btn btn-neon-action w-100 py-3 text-center fw-bold text-uppercase tracking-wider text-decoration-none d-block">
+            Explore Full Profile <i class="fa-solid fa-arrow-right ms-2"></i>
+        </a>
+    </div>
+</div>
+
+<script>
+    function openShopModal(id, shopName, ownerName, expertise, experience, address, detailUrl) {
+        document.getElementById('modalShopName').innerText = shopName;
+        document.getElementById('modalOwnerName').innerText = ownerName;
+        document.getElementById('modalExpertise').innerText = expertise;
+        document.getElementById('modalExperience').innerText = experience;
+        document.getElementById('modalAddress').innerText = address;
+        document.getElementById('modalExploreBtn').href = detailUrl;
+
+        document.getElementById('shopPopupModal').style.display = 'flex';
+    }
+
+    function closeShopModal() {
+        document.getElementById('shopPopupModal').style.display = 'none';
+    }
+
+    function closeShopModalOutside(event) {
+        if (event.target === document.getElementById('shopPopupModal')) {
+            closeShopModal();
+        }
+    }
+</script>
 {% endblock %}
