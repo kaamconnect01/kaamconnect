@@ -2,12 +2,14 @@
 {% block content %}
 <style>
     /* =========================================
-       COMPACT NON-SCROLL SAAS SIGNUP DESIGN
+       PREMIUM SAAS INPUT REDESIGN (NON-SCROLL)
        ========================================= */
     :root {
         --indigo-primary: #4f46e5;
         --indigo-hover: #4338ca;
         --indigo-light: #eef2ff;
+        --input-border: #cbd5e1;
+        --input-focus: #4f46e5;
     }
 
     body {
@@ -18,8 +20,8 @@
     .auth-card {
         background: #ffffff;
         border-radius: 20px;
-        box-shadow: 0 15px 35px rgba(79, 70, 229, 0.07);
-        border: 1px solid rgba(79, 70, 229, 0.05);
+        box-shadow: 0 15px 35px rgba(79, 70, 229, 0.08);
+        border: 1px solid rgba(79, 70, 229, 0.06);
     }
 
     /* Compact Role Grid Cards */
@@ -58,19 +60,51 @@
         color: white !important;
     }
 
-    /* Ultra-Compact Form Controls */
-    .custom-input {
-        border-radius: 9px;
-        padding: 8px 12px;
-        border: 1.5px solid #cbd5e1;
-        font-size: 0.88rem;
-        background-color: #fff;
+    /* Premium Modern Input Styling */
+    .input-group-text {
+        background-color: #f8fafc;
+        border: 1.5px solid var(--input-border);
+        border-right: none;
+        border-radius: 10px 0 0 10px;
+        color: #64748b;
+        font-size: 0.85rem;
         transition: all 0.2s ease;
     }
-    
-    .custom-input:focus {
-        border-color: var(--indigo-primary);
-        box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+
+    .custom-input {
+        border-radius: 0 10px 10px 0;
+        padding: 8px 12px;
+        border: 1.5px solid var(--input-border);
+        border-left: none;
+        font-size: 0.86rem;
+        background-color: #ffffff;
+        color: #1e293b;
+        transition: all 0.2s ease;
+    }
+
+    /* Single inputs without addon groups */
+    .custom-input-standalone {
+        border-radius: 10px;
+        padding: 8px 12px;
+        border: 1.5px solid var(--input-border);
+        font-size: 0.86rem;
+        background-color: #ffffff;
+        color: #1e293b;
+        transition: all 0.2s ease;
+    }
+
+    .custom-input:focus, .custom-input-standalone:focus {
+        border-color: var(--input-focus);
+        box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.12);
+        background-color: #ffffff;
+        outline: none;
+    }
+
+    /* When input is focused, style its addon box too */
+    .input-group:focus-within .input-group-text {
+        border-color: var(--input-focus);
+        color: var(--indigo-primary);
+        background-color: #eef2ff;
     }
 
     .btn-indigo {
@@ -163,56 +197,83 @@
                         </div>
                     </div>
 
-                    <!-- Common Credentials Section (3 items in 1 row) -->
+                    <!-- Common Credentials Section (Premium Icon Inputs) -->
                     <div id="commonCredentials" style="display: none;" class="dynamic-field-anim mb-2">
-                        <div class="bg-light p-2 p-md-3 rounded-3 border-0">
+                        <div class="p-2 p-md-3 rounded-3 border bg-white shadow-sm">
                             <div class="row g-2">
                                 <div class="col-md-4">
-                                    <label class="form-label text-secondary mb-1" style="font-size: 0.75rem; font-weight: 600;">Full Name</label>
-                                    <input type="text" name="name" class="form-control custom-input" required placeholder="Full name">
+                                    <label class="form-label text-secondary mb-1" style="font-size: 0.73rem; font-weight: 600;">Full Name</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text"><i class="fa-solid fa-user"></i></span>
+                                        <input type="text" name="name" class="form-control custom-input" required placeholder="Full name">
+                                    </div>
                                 </div>
                                 <div class="col-md-4">
-                                    <label class="form-label text-secondary mb-1" style="font-size: 0.75rem; font-weight: 600;">Mobile Number</label>
-                                    <input type="text" name="mobile" class="form-control custom-input" required placeholder="10-digit mobile">
+                                    <label class="form-label text-secondary mb-1" style="font-size: 0.73rem; font-weight: 600;">Mobile Number</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text"><i class="fa-solid fa-phone"></i></span>
+                                        <input type="text" name="mobile" class="form-control custom-input" required placeholder="10-digit mobile">
+                                    </div>
                                 </div>
                                 <div class="col-md-4">
-                                    <label class="form-label text-secondary mb-1" style="font-size: 0.75rem; font-weight: 600;">Password</label>
-                                    <input type="password" name="password" class="form-control custom-input" required placeholder="Password">
+                                    <label class="form-label text-secondary mb-1" style="font-size: 0.73rem; font-weight: 600;">Password</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text"><i class="fa-solid fa-lock"></i></span>
+                                        <input type="password" name="password" class="form-control custom-input" required placeholder="Password">
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
 
-                    <!-- Professional / Details Section (Multi-column tight grid) -->
+                    <!-- Professional / Details Section (Premium Inputs with Icons) -->
                     <div id="proFields" style="display: none;" class="dynamic-field-anim mb-2">
-                        <div class="bg-light p-2 p-md-3 rounded-3 border-0">
+                        <div class="p-2 p-md-3 rounded-3 border bg-white shadow-sm">
                             
                             <!-- Shop Name Input Field (Shown ONLY for Shop Owners) -->
                             <div class="mb-2" id="shopNameContainer" style="display: none;">
-                                <label class="form-label text-secondary mb-1" style="font-size: 0.75rem; font-weight: 600;">Shop / Business Name</label>
-                                <input type="text" name="shop_name" id="shopNameInput" class="form-control custom-input" placeholder="Enter shop/business name">
+                                <label class="form-label text-secondary mb-1" style="font-size: 0.73rem; font-weight: 600;">Shop / Business Name</label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="fa-solid fa-shop"></i></span>
+                                    <input type="text" name="shop_name" id="shopNameInput" class="form-control custom-input" placeholder="Enter shop/business name">
+                                </div>
                             </div>
 
                             <div class="row g-2">
                                 <div class="col-md-6">
-                                    <label class="form-label text-secondary mb-1" style="font-size: 0.75rem; font-weight: 600;">Expertise / Skill</label>
-                                    <input type="text" name="expertise" id="expertInput" class="form-control custom-input" placeholder="e.g. Electrician, Painter">
+                                    <label class="form-label text-secondary mb-1" style="font-size: 0.73rem; font-weight: 600;">Expertise / Skill</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text"><i class="fa-solid fa-screwdriver-wrench"></i></span>
+                                        <input type="text" name="expertise" id="expertInput" class="form-control custom-input" placeholder="e.g. Electrician, Painter">
+                                    </div>
                                 </div>
                                 <div class="col-md-6">
-                                    <label class="form-label text-secondary mb-1" style="font-size: 0.75rem; font-weight: 600;">Experience (Years)</label>
-                                    <input type="text" name="experience" id="expInput" class="form-control custom-input" placeholder="e.g. 4">
+                                    <label class="form-label text-secondary mb-1" style="font-size: 0.73rem; font-weight: 600;">Experience (Years)</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text"><i class="fa-solid fa-star"></i></span>
+                                        <input type="text" name="experience" id="expInput" class="form-control custom-input" placeholder="e.g. 4">
+                                    </div>
                                 </div>
                                 <div class="col-md-6">
-                                    <label class="form-label text-secondary mb-1" style="font-size: 0.75rem; font-weight: 600;">Email Address (Optional)</label>
-                                    <input type="email" name="email" class="form-control custom-input" placeholder="name@example.com">
+                                    <label class="form-label text-secondary mb-1" style="font-size: 0.73rem; font-weight: 600;">Email Address (Optional)</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text"><i class="fa-solid fa-envelope"></i></span>
+                                        <input type="email" name="email" class="form-control custom-input" placeholder="name@example.com">
+                                    </div>
                                 </div>
                                 <div class="col-md-6" id="workerFields" style="display: none;">
-                                    <label class="form-label text-secondary mb-1" style="font-size: 0.75rem; font-weight: 600;">Expected Daily Wage (₹)</label>
-                                    <input type="number" name="per_day_amount" id="wageInput" class="form-control custom-input" placeholder="e.g. 700">
+                                    <label class="form-label text-secondary mb-1" style="font-size: 0.73rem; font-weight: 600;">Expected Daily Wage (₹)</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text"><i class="fa-solid fa-indian-rupee-sign"></i></span>
+                                        <input type="number" name="per_day_amount" id="wageInput" class="form-control custom-input" placeholder="e.g. 700">
+                                    </div>
                                 </div>
                                 <div class="col-12">
-                                    <label class="form-label text-secondary mb-1" style="font-size: 0.75rem; font-weight: 600;">Address / Location</label>
-                                    <input type="text" name="address" id="addressInput" class="form-control custom-input" placeholder="Gali, Shop No, City, State...">
+                                    <label class="form-label text-secondary mb-1" style="font-size: 0.73rem; font-weight: 600;">Address / Location</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text"><i class="fa-solid fa-location-dot"></i></span>
+                                        <input type="text" name="address" id="addressInput" class="form-control custom-input" placeholder="Gali, Shop No, City, State...">
+                                    </div>
                                 </div>
                             </div>
                         </div>
