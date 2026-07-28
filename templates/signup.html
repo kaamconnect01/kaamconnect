@@ -2,13 +2,12 @@
 {% block content %}
 <style>
     /* =========================================
-       MODERN INDIGO SAAS ONBOARDING REDESIGN
+       COMPACT NON-SCROLL SAAS SIGNUP DESIGN
        ========================================= */
     :root {
         --indigo-primary: #4f46e5;
         --indigo-hover: #4338ca;
         --indigo-light: #eef2ff;
-        --dark-slate: #0f172a;
     }
 
     body {
@@ -18,42 +17,40 @@
 
     .auth-card {
         background: #ffffff;
-        border-radius: 28px;
-        box-shadow: 0 20px 45px rgba(79, 70, 229, 0.08);
-        border: 1px solid rgba(79, 70, 229, 0.06);
+        border-radius: 20px;
+        box-shadow: 0 15px 35px rgba(79, 70, 229, 0.07);
+        border: 1px solid rgba(79, 70, 229, 0.05);
     }
 
-    /* Modern 3-Column Horizontal Role Grid */
+    /* Compact Role Grid Cards */
     .role-card {
         border: 2px solid #e2e8f0;
-        border-radius: 18px;
+        border-radius: 12px;
         cursor: pointer;
-        transition: all 0.25s ease;
+        transition: all 0.2s ease;
         background-color: #ffffff;
-        position: relative;
     }
     
     .role-card:hover {
         border-color: #cbd5e1;
-        transform: translateY(-2px);
         background-color: #fafbfc;
     }
     
     .role-card.active {
         border-color: var(--indigo-primary);
         background-color: var(--indigo-light);
-        box-shadow: 0 8px 20px rgba(79, 70, 229, 0.12);
+        box-shadow: 0 4px 12px rgba(79, 70, 229, 0.1);
     }
     
     .role-icon-box {
-        width: 50px;
-        height: 50px;
-        border-radius: 14px;
+        width: 38px;
+        height: 38px;
+        border-radius: 10px;
         background-color: #f1f5f9;
         display: flex;
         align-items: center;
         justify-content: center;
-        transition: all 0.25s ease;
+        transition: all 0.2s ease;
     }
     
     .role-card.active .role-icon-box {
@@ -61,20 +58,19 @@
         color: white !important;
     }
 
-    /* Custom Form Styling */
+    /* Ultra-Compact Form Controls */
     .custom-input {
-        border-radius: 12px;
-        padding: 12px 16px;
-        border: 1.5px solid #e2e8f0;
-        background-color: #ffffff;
-        font-size: 0.95rem;
+        border-radius: 9px;
+        padding: 8px 12px;
+        border: 1.5px solid #cbd5e1;
+        font-size: 0.88rem;
+        background-color: #fff;
         transition: all 0.2s ease;
     }
     
     .custom-input:focus {
         border-color: var(--indigo-primary);
-        box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.12);
-        background-color: #ffffff;
+        box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
     }
 
     .btn-indigo {
@@ -87,84 +83,79 @@
     .btn-indigo:hover {
         background: linear-gradient(135deg, #4338ca 0%, #3730a3 100%);
         color: white;
-        transform: scale(1.01);
-        box-shadow: 0 10px 25px rgba(79, 70, 229, 0.3);
+        box-shadow: 0 6px 16px rgba(79, 70, 229, 0.25);
     }
 
     .badge-pill {
         display: inline-block;
-        padding: 6px 16px;
+        padding: 4px 12px;
         background-color: var(--indigo-light);
         color: var(--indigo-primary);
         border-radius: 50px;
         font-weight: 700;
-        font-size: 0.75rem;
+        font-size: 0.7rem;
         text-transform: uppercase;
         letter-spacing: 0.5px;
     }
 
-    /* Smooth Field Reveal Animation */
-    @keyframes fadeInUp {
-        0% { opacity: 0; transform: translateY(12px); }
+    @keyframes fadeIn {
+        0% { opacity: 0; transform: translateY(6px); }
         100% { opacity: 1; transform: translateY(0); }
     }
     .dynamic-field-anim {
-        animation: fadeInUp 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        animation: fadeIn 0.25s ease forwards;
     }
 </style>
 
-<div class="container py-5">
+<div class="container py-3">
     <div class="row justify-content-center">
-        <div class="col-lg-8 col-xl-7">
+        <div class="col-lg-9 col-xl-8">
             
-            <div class="auth-card p-4 p-md-5">
+            <div class="auth-card p-3 p-md-4">
                 
-                <!-- Page Header -->
-                <div class="text-center mb-5">
-                    <span class="badge-pill mb-3">Kaamconnect Platform</span>
-                    <h2 class="fw-bold text-dark tracking-tight mb-2">Create Your Account</h2>
-                    <p class="text-muted small">Select your profile type below to unlock your specialized dashboard experience.</p>
+                <!-- Header -->
+                <div class="text-center mb-3">
+                    <span class="badge-pill mb-1">Kaamconnect</span>
+                    <h4 class="fw-bold text-dark mb-1" style="font-size: 1.35rem;">Create Your Account</h4>
+                    <p class="text-muted small mb-0" style="font-size: 0.8rem;">Select your profile type to proceed instantly.</p>
                 </div>
 
                 <form method="POST">
                     
-                    <!-- Role Selection Section (Horizontal Grid Cards) -->
-                    <div class="mb-4">
-                        <label class="form-label fw-bold small text-uppercase text-secondary mb-3 d-block text-center tracking-wider">Choose Profile Category</label>
-                        <div class="row g-3">
+                    <!-- Role Selection (Horizontal Compact Grid) -->
+                    <div class="mb-3">
+                        <label class="form-label fw-bold text-uppercase text-secondary mb-2 d-block text-center" style="font-size: 0.72rem; letter-spacing: 0.5px;">Choose Profile Category</label>
+                        <div class="row g-2">
                             
-                            <!-- Customer Card -->
-                            <div class="col-md-4">
-                                <div class="role-card text-center p-3 h-100" id="card_customer" onclick="selectRole('customer')">
-                                    <div class="role-icon-box mx-auto mb-2 text-primary">
-                                        <i class="fa-solid fa-user-tie fa-lg"></i>
+                            <div class="col-4">
+                                <div class="role-card text-center p-2" id="card_customer" onclick="selectRole('customer')">
+                                    <div class="role-icon-box mx-auto mb-1 text-primary">
+                                        <i class="fa-solid fa-user-tie"></i>
                                     </div>
-                                    <h6 class="fw-bold text-dark mb-1 small">Customer</h6>
-                                    <p class="text-muted mb-0" style="font-size: 0.73rem;">Kaam karwana hai</p>
+                                    <h6 class="fw-bold text-dark mb-0" style="font-size: 0.82rem;">Customer</h6>
+                                    <span class="text-muted d-none d-md-block" style="font-size: 0.68rem;">Kaam karwana hai</span>
                                     <input type="radio" name="role" id="role_customer" value="customer" required class="d-none">
                                 </div>
                             </div>
 
-                            <!-- Shop Owner Card -->
-                            <div class="col-md-4">
-                                <div class="role-card text-center p-3 h-100" id="card_shop_owner" onclick="selectRole('shop_owner')">
-                                    <div class="role-icon-box mx-auto mb-2 text-success">
-                                        <i class="fa-solid fa-shop fa-lg"></i>
+                            <div class="col-4">
+                                <div class="role-card text-center p-2" id="card_shop_owner" onclick="selectRole('shop_owner')">
+                                    <div class="role-icon-box mx-auto mb-1 text-success">
+                                        <i class="fa-solid fa-shop"></i>
                                     </div>
-                                    <h6 class="fw-bold text-dark mb-1 small">Shop Owner</h6>
-                                    <p class="text-muted mb-0" style="font-size: 0.73rem;">Business & Leads</p>
+                                    <h6 class="fw-bold text-dark mb-0" style="font-size: 0.82rem;">Shop Owner</h6>
+                                    <span class="text-muted d-none d-md-block" style="font-size: 0.68rem;">Business & Leads</span>
                                     <input type="radio" name="role" id="role_shop_owner" value="shop_owner" class="d-none">
                                 </div>
                             </div>
 
-                            <!-- Worker Card -->
-                            <div class="col-md-4">
-                                <div class="role-card text-center p-3 h-100" id="card_worker" onclick="selectRole('worker')">
-                                    <div class="role-icon-box mx-auto mb-2 text-warning">
-                                        <i class="fa-solid fa-helmet-safety fa-lg"></i>
+                            <div class="col-4">
+                                <div class="role-card text-center p-2" id="card_worker" onclick="selectRole('worker')">
+                                    <div class="role-icon-box mx-auto mb-1 text-warning">
+                                        <i class="fa-solid fa-helmet-safety"></i>
                                     </div>
-                                    <h6 class="fw-bold text-dark mb-1 small">Skilled Worker</h6>
-                                    <p class="text-muted mb-0" style="font-size: 0.73rem;">Daily/Monthly Job</p>
+                                    <h6 class="fw-bold text-dark mb-0" style="font-size: 0.82rem;">Skilled Worker</h6>
+                                    <span class="text-muted d-none d-md-block" style="font-size: 0.68rem;">Daily/Monthly Job</span>
                                     <input type="radio" name="role" id="role_worker" value="worker" class="d-none">
                                 </div>
                             </div>
@@ -172,75 +163,68 @@
                         </div>
                     </div>
 
-                    <!-- Common Credentials Section -->
-                    <div id="commonCredentials" style="display: none;" class="dynamic-field-anim mt-4">
-                        <div class="card bg-light border-0 p-4 rounded-4 mb-4 shadow-sm">
-                            <h6 class="fw-bold text-dark mb-3 small text-uppercase text-indigo tracking-wider"><i class="fa-solid fa-id-card me-2"></i>Basic Credentials</h6>
-                            <div class="row g-3">
-                                <div class="col-12">
-                                    <label class="form-label small fw-bold text-secondary">Full Name</label>
-                                    <input type="text" name="name" class="form-control custom-input" required placeholder="Enter your full name">
+                    <!-- Common Credentials Section (3 items in 1 row) -->
+                    <div id="commonCredentials" style="display: none;" class="dynamic-field-anim mb-2">
+                        <div class="bg-light p-2 p-md-3 rounded-3 border-0">
+                            <div class="row g-2">
+                                <div class="col-md-4">
+                                    <label class="form-label text-secondary mb-1" style="font-size: 0.75rem; font-weight: 600;">Full Name</label>
+                                    <input type="text" name="name" class="form-control custom-input" required placeholder="Full name">
                                 </div>
-                                <div class="col-md-6">
-                                    <label class="form-label small fw-bold text-secondary">Mobile Number</label>
-                                    <input type="text" name="mobile" class="form-control custom-input" required placeholder="10-digit mobile number">
+                                <div class="col-md-4">
+                                    <label class="form-label text-secondary mb-1" style="font-size: 0.75rem; font-weight: 600;">Mobile Number</label>
+                                    <input type="text" name="mobile" class="form-control custom-input" required placeholder="10-digit mobile">
                                 </div>
-                                <div class="col-md-6">
-                                    <label class="form-label small fw-bold text-secondary">Password</label>
-                                    <input type="password" name="password" class="form-control custom-input" required placeholder="Create secure password">
+                                <div class="col-md-4">
+                                    <label class="form-label text-secondary mb-1" style="font-size: 0.75rem; font-weight: 600;">Password</label>
+                                    <input type="password" name="password" class="form-control custom-input" required placeholder="Password">
                                 </div>
                             </div>
                         </div>
                     </div>
 
-                    <!-- Professional & Business Information Section -->
-                    <div id="proFields" style="display: none;" class="dynamic-field-anim">
-                        <div class="card bg-light border-0 p-4 rounded-4 mb-4 shadow-sm">
-                            <h6 class="fw-bold text-dark mb-3 small text-uppercase text-indigo tracking-wider"><i class="fa-solid fa-briefcase me-2"></i>Professional Details</h6>
+                    <!-- Professional / Details Section (Multi-column tight grid) -->
+                    <div id="proFields" style="display: none;" class="dynamic-field-anim mb-2">
+                        <div class="bg-light p-2 p-md-3 rounded-3 border-0">
                             
-                            <!-- Shop Name Input Field (Visible ONLY for Shop Owners) -->
-                            <div class="mb-3" id="shopNameContainer" style="display: none;">
-                                <label class="form-label small fw-bold text-secondary">Shop / Business Name</label>
-                                <input type="text" name="shop_name" id="shopNameInput" class="form-control custom-input" placeholder="Enter your shop or business name">
+                            <!-- Shop Name Input Field (Shown ONLY for Shop Owners) -->
+                            <div class="mb-2" id="shopNameContainer" style="display: none;">
+                                <label class="form-label text-secondary mb-1" style="font-size: 0.75rem; font-weight: 600;">Shop / Business Name</label>
+                                <input type="text" name="shop_name" id="shopNameInput" class="form-control custom-input" placeholder="Enter shop/business name">
                             </div>
 
-                            <div class="row g-3">
-                                <div class="col-12">
-                                    <label class="form-label small fw-bold text-secondary">Complete Work Address / Location</label>
-                                    <textarea name="address" id="addressInput" class="form-control custom-input" rows="2" placeholder="Gali, Shop No, City, State..."></textarea>
-                                </div>
-                                <div class="col-12">
-                                    <label class="form-label small fw-bold text-secondary">Email Address (Optional)</label>
-                                    <input type="email" name="email" class="form-control custom-input" placeholder="name@example.com">
+                            <div class="row g-2">
+                                <div class="col-md-6">
+                                    <label class="form-label text-secondary mb-1" style="font-size: 0.75rem; font-weight: 600;">Expertise / Skill</label>
+                                    <input type="text" name="expertise" id="expertInput" class="form-control custom-input" placeholder="e.g. Electrician, Painter">
                                 </div>
                                 <div class="col-md-6">
-                                    <label class="form-label small fw-bold text-secondary">Experience (Years)</label>
+                                    <label class="form-label text-secondary mb-1" style="font-size: 0.75rem; font-weight: 600;">Experience (Years)</label>
                                     <input type="text" name="experience" id="expInput" class="form-control custom-input" placeholder="e.g. 4">
                                 </div>
                                 <div class="col-md-6">
-                                    <label class="form-label small fw-bold text-secondary">Expertise / Skill Category</label>
-                                    <input type="text" name="expertise" id="expertInput" class="form-control custom-input" placeholder="e.g. Electrician, Painter, Carpenter">
+                                    <label class="form-label text-secondary mb-1" style="font-size: 0.75rem; font-weight: 600;">Email Address (Optional)</label>
+                                    <input type="email" name="email" class="form-control custom-input" placeholder="name@example.com">
+                                </div>
+                                <div class="col-md-6" id="workerFields" style="display: none;">
+                                    <label class="form-label text-secondary mb-1" style="font-size: 0.75rem; font-weight: 600;">Expected Daily Wage (₹)</label>
+                                    <input type="number" name="per_day_amount" id="wageInput" class="form-control custom-input" placeholder="e.g. 700">
+                                </div>
+                                <div class="col-12">
+                                    <label class="form-label text-secondary mb-1" style="font-size: 0.75rem; font-weight: 600;">Address / Location</label>
+                                    <input type="text" name="address" id="addressInput" class="form-control custom-input" placeholder="Gali, Shop No, City, State...">
                                 </div>
                             </div>
-                        </div>
-                    </div>
-
-                    <!-- Worker Wage Field Section -->
-                    <div id="workerFields" style="display: none;" class="dynamic-field-anim mb-4">
-                        <div class="card bg-light border-0 p-4 rounded-4 shadow-sm">
-                            <h6 class="fw-bold text-dark mb-3 small text-uppercase text-indigo tracking-wider"><i class="fa-solid fa-indian-rupee-sign me-2"></i>Wage Expectations</h6>
-                            <label class="form-label small fw-bold text-secondary">Expected Daily Wage / Per Day Amount (₹)</label>
-                            <input type="number" name="per_day_amount" id="wageInput" class="form-control custom-input" placeholder="e.g. 700">
                         </div>
                     </div>
 
                     <!-- Submit Button -->
-                    <div id="actionContainer" style="display: none;" class="dynamic-field-anim mt-4">
-                        <button type="submit" class="btn btn-indigo w-100 py-3 fw-bold rounded-pill shadow-sm">Create Account 🚀</button>
+                    <div id="actionContainer" style="display: none;" class="dynamic-field-anim mt-3">
+                        <button type="submit" class="btn btn-indigo w-100 py-2 fw-bold rounded-3 shadow-sm" style="font-size: 0.95rem;">Create Account</button>
                     </div>
                     
-                    <div class="text-center mt-4">
-                        <p class="text-muted small mb-0">Already have an account? <a href="{{ url_for('login') }}" class="text-indigo fw-bold text-decoration-none">Sign in here</a></p>
+                    <div class="text-center mt-3">
+                        <p class="text-muted small mb-0" style="font-size: 0.8rem;">Already have an account? <a href="{{ url_for('login') }}" class="text-indigo fw-bold text-decoration-none">Sign in here</a></p>
                     </div>
                 </form>
             </div>
@@ -251,14 +235,14 @@
 
 <script>
     function selectRole(role) {
-        // 1. Reset active class on all role cards
+        // 1. Reset active card classes
         document.querySelectorAll('.role-card').forEach(card => card.classList.remove('active'));
         
-        // 2. Select corresponding radio input and add active state to card
+        // 2. Select corresponding hidden radio & activate card
         document.getElementById('role_' + role).checked = true;
         document.getElementById('card_' + role).classList.add('active');
 
-        // 3. Target DOM elements for dynamic field control
+        // 3. DOM references
         const commonCredentials = document.getElementById('commonCredentials');
         const proFields = document.getElementById('proFields');
         const shopNameContainer = document.getElementById('shopNameContainer');
@@ -269,11 +253,11 @@
         const reqInputs = [document.getElementById('addressInput'), document.getElementById('expInput'), document.getElementById('expertInput')];
         const wageInput = document.getElementById('wageInput');
 
-        // Display base containers
+        // Show sections
         commonCredentials.style.display = 'block';
         actionContainer.style.display = 'block';
 
-        // 4. Handle dynamic visibility and validation requirements based on selected role
+        // 4. Role logic adaptation
         if (role === 'customer') {
             proFields.style.display = 'none';
             shopNameContainer.style.display = 'none';
@@ -284,16 +268,16 @@
         } 
         else if (role === 'shop_owner') {
             proFields.style.display = 'block';
-            shopNameContainer.style.display = 'block'; // Show shop name ONLY for shop owners
-            workerFields.style.display = 'none';
+            shopNameContainer.style.display = 'block'; // Shop name shown for shop owner
+            workerFields.style.display = 'none';       // Wage hidden for shop owner
             shopNameInput.setAttribute('required', 'true');
             reqInputs.forEach(input => input.setAttribute('required', 'true'));
             wageInput.removeAttribute('required');
         } 
         else if (role === 'worker') {
             proFields.style.display = 'block';
-            shopNameContainer.style.display = 'none'; // Shop name excluded completely for workers
-            workerFields.style.display = 'block';
+            shopNameContainer.style.display = 'none';  // Shop name removed for worker
+            workerFields.style.display = 'block';      // Wage shown for worker
             shopNameInput.removeAttribute('required');
             reqInputs.forEach(input => input.setAttribute('required', 'true'));
             wageInput.setAttribute('required', 'true');
