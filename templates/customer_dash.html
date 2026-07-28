@@ -1,262 +1,345 @@
 {% extends 'base.html' %}
 {% block content %}
-<div class="container py-4">
+
+<!-- Custom Styling for Modern Dashboard -->
+<style>
+    body {
+        background-color: #f4f7f6;
+    }
+    .hero-bg {
+        background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+        border-radius: 0 0 2rem 2rem;
+        padding-bottom: 5rem;
+    }
+    .floating-card {
+        margin-top: -4rem;
+        border-radius: 1.5rem;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+        border: none;
+    }
+    .custom-range::-webkit-slider-thumb {
+        background: #1e3c72;
+        width: 24px;
+        height: 24px;
+        border-radius: 50%;
+        cursor: pointer;
+        margin-top: -8px;
+    }
+    .custom-range::-webkit-slider-runnable-track {
+        background: #d1d5db;
+        height: 8px;
+        border-radius: 4px;
+    }
+    .glass-input {
+        background-color: #f8fafc;
+        border: 1px solid #e2e8f0;
+        border-radius: 0.75rem;
+        padding: 0.75rem 1rem;
+    }
+    .glass-input:focus {
+        background-color: #fff;
+        border-color: #2a5298;
+        box-shadow: 0 0 0 4px rgba(42, 82, 152, 0.1);
+    }
+    .detached-accordion .accordion-item {
+        border: none;
+        border-radius: 1rem !important;
+        margin-bottom: 1rem;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.03);
+        overflow: hidden;
+    }
+    .detached-accordion .accordion-button {
+        border-radius: 1rem !important;
+        background: #fff;
+        padding: 1.25rem 1.5rem;
+    }
+    .detached-accordion .accordion-button:not(.collapsed) {
+        background: #f8fafc;
+        box-shadow: inset 0 -1px 0 rgba(0,0,0,0.05);
+        color: #1e3c72;
+    }
+    .quote-card {
+        border-left: 4px solid #10b981;
+        background: #fff;
+        border-radius: 0.75rem;
+        transition: transform 0.2s;
+    }
+    .quote-card:hover {
+        transform: translateY(-2px);
+    }
+</style>
+
+<!-- HERO SECTION -->
+<div class="hero-bg text-white text-center pt-5 pb-5 px-3">
+    <h2 class="fw-bold mb-2">Welcome Back, {{ current_user.name.split(' ')[0] }}! 👋</h2>
+    <p class="text-white-50 fs-6">Post your furniture requirements and get the best quotes from top craftsmen.</p>
+</div>
+
+<div class="container px-3 px-md-4">
     <div class="row justify-content-center">
         
-        <!-- POST REQUIREMENT SECTION -->
-        <div class="col-lg-10 col-md-12 mb-5">
-            <div class="card shadow border-0 p-4 rounded-4 bg-white">
-                <div class="d-flex align-items-center mb-4 pb-3 border-bottom">
-                    <div class="bg-primary bg-opacity-10 text-primary p-3 rounded-circle me-3">
-                        <i class="fa-solid fa-plus-circle fa-2x"></i>
+        <!-- NEW POST FORM SECTION -->
+        <div class="col-lg-10 mb-5">
+            <div class="card floating-card bg-white p-4 p-md-5">
+                
+                <div class="d-flex align-items-center mb-4">
+                    <div class="bg-primary bg-opacity-10 text-primary rounded-circle p-3 me-3 d-flex align-items-center justify-content-center" style="width: 50px; height: 50px;">
+                        <i class="fa-solid fa-pen-nib fs-4"></i>
                     </div>
-                    <div>
-                        <h4 class="fw-bold text-dark mb-0">Post a New Job & Get Quotes</h4>
-                        <p class="text-muted small mb-0">Provide details about your furniture needs to get estimates from top shops.</p>
-                    </div>
+                    <h4 class="fw-bold mb-0 text-dark">Create New Job Post</h4>
                 </div>
                 
-                <form method="POST">
-                    <!-- Contact Info Section -->
-                    <div class="mb-4">
-                        <div class="d-flex justify-content-between align-items-center mb-2">
-                            <h6 class="text-primary fw-bold mb-0"><i class="fa-solid fa-user-shield me-2"></i> Your Contact Info</h6>
-                            <span class="badge bg-success bg-opacity-10 text-success border border-success rounded-pill small"><i class="fa-solid fa-lock me-1"></i> Kept Private</span>
+                <form method="POST" id="jobForm" onsubmit="prepareSubmit()">
+                    
+                    <!-- Private Info Grid -->
+                    <div class="row g-3 mb-4 p-4 rounded-4" style="background-color: #f8fafc; border: 1px dashed #cbd5e1;">
+                        <div class="col-12 mb-2 d-flex justify-content-between align-items-center">
+                            <h6 class="fw-bold text-secondary mb-0"><i class="fa-solid fa-lock me-2"></i> Private Contact Info</h6>
+                            <span class="badge bg-success bg-opacity-10 text-success rounded-pill px-3 py-1">Secure <i class="fa-solid fa-shield-check ms-1"></i></span>
                         </div>
-                        <p class="text-muted small mb-3">Your email and address are secure. They will only be visible to the shopkeeper whose quote you accept.</p>
+                        <div class="col-md-3">
+                            <label class="small text-muted mb-1">Name</label>
+                            <input type="text" name="name" class="form-control glass-input fw-medium" value="{{ current_user.name }}" required>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="small text-muted mb-1">Mobile</label>
+                            <input type="text" class="form-control glass-input text-muted" value="{{ current_user.mobile }}" readonly>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="small text-muted mb-1">Email <span class="text-danger">*</span></label>
+                            <input type="email" name="email" class="form-control glass-input" value="{{ current_user.email or '' }}" placeholder="email@example.com" required>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="small text-muted mb-1">Full Address <span class="text-danger">*</span></label>
+                            <input type="text" name="address" class="form-control glass-input" value="{{ current_user.address or '' }}" placeholder="Your City & Area" required>
+                        </div>
+                    </div>
+
+                    <!-- Job Specifics -->
+                    <h6 class="fw-bold text-dark mt-4 mb-3"><i class="fa-solid fa-layer-group me-2 text-primary"></i> Work Specifications</h6>
+                    <div class="row g-4 mb-4">
+                        <div class="col-md-4">
+                            <label class="small fw-bold text-dark mb-2">Job Category</label>
+                            <select name="category" class="form-select glass-input" required>
+                                <option value="" disabled selected>Select Category...</option>
+                                <option value="Modular Kitchen">Modular Kitchen</option>
+                                <option value="Home Interior (Full)">Home Interior (Full)</option>
+                                <option value="Bedroom Setup">Bedroom Setup</option>
+                                <option value="Sofa & Seating">Sofa & Seating</option>
+                                <option value="Office Furniture">Office Furniture</option>
+                                <option value="Repair / Polish">Repair / Polish</option>
+                            </select>
+                        </div>
                         
-                        <div class="row g-3 p-3 bg-light rounded-3 border border-light">
-                            <div class="col-md-3">
-                                <label class="small fw-bold text-dark mb-1">Full Name <span class="text-danger">*</span></label>
-                                <input type="text" name="name" class="form-control bg-white shadow-none border-secondary-subtle" value="{{ current_user.name }}" required>
-                            </div>
-                            <div class="col-md-3">
-                                <label class="small fw-bold text-dark mb-1">Mobile No.</label>
-                                <input type="text" class="form-control text-muted shadow-none bg-white border-secondary-subtle" value="{{ current_user.mobile }}" readonly>
-                            </div>
-                            <div class="col-md-3">
-                                <label class="small fw-bold text-dark mb-1">Email Address <span class="text-danger">*</span></label>
-                                <input type="email" name="email" class="form-control bg-white shadow-none border-secondary-subtle" value="{{ current_user.email or '' }}" placeholder="Enter your email" required>
-                            </div>
-                            <div class="col-md-3">
-                                <label class="small fw-bold text-dark mb-1">Full Address <span class="text-danger">*</span></label>
-                                <input type="text" name="address" class="form-control bg-white shadow-none border-secondary-subtle" value="{{ current_user.address or '' }}" placeholder="House no, Area, City" required>
+                        <!-- NEW OPTIONS: Property & Material -->
+                        <div class="col-md-4">
+                            <label class="small fw-bold text-dark mb-2">Property Type <span class="text-muted fw-normal">(Optional)</span></label>
+                            <select id="propType" class="form-select glass-input">
+                                <option value="Not Specified">Select Property...</option>
+                                <option value="Flat / Apartment">Flat / Apartment</option>
+                                <option value="Villa / House">Villa / House</option>
+                                <option value="Commercial / Shop">Commercial / Shop</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="small fw-bold text-dark mb-2">Preferred Material <span class="text-muted fw-normal">(Optional)</span></label>
+                            <select id="matType" class="form-select glass-input">
+                                <option value="Expert Recommendation">Expert Suggestion</option>
+                                <option value="Teak Wood (Sagwan)">Teak Wood (Sagwan)</option>
+                                <option value="Plywood + Laminate">Plywood + Laminate</option>
+                                <option value="MDF / Particle Board">MDF / Particle Board</option>
+                                <option value="Metal / Glass">Metal / Glass</option>
+                            </select>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="small fw-bold text-dark mb-2">Expected Delivery Date <span class="text-danger">*</span></label>
+                            <input type="date" name="deadline" class="form-control glass-input" required>
+                        </div>
+                        
+                        <!-- BUDGET RANGE SLIDER -->
+                        <div class="col-md-6">
+                            <label class="small fw-bold text-dark mb-2">Select Your Budget Range <span class="text-danger">*</span></label>
+                            <div class="bg-light p-3 rounded-3 border">
+                                <div class="d-flex align-items-center gap-3">
+                                    <span class="small fw-bold text-muted">₹1K</span>
+                                    <input type="range" class="form-range custom-range flex-grow-1" name="budget" id="budgetRange" min="1000" max="500000" step="1000" value="15000">
+                                    <span class="small fw-bold text-muted">₹5L+</span>
+                                </div>
+                                <div class="text-center mt-2">
+                                    <span class="text-muted small">Max Budget:</span> 
+                                    <span class="fs-5 fw-bold text-primary" id="budgetAmountDisplay">₹ 15,000</span>
+                                </div>
                             </div>
                         </div>
                     </div>
 
-                    <!-- Work Requirements Section -->
-                    <h6 class="text-primary fw-bold mb-3"><i class="fa-solid fa-list-check me-2"></i> Work Requirements</h6>
-                    <div class="row g-3 mb-4">
-                        <div class="col-md-4">
-                            <label class="small fw-bold text-dark mb-1">Job Category <span class="text-danger">*</span></label>
-                            <select name="category" class="form-select bg-light shadow-none border-secondary-subtle" required>
-                                <option value="" disabled selected>Select a professional category...</option>
-                                <option value="Home Interior Setup (Full)">Home Interior Setup (Full)</option>
-                                <option value="Modular Kitchen & Wardrobe">Modular Kitchen & Wardrobe</option>
-                                <option value="Bed & Bedroom Furniture">Bed & Bedroom Furniture</option>
-                                <option value="Sofa & Upholstery Work">Sofa & Upholstery Work</option>
-                                <option value="Office / Commercial Furniture">Office / Commercial Furniture</option>
-                                <option value="Custom Woodwork & Carving">Custom Woodwork & Carving</option>
-                                <option value="Furniture Repair & Polish">Furniture Repair & Polish</option>
-                                <option value="Other">Other Requirement</option>
-                            </select>
-                        </div>
-                        <div class="col-md-4">
-                            <label class="small fw-bold text-dark mb-1">Estimated Budget (₹) <span class="text-danger">*</span></label>
-                            <input type="number" name="budget" min="1" class="form-control bg-light shadow-none border-secondary-subtle" placeholder="e.g. 15000" required>
-                        </div>
-                        <div class="col-md-4">
-                            <label class="small fw-bold text-dark mb-1">Required By (Deadline) <span class="text-danger">*</span></label>
-                            <input type="date" name="deadline" class="form-control bg-light shadow-none text-muted border-secondary-subtle" required>
-                        </div>
-                        
-                        <div class="col-12 mt-4">
-                            <label class="small fw-bold text-dark mb-2">Detailed Work Description <span class="text-danger">*</span></label>
-                            <textarea name="description" class="form-control bg-light shadow-none border-secondary-subtle" rows="4" placeholder="Example: Need a 3-seater L-shape sofa in velvet blue fabric. Dimensions should be 6ft x 4ft. Foam quality should be high density..." required></textarea>
-                            
-                            <!-- Strict Instructions & Warning -->
-                            <div class="d-flex bg-danger bg-opacity-10 text-danger p-3 rounded-3 mt-3 border border-danger-subtle">
-                                <div class="me-3 mt-1">
-                                    <i class="fa-solid fa-triangle-exclamation fa-lg"></i>
-                                </div>
-                                <div class="small">
-                                    <strong>Important Instructions:</strong> Please write <b>genuine and complete requirements</b> only (Mention size, material, color, and design preferences). <br>
-                                    <i>Note: Any spam, fake queries, or time-pass posts will lead to permanent account suspension.</i>
-                                </div>
-                            </div>
+                    <!-- IMPORTANT INSTRUCTIONS (YELLOW BOX) -->
+                    <div class="alert alert-warning border border-warning shadow-sm rounded-4 p-4 mb-4 d-flex align-items-start gap-3" style="background-color: #fffbeb;">
+                        <i class="fa-solid fa-triangle-exclamation fa-2x text-warning mt-1"></i>
+                        <div>
+                            <h6 class="fw-bold text-dark mb-2">Strict Guidelines for Job Posting</h6>
+                            <ul class="mb-0 text-dark small" style="line-height: 1.6;">
+                                <li><strong>Be Specific:</strong> Mention size, exact color preference, and style (e.g., L-shape, 3-seater).</li>
+                                <li><strong>No Time-Pass:</strong> Fake requests or invalid numbers will result in <b>permanent account suspension</b>.</li>
+                                <li>Shopkeepers pay to send you quotes. Respect their time.</li>
+                            </ul>
                         </div>
                     </div>
+
+                    <div class="col-12 mb-4">
+                        <label class="small fw-bold text-dark mb-2">Detailed Work Description <span class="text-danger">*</span></label>
+                        <textarea id="rawDescription" class="form-control glass-input" rows="4" placeholder="Example: I need a modern TV unit for my living room. Dimensions: 6ft x 4ft. Need hidden wiring compartments..." required></textarea>
+                        <!-- Hidden input to send merged data -->
+                        <input type="hidden" name="description" id="finalDescription">
+                    </div>
                     
-                    <button type="submit" class="btn btn-primary w-100 py-3 rounded-3 fw-bold shadow-sm fs-5">
-                        🚀 PUBLISH JOB REQUIREMENT
+                    <button type="submit" class="btn btn-primary w-100 py-3 rounded-pill fw-bold shadow-lg fs-5" style="background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%); border: none;">
+                        <i class="fa-solid fa-paper-plane me-2"></i> POST REQUIREMENT NOW
                     </button>
                 </form>
             </div>
         </div>
 
-        <!-- ACTIVE POSTS & QUOTES SECTION -->
-        <div class="col-lg-10 col-md-12">
-            <h4 class="mb-4 fw-bold text-dark border-bottom pb-3">
-                <i class="fa-solid fa-briefcase text-primary me-2"></i> My Active Jobs & Received Quotes
-            </h4>
+        <!-- MY ACTIVE POSTS SECTION -->
+        <div class="col-lg-10 mb-5">
+            <div class="d-flex justify-content-between align-items-center mb-4 border-bottom pb-2">
+                <h4 class="fw-bold text-dark mb-0">
+                    <i class="fa-solid fa-clipboard-list text-primary me-2"></i> My Active Jobs
+                </h4>
+                <span class="badge bg-primary rounded-pill px-3 py-2">{{ my_reqs|length }} Jobs</span>
+            </div>
 
             {% if my_reqs %}
-                <div class="accordion shadow-sm rounded-4" id="jobsAccordion">
+                <div class="accordion detached-accordion" id="jobsAccordion">
                     
                     {% for req in my_reqs %}
-                    <div class="accordion-item border-0 border-bottom mb-3 rounded-3 overflow-hidden bg-white shadow-sm">
-                        
+                    <div class="accordion-item">
                         <h2 class="accordion-header" id="heading{{ req.id }}">
-                            <button class="accordion-button collapsed bg-white fw-bold py-3" type="button" data-bs-toggle="collapse" data-bs-target="#collapse{{ req.id }}" aria-expanded="false" aria-controls="collapse{{ req.id }}">
-                                <div class="d-flex flex-wrap align-items-center w-100 gap-3 pe-3">
-                                    <span class="badge bg-primary px-3 py-2 rounded-2 fs-6">{{ req.category }}</span>
-                                    <div class="text-dark ms-2 d-flex flex-column">
-                                        <span class="small text-muted fw-normal">My Budget</span>
-                                        <span class="text-success fs-6">₹{{ req.budget }}</span>
+                            <button class="accordion-button collapsed d-flex flex-wrap gap-3" type="button" data-bs-toggle="collapse" data-bs-target="#collapse{{ req.id }}" aria-expanded="false" aria-controls="collapse{{ req.id }}">
+                                
+                                <div class="d-flex align-items-center gap-3 w-100">
+                                    <div class="bg-primary text-white rounded-3 p-3 text-center" style="width: 60px;">
+                                        <i class="fa-solid fa-couch fs-4"></i>
                                     </div>
-                                    <div class="ms-auto text-end">
-                                        <span class="d-block text-muted small fw-normal">Deadline</span>
-                                        <span class="text-danger small"><i class="fa-regular fa-clock me-1"></i> {{ req.deadline }}</span>
+                                    <div class="flex-grow-1">
+                                        <h6 class="fw-bold text-dark mb-1">{{ req.category }}</h6>
+                                        <div class="text-muted small">
+                                            <i class="fa-regular fa-calendar text-danger me-1"></i> Deadline: {{ req.deadline }}
+                                        </div>
+                                    </div>
+                                    <div class="text-end d-none d-md-block">
+                                        <div class="small text-muted">My Budget</div>
+                                        <h5 class="text-success fw-bold mb-0">₹{{ req.budget }}</h5>
                                     </div>
                                 </div>
                             </button>
                         </h2>
                         
                         <div id="collapse{{ req.id }}" class="accordion-collapse collapse" aria-labelledby="heading{{ req.id }}" data-bs-parent="#jobsAccordion">
-                            <div class="accordion-body bg-light p-4">
+                            <div class="accordion-body bg-light p-4 border-top">
                                 
-                                <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4 bg-white p-3 rounded-3 shadow-sm border border-light">
-                                    <div class="mb-3 mb-md-0">
-                                        <h6 class="fw-bold mb-1 text-dark"><i class="fa-solid fa-align-left text-muted me-1"></i> Work Details Provided:</h6>
-                                        <p class="text-muted small mb-0 mt-2">{{ req.description }}</p>
-                                    </div>
-                                    <div class="d-flex gap-2 ms-md-3">
-                                        <button class="btn btn-sm btn-outline-primary rounded-pill px-3 fw-bold" data-bs-toggle="modal" data-bs-target="#editReqModal{{ req.id }}">
-                                            <i class="fa-solid fa-pen me-1"></i> Edit
-                                        </button>
-                                        <form action="{{ url_for('delete_requirement', req_id=req.id) }}" method="POST" class="m-0" onsubmit="return confirm('Are you sure you want to delete this job requirement?');">
-                                            <button type="submit" class="btn btn-sm btn-outline-danger rounded-pill px-3 fw-bold">
-                                                <i class="fa-solid fa-trash me-1"></i> Delete
+                                <!-- Job Details Box -->
+                                <div class="bg-white p-3 rounded-4 shadow-sm mb-4">
+                                    <div class="d-flex justify-content-between align-items-center mb-2">
+                                        <h6 class="fw-bold text-secondary mb-0">Description Provided:</h6>
+                                        <div class="d-flex gap-2">
+                                            <button class="btn btn-sm btn-light border fw-bold text-primary px-3 rounded-pill" data-bs-toggle="modal" data-bs-target="#editReqModal{{ req.id }}">
+                                                <i class="fa-solid fa-pen me-1"></i> Edit
                                             </button>
-                                        </form>
+                                            <form action="{{ url_for('delete_requirement', req_id=req.id) }}" method="POST" class="m-0" onsubmit="return confirm('Delete this job?');">
+                                                <button type="submit" class="btn btn-sm btn-light border fw-bold text-danger px-3 rounded-pill">
+                                                    <i class="fa-solid fa-trash"></i>
+                                                </button>
+                                            </form>
+                                        </div>
                                     </div>
+                                    <p class="text-dark small mb-0" style="white-space: pre-line;">{{ req.description }}</p>
                                 </div>
 
-                                <h6 class="fw-bold text-dark mb-3">
-                                    <i class="fa-solid fa-file-invoice-dollar text-warning me-2"></i> Quotes Received from Shops:
-                                </h6>
+                                <h6 class="fw-bold text-dark mb-3"><i class="fa-solid fa-tags text-warning me-2"></i> Quotes Received ({{ req.unlocked_by_shops|length }})</h6>
                                 
                                 {% if req.unlocked_by_shops %}
-                                    <div class="table-responsive bg-white rounded-3 shadow-sm border border-light">
-                                        <table class="table table-hover align-middle mb-0">
-                                            <thead class="table-light text-muted small">
-                                                <tr>
-                                                    <th class="ps-3">Shop Details</th>
-                                                    <th>Contact</th>
-                                                    <th>Shop's Estimate</th>
-                                                    <th>Delivery Time</th>
-                                                    <th class="text-center pe-3">Action</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                {% for quote in req.unlocked_by_shops %}
-                                                <tr>
-                                                    <td class="ps-3">
-                                                        <div class="fw-bold text-dark">{{ quote.shop_name }}</div>
-                                                        <small class="text-muted"><i class="fa-solid fa-id-badge me-1"></i> #{{ quote.shop_owner_id }}</small>
-                                                    </td>
-                                                    <td>
-                                                        {% if quote.shop_mobile and quote.shop_mobile != 'N/A' %}
-                                                            <a href="tel:{{ quote.shop_mobile }}" class="btn btn-sm btn-success bg-opacity-10 text-success border-success rounded-pill px-3 fw-bold small">
-                                                                <i class="fa-solid fa-phone me-1"></i> {{ quote.shop_mobile }}
-                                                            </a>
-                                                        {% else %}
-                                                            <span class="badge bg-secondary">Not Available</span>
-                                                        {% endif %}
-                                                    </td>
-                                                    <td>
-                                                        <span class="badge bg-success fs-6 px-3 py-2 rounded-pill">₹{{ quote.amount }}</span>
-                                                    </td>
-                                                    <td class="text-muted small fw-medium">{{ quote.deadline }}</td>
-                                                    <td class="text-center pe-3">
-                                                        <button class="btn btn-sm btn-primary rounded-pill px-3 fw-bold shadow-sm" data-bs-toggle="modal" data-bs-target="#viewQuoteModal{{ quote.id }}">
-                                                            View Offer
-                                                        </button>
-                                                    </td>
-                                                </tr>
+                                    <div class="row g-3">
+                                        {% for quote in req.unlocked_by_shops %}
+                                        <div class="col-md-6">
+                                            <div class="quote-card p-3 shadow-sm d-flex flex-column h-100">
+                                                <div class="d-flex justify-content-between align-items-start mb-2">
+                                                    <div>
+                                                        <h6 class="fw-bold text-dark mb-0">{{ quote.shop_name }}</h6>
+                                                        <small class="text-muted">Shop ID: #{{ quote.shop_owner_id }}</small>
+                                                    </div>
+                                                    <span class="badge bg-success bg-opacity-10 text-success fs-6 border border-success px-2 py-1">
+                                                        ₹{{ quote.amount }}
+                                                    </span>
+                                                </div>
+                                                <div class="small text-muted mb-3">
+                                                    <i class="fa-solid fa-truck-fast me-1"></i> Delivery: {{ quote.deadline }}
+                                                </div>
+                                                
+                                                <div class="mt-auto d-flex gap-2">
+                                                    <button class="btn btn-outline-primary btn-sm w-50 rounded-pill fw-bold" data-bs-toggle="modal" data-bs-target="#viewQuoteModal{{ quote.id }}">
+                                                        View Details
+                                                    </button>
+                                                    {% if quote.shop_mobile and quote.shop_mobile != 'N/A' %}
+                                                        <a href="tel:{{ quote.shop_mobile }}" class="btn btn-success btn-sm w-50 rounded-pill fw-bold">
+                                                            <i class="fa-solid fa-phone me-1"></i> Call
+                                                        </a>
+                                                    {% endif %}
+                                                </div>
+                                            </div>
+                                        </div>
 
-                                                <!-- View Quote Modal -->
-                                                <div class="modal fade" id="viewQuoteModal{{ quote.id }}" tabindex="-1" aria-hidden="true">
-                                                    <div class="modal-dialog modal-dialog-centered">
-                                                        <div class="modal-content rounded-4 border-0 shadow-lg">
-                                                            <div class="modal-header border-0 bg-primary text-white p-4 pb-3">
-                                                                <h5 class="modal-title fw-bold"><i class="fa-solid fa-handshake me-2"></i> Official Quotation</h5>
-                                                                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                                        <!-- VIEW QUOTE MODAL -->
+                                        <div class="modal fade" id="viewQuoteModal{{ quote.id }}" tabindex="-1" aria-hidden="true">
+                                            <div class="modal-dialog modal-dialog-centered">
+                                                <div class="modal-content rounded-4 border-0 shadow-lg">
+                                                    <div class="modal-header border-0 bg-light p-4">
+                                                        <h5 class="modal-title fw-bold text-dark"><i class="fa-solid fa-file-contract text-primary me-2"></i> Shop Estimate</h5>
+                                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                    </div>
+                                                    <div class="modal-body p-4 text-center">
+                                                        <div class="bg-primary bg-opacity-10 rounded-circle d-inline-flex p-3 mb-3">
+                                                            <i class="fa-solid fa-shop fa-2x text-primary"></i>
+                                                        </div>
+                                                        <h4 class="fw-bold text-dark mb-0">{{ quote.shop_name }}</h4>
+                                                        <p class="text-muted small">Verified Partner #{{ quote.shop_owner_id }}</p>
+                                                        
+                                                        <div class="bg-light rounded-4 p-3 mb-3 text-start border">
+                                                            <div class="d-flex justify-content-between mb-2">
+                                                                <span class="text-muted fw-bold">Estimated Cost:</span>
+                                                                <span class="text-success fw-bold fs-5">₹{{ quote.amount }}</span>
                                                             </div>
-                                                            <div class="modal-body p-4 bg-light">
-                                                                
-                                                                <div class="card border-0 shadow-sm rounded-3 p-3 bg-white mb-3 border-start border-primary border-4">
-                                                                    <h6 class="text-muted border-bottom pb-2 mb-2 small fw-bold text-uppercase">👨‍💼 Shopkeeper Profile</h6>
-                                                                    <div class="mb-1"><strong class="text-dark">Shop Name:</strong> {{ quote.shop_name }}</div>
-                                                                    <div class="mb-1"><strong class="text-dark">Verified ID:</strong> #{{ quote.shop_owner_id }}</div>
-                                                                    <div class="mt-2">
-                                                                        <strong class="text-dark">Direct Contact:</strong> 
-                                                                        {% if quote.shop_mobile and quote.shop_mobile != 'N/A' %}
-                                                                            <a href="tel:{{ quote.shop_mobile }}" class="text-success fw-bold ms-1 text-decoration-none">
-                                                                                <i class="fa-solid fa-phone-flip me-1"></i> {{ quote.shop_mobile }}
-                                                                            </a>
-                                                                        {% else %}
-                                                                            <span class="text-muted">N/A</span>
-                                                                        {% endif %}
-                                                                    </div>
-                                                                </div>
-
-                                                                <div class="card border-0 shadow-sm rounded-3 p-3 bg-white border-start border-success border-4">
-                                                                    <h6 class="text-muted border-bottom pb-2 mb-3 small fw-bold text-uppercase">💰 Estimate Details</h6>
-                                                                    <div class="mb-3 d-flex justify-content-between align-items-center">
-                                                                        <strong class="text-dark">Final Price:</strong> 
-                                                                        <span class="text-success fw-bold fs-4">₹{{ quote.amount }}</span>
-                                                                    </div>
-                                                                    <div class="mb-3 d-flex justify-content-between align-items-center">
-                                                                        <strong class="text-dark">Completion Time:</strong> 
-                                                                        <span class="badge bg-dark px-3 py-2 rounded-2">{{ quote.deadline }}</span>
-                                                                    </div>
-                                                                    
-                                                                    <div class="mt-3">
-                                                                        <strong class="d-block mb-2 text-dark">Shopkeeper's Message/Notes:</strong>
-                                                                        <div class="p-3 bg-light rounded text-secondary small fst-italic border border-secondary-subtle" style="white-space: pre-line;">
-                                                                            {% if quote.notes %}
-                                                                                "{{ quote.notes }}"
-                                                                            {% else %}
-                                                                                No extra notes provided by the shopkeeper.
-                                                                            {% endif %}
-                                                                        </div>
-                                                                    </div>
-                                                                </div>
-
+                                                            <div class="d-flex justify-content-between">
+                                                                <span class="text-muted fw-bold">Delivery Time:</span>
+                                                                <span class="text-dark fw-bold">{{ quote.deadline }}</span>
                                                             </div>
-                                                            <div class="modal-footer border-0 p-4 pt-0 bg-light rounded-bottom-4">
-                                                                {% if quote.shop_mobile and quote.shop_mobile != 'N/A' %}
-                                                                    <a href="tel:{{ quote.shop_mobile }}" class="btn btn-success w-100 rounded-3 py-3 fw-bold shadow-sm fs-6">
-                                                                        <i class="fa-solid fa-phone-volume me-2"></i> CALL SHOPKEEPER NOW
-                                                                    </a>
-                                                                {% endif %}
+                                                        </div>
+
+                                                        <div class="text-start">
+                                                            <span class="small fw-bold text-secondary">Shopkeeper's Note:</span>
+                                                            <div class="bg-white p-3 rounded-3 border mt-1 small fst-italic text-muted">
+                                                                "{{ quote.notes or 'No additional notes provided.' }}"
                                                             </div>
                                                         </div>
                                                     </div>
+                                                    <div class="modal-footer border-0 p-4 pt-0">
+                                                        {% if quote.shop_mobile and quote.shop_mobile != 'N/A' %}
+                                                            <a href="tel:{{ quote.shop_mobile }}" class="btn btn-success w-100 py-3 rounded-pill fw-bold shadow-sm">
+                                                                <i class="fa-solid fa-phone-volume me-2"></i> Call {{ quote.shop_name }} Now
+                                                            </a>
+                                                        {% endif %}
+                                                    </div>
                                                 </div>
-                                                {% endfor %}
-                                            </tbody>
-                                        </table>
+                                            </div>
+                                        </div>
+                                        {% endfor %}
                                     </div>
                                 {% else %}
-                                    <div class="text-center py-5 bg-white rounded-3 border border-dashed shadow-sm">
-                                        <div class="bg-light rounded-circle d-inline-block p-4 mb-3">
-                                            <i class="fa-regular fa-hourglass-half fa-2x text-muted"></i>
-                                        </div>
-                                        <h6 class="fw-bold text-dark">No Quotes Yet</h6>
-                                        <p class="text-muted small mb-0">Shopkeepers are reviewing your requirement. Quotes will appear here soon.</p>
+                                    <div class="text-center py-5 bg-white rounded-4 border border-dashed">
+                                        <i class="fa-regular fa-clock fa-2x text-muted mb-2 opacity-50"></i>
+                                        <h6 class="fw-bold text-secondary mb-0">Waiting for Quotes</h6>
+                                        <p class="text-muted small">Shopkeepers are reviewing your request.</p>
                                     </div>
                                 {% endif %}
                                 
@@ -264,46 +347,35 @@
                         </div>
                     </div>
 
-                    <!-- Edit Requirement Modal -->
+                    <!-- EDIT REQUIREMENT MODAL -->
                     <div class="modal fade" id="editReqModal{{ req.id }}" tabindex="-1" aria-hidden="true">
                         <div class="modal-dialog modal-dialog-centered">
                             <div class="modal-content rounded-4 border-0 shadow-lg">
-                                <div class="modal-header border-0 bg-dark text-white p-4">
-                                    <h5 class="modal-title fw-bold"><i class="fa-solid fa-pen-to-square me-2"></i> Edit Job Requirement</h5>
+                                <div class="modal-header border-0 bg-primary text-white p-4">
+                                    <h5 class="modal-title fw-bold"><i class="fa-solid fa-pen-to-square me-2"></i> Update Job Details</h5>
                                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
                                 </div>
                                 <form action="{{ url_for('edit_requirement', req_id=req.id) }}" method="POST">
                                     <div class="modal-body p-4 bg-light">
                                         <div class="mb-3">
                                             <label class="form-label small fw-bold text-dark">Category</label>
-                                            <select name="category" class="form-select bg-white border-secondary-subtle" required>
-                                                <option value="{{ req.category }}" selected>{{ req.category }} (Current)</option>
-                                                <option value="Home Interior Setup (Full)">Home Interior Setup (Full)</option>
-                                                <option value="Modular Kitchen & Wardrobe">Modular Kitchen & Wardrobe</option>
-                                                <option value="Bed & Bedroom Furniture">Bed & Bedroom Furniture</option>
-                                                <option value="Sofa & Upholstery Work">Sofa & Upholstery Work</option>
-                                                <option value="Office / Commercial Furniture">Office / Commercial Furniture</option>
-                                                <option value="Custom Woodwork & Carving">Custom Woodwork & Carving</option>
-                                                <option value="Furniture Repair & Polish">Furniture Repair & Polish</option>
-                                                <option value="Other">Other Requirement</option>
-                                            </select>
+                                            <input type="text" name="category" class="form-control glass-input" value="{{ req.category }}" required>
                                         </div>
                                         <div class="mb-3">
-                                            <label class="form-label small fw-bold text-dark">Budget (₹)</label>
-                                            <input type="number" name="budget" min="1" class="form-control bg-white border-secondary-subtle" value="{{ req.budget }}" required>
+                                            <label class="form-label small fw-bold text-dark">Budget Estimate (₹)</label>
+                                            <input type="number" name="budget" class="form-control glass-input" value="{{ req.budget }}" required>
                                         </div>
                                         <div class="mb-3">
                                             <label class="form-label small fw-bold text-dark">Deadline</label>
-                                            <!-- Pre-fill text type for old dates, but let browser handle formatting -->
-                                            <input type="text" name="deadline" class="form-control bg-white border-secondary-subtle" value="{{ req.deadline }}" required>
+                                            <input type="text" name="deadline" class="form-control glass-input" value="{{ req.deadline }}" required>
                                         </div>
                                         <div class="mb-3">
                                             <label class="form-label small fw-bold text-dark">Work Details</label>
-                                            <textarea name="description" class="form-control bg-white border-secondary-subtle" rows="4" required>{{ req.description }}</textarea>
+                                            <textarea name="description" class="form-control glass-input" rows="5" required>{{ req.description }}</textarea>
                                         </div>
                                     </div>
-                                    <div class="modal-footer border-0 p-4 pt-0 bg-light rounded-bottom-4">
-                                        <button type="submit" class="btn btn-dark w-100 rounded-3 py-2 fw-bold shadow-sm">Save Changes</button>
+                                    <div class="modal-footer border-0 p-4 pt-0 bg-light">
+                                        <button type="submit" class="btn btn-primary w-100 rounded-pill py-2 fw-bold shadow-sm">Save Changes</button>
                                     </div>
                                 </form>
                             </div>
@@ -314,14 +386,9 @@
                 </div>
             {% else %}
                 <div class="text-center py-5 bg-white shadow-sm rounded-4 border">
-                    <div class="bg-light rounded-circle d-inline-block p-4 mb-3 mt-3">
-                        <i class="fa-solid fa-box-open fa-3x text-primary opacity-75"></i>
-                    </div>
-                    <h5 class="fw-bold text-dark">No Active Jobs Found</h5>
-                    <p class="text-muted small mb-4">You haven't posted any furniture requirements yet.</p>
-                    <a href="#" onclick="window.scrollTo({ top: 0, behavior: 'smooth' }); return false;" class="btn btn-outline-primary rounded-pill px-4 fw-bold">
-                        <i class="fa-solid fa-arrow-up me-2"></i> Post Your First Job
-                    </a>
+                    <img src="https://cdn-icons-png.flaticon.com/512/7486/7486747.png" alt="No Jobs" width="100" class="mb-3 opacity-50">
+                    <h5 class="fw-bold text-dark">No Active Jobs</h5>
+                    <p class="text-muted small">Post your first requirement above to get started.</p>
                 </div>
             {% endif %}
 
@@ -329,25 +396,27 @@
     </div>
 </div>
 
-<style>
-    /* Custom Styling for smoother UI */
-    .form-control:focus, .form-select:focus {
-        border-color: #0d6efd;
-        box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.15);
+<!-- Script for Range Slider & Smart Form Merge -->
+<script>
+    // Update Budget Display live
+    const budgetSlider = document.getElementById('budgetRange');
+    const budgetDisplay = document.getElementById('budgetAmountDisplay');
+
+    budgetSlider.addEventListener('input', function() {
+        // Format as Indian Rupee
+        let val = parseInt(this.value).toLocaleString('en-IN');
+        budgetDisplay.textContent = '₹ ' + val;
+    });
+
+    // Merge Extra Fields into Description seamlessly
+    function prepareSubmit() {
+        const prop = document.getElementById('propType').value;
+        const mat = document.getElementById('matType').value;
+        const rawDesc = document.getElementById('rawDescription').value;
+        
+        let mergedDescription = `[Property: ${prop} | Material: ${mat}]\n\n${rawDesc}`;
+        document.getElementById('finalDescription').value = mergedDescription;
     }
-    .accordion-button:not(.collapsed) {
-        background-color: #f8f9fa;
-        color: #000;
-        box-shadow: inset 0 -1px 0 rgba(0,0,0,.125);
-    }
-    .accordion-button:focus {
-        box-shadow: none;
-        border-color: rgba(0,0,0,.125);
-    }
-    .border-dashed {
-        border-style: dashed !important;
-        border-width: 2px !important;
-        border-color: #dee2e6 !important;
-    }
-</style>
+</script>
+
 {% endblock %}
