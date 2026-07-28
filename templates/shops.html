@@ -2,7 +2,7 @@
 {% block content %}
 <style>
     /* =========================================
-       LIGHT THEME INTERACTIVE SCREENSAVER SHOPS
+       ULTIMATE PREMIUM SCREENSAVER SHOPS
        ========================================= */
     body {
         background-color: #f8fafc;
@@ -11,19 +11,40 @@
         overflow-x: hidden;
     }
 
-    /* Screensaver Universe Container */
+    /* Future Banner Slot Wrapper */
+    .banner-slot-container {
+        width: 100%;
+        min-height: 90px;
+        background: linear-gradient(135deg, #e0eafc 0%, #cfdef3 100%);
+        border: 2px dashed #94a3b8;
+        border-radius: 20px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #64748b;
+        font-weight: 600;
+        font-size: 0.9rem;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.03);
+        transition: all 0.3s ease;
+    }
+    .banner-slot-container:hover {
+        border-color: #4f46e5;
+        color: #4f46e5;
+    }
+
+    /* Larger Screensaver Universe Container */
     .bubble-universe-container {
         position: relative;
         width: 100%;
-        height: 600px;
+        height: 700px;
         background: #ffffff;
         border-radius: 28px;
         border: 1px solid #e2e8f0;
-        box-shadow: 0 15px 40px rgba(0, 0, 0, 0.04);
+        box-shadow: 0 20px 50px rgba(0, 0, 0, 0.05);
         overflow: hidden;
     }
 
-    /* Circular Shop Bubble (Larger & Interactive) */
+    /* Circular Shop Bubble (Larger & Ball-like) */
     .shop-bubble {
         width: 170px;
         height: 170px;
@@ -38,7 +59,7 @@
         cursor: grab;
         padding: 14px;
         position: absolute;
-        box-shadow: 0 10px 25px rgba(79, 70, 229, 0.15);
+        box-shadow: 0 10px 30px rgba(79, 70, 229, 0.18);
         user-select: none;
         transition: border-color 0.2s ease, box-shadow 0.2s ease;
         z-index: 2;
@@ -50,7 +71,7 @@
 
     .shop-bubble:hover {
         border-color: #06b6d4;
-        box-shadow: 0 15px 35px rgba(6, 182, 212, 0.25);
+        box-shadow: 0 15px 40px rgba(6, 182, 212, 0.3);
         z-index: 100;
     }
 
@@ -74,15 +95,15 @@
     /* Hover Details Popup Card */
     .bubble-hover-card {
         position: absolute;
-        bottom: 120%;
+        bottom: 125%;
         left: 50%;
         transform: translateX(-50%) scale(0.9);
-        width: 260px;
+        width: 270px;
         background: #ffffff;
         border: 1px solid #e2e8f0;
-        border-radius: 18px;
-        box-shadow: 0 15px 35px rgba(0, 0, 0, 0.12);
-        padding: 16px;
+        border-radius: 20px;
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+        padding: 18px;
         opacity: 0;
         visibility: hidden;
         transition: all 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
@@ -100,11 +121,19 @@
 </style>
 
 <div class="container my-4 my-md-5">
+    
+    <!-- Top Space / Banner Slot (Reserved for future advertisements) -->
+    <div class="mb-4">
+        <div class="banner-slot-container">
+            <i class="fa-solid fa-rectangle-ad me-2 fs-5"></i> 📢 Banner Space / Advertisement Slot (Reserved)
+        </div>
+    </div>
+
     <!-- Header Section -->
-    <div class="text-center mb-4 mb-md-5">
-        <span class="badge bg-primary bg-opacity-10 text-primary border border-primary-subtle px-3 py-1 rounded-pill mb-2 fw-bold" style="font-size: 0.75rem;">INTERACTIVE SCREENSAVER</span>
+    <div class="text-center mb-4">
+        <span class="badge bg-primary bg-opacity-10 text-primary border border-primary-subtle px-3 py-1 rounded-pill mb-2 fw-bold" style="font-size: 0.75nsrem;">INTERACTIVE SCREENSAVER UNIVERSE</span>
         <h2 class="fw-bold text-dark display-6 mb-2">🏢 Registered Shops & Contractors</h2>
-        <p class="text-muted small px-3">Circles ko drag karein ya hover karke details dekhein (Jaise Windows Screensaver!)</p>
+        <p class="text-muted small px-3">Circles ko kheench kar phenkein (Bounce Physics), hover karke details dekhein, ya click karke profile explore karein!</p>
     </div>
 
     <!-- Bubble Universe Container -->
@@ -112,12 +141,12 @@
         
         {% for shop in shops %}
         <!-- Circular Floating Shop Bubble -->
-        <div class="shop-bubble">
+        <div class="shop-bubble" data-url="{{ url_for('shop_detail', shop_id=(shop.shop_id if shop.shop_id else shop.id)) }}">
             <div class="position-absolute top-0 end-0 translate-middle p-1 bg-success border border-white rounded-circle shadow-sm" style="width: 14px; height: 14px;" title="Active"></div>
             
             <i class="fa-solid fa-store"></i>
-            <span class="shop-bubble-title">{{ shop.shop_name if shop.shop_name else 'Premium Shop' }}</span>
-            <span class="badge bg-light text-primary border px-2 py-1 mt-1" style="font-size: 0.65rem;">{{ shop.expertise or 'Expert' }}</span>
+            <span class="shop-bubble-title">{{ shop.shop_name if shop.shop_name else 'Premium Shop' }}[cite: 5]</span>
+            <span class="badge bg-light text-primary border px-2 py-1 mt-1" style="font-size: 0.65rem;">{{ shop.expertise or 'Expert' }}[cite: 5]</span>
 
             <!-- Hover Details Card -->
             <div class="bubble-hover-card">
@@ -126,16 +155,16 @@
                         <i class="fa-solid fa-store"></i>
                     </div>
                     <div>
-                        <h6 class="fw-bold text-dark mb-0 text-truncate" style="max-width: 170px;">{{ shop.shop_name if shop.shop_name else 'Premium Shop' }}</h6>
+                        <h6 class="fw-bold text-dark mb-0 text-truncate" style="max-width: 175px;">{{ shop.shop_name if shop.shop_name else 'Premium Shop' }}[cite: 5]</h6>
                         <span class="text-muted" style="font-size: 0.7rem;">Verified Node</span>
                     </div>
                 </div>
-                <p class="mb-1 text-muted small"><i class="fa-solid fa-user-tie text-primary me-1"></i> <span class="text-dark fw-semibold">{{ shop.name or 'Verified Partner' }}</span></p>
-                <p class="mb-1 text-muted small"><i class="fa-solid fa-screwdriver-wrench text-warning me-1"></i> <span class="text-dark fw-semibold">{{ shop.expertise or 'Expert' }}</span> ({{ shop.experience or '0' }} Yrs)</p>
-                <p class="mb-2 text-muted small text-truncate"><i class="fa-solid fa-location-dot text-danger me-1"></i> <span class="text-dark">{{ shop.address or 'Address not provided' }}</span></p>
-                <a href="{{ url_for('shop_detail', shop_id=(shop.shop_id if shop.shop_id else shop.id)) }}" class="btn btn-primary w-100 rounded-pill py-1 fw-bold shadow-sm" style="font-size: 0.75rem;">
-                    Explore Profile <i class="fa-solid fa-arrow-right ms-1"></i>
-                </a>
+                <p class="mb-1 text-muted small"><i class="fa-solid fa-user-tie text-primary me-1"></i> <span class="text-dark fw-semibold">{{ shop.name or 'Verified Partner' }}[cite: 5]</span></p>
+                <p class="mb-1 text-muted small"><i class="fa-solid fa-screwdriver-wrench text-warning me-1"></i> <span class="text-dark fw-semibold">{{ shop.expertise or 'Expert' }}[cite: 5]</span> ({{ shop.experience or '0' }} Yrs)[cite: 5]</p>
+                <p class="mb-2 text-muted small text-truncate"><i class="fa-solid fa-location-dot text-danger me-1"></i> <span class="text-dark">{{ shop.address or 'Address not provided' }}[cite: 5]</span></p>
+                <div class="btn btn-primary w-100 rounded-pill py-1 fw-bold shadow-sm text-center" style="font-size: 0.75rem;">
+                    Click Bubble to Explore <i class="fa-solid fa-arrow-right ms-1"></i>
+                </div>
             </div>
         </div>
         
@@ -159,13 +188,14 @@
 
         const bubbleData = [];
         const bubbleSize = 170;
+        const radius = bubbleSize / 2;
 
-        // Initialize random positions and velocities for screensaver effect
+        // Initialize scattered positions and ball velocities
         bubbles.forEach((bubble) => {
             let x = Math.random() * (container.clientWidth - bubbleSize);
             let y = Math.random() * (container.clientHeight - bubbleSize);
-            let vx = (Math.random() - 0.5) * 1.8;
-            let vy = (Math.random() - 0.5) * 1.8;
+            let vx = (Math.random() - 0.5) * 2.2;
+            let vy = (Math.random() - 0.5) * 2.2;
 
             bubble.style.left = x + 'px';
             bubble.style.top = y + 'px';
@@ -175,78 +205,81 @@
 
         let activeBubble = null;
         let offsetX = 0, offsetY = 0;
+        let startX = 0, startY = 0;
+        let totalMoved = 0;
 
-        // Drag and Drop Event Listeners
+        // Event Listeners for Drag and Click Handling
         bubbleData.forEach((data) => {
             const bubble = data.el;
 
-            bubble.addEventListener('mousedown', (e) => {
-                if (e.target.closest('.bubble-hover-card')) return;
+            const onDragStart = (clientX, clientY) => {
+                if (event.target.closest('.bubble-hover-card')) return;
                 data.isDragging = true;
                 activeBubble = data;
+                startX = clientX;
+                startY = clientY;
+                totalMoved = 0;
                 data.vx = 0;
                 data.vy = 0;
                 const rect = container.getBoundingClientRect();
-                offsetX = e.clientX - rect.left - data.x;
-                offsetY = e.clientY - rect.top - data.y;
-                bubble.style.zIndex = 2000;
-                e.preventDefault();
-            });
+                offsetX = clientX - rect.left - data.x;
+                offsetY = clientY - rect.top - data.y;
+                bubble.style.zIndex = 3000;
+            };
 
+            bubble.addEventListener('mousedown', (e) => onDragStart(e.clientX, e.clientY));
             bubble.addEventListener('touchstart', (e) => {
-                if (e.target.closest('.bubble-hover-card')) return;
-                data.isDragging = true;
-                activeBubble = data;
-                data.vx = 0;
-                data.vy = 0;
-                const rect = container.getBoundingClientRect();
                 const touch = e.touches[0];
-                offsetX = touch.clientX - rect.left - data.x;
-                offsetY = touch.clientY - rect.top - data.y;
-                bubble.style.zIndex = 2000;
-                e.preventDefault();
-            }, { passive: false });
+                onDragStart(touch.clientX, touch.clientY);
+            }, { passive: true });
         });
 
-        window.addEventListener('mousemove', (e) => {
+        const onDragMove = (clientX, clientY) => {
             if (!activeBubble) return;
             const rect = container.getBoundingClientRect();
-            activeBubble.x = e.clientX - rect.left - offsetX;
-            activeBubble.y = e.clientY - rect.top - offsetY;
-        });
+            let newX = clientX - rect.left - offsetX;
+            let newY = clientY - rect.top - offsetY;
 
+            totalMoved += Math.abs(clientX - (activeBubble.x + rect.left + offsetX)) + Math.abs(clientY - (activeBubble.y + rect.top + offsetY));
+
+            activeBubble.x = Math.max(0, Math.min(container.clientWidth - bubbleSize, newX));
+            activeBubble.y = Math.max(0, Math.min(container.clientHeight - bubbleSize, newY));
+        };
+
+        window.addEventListener('mousemove', (e) => onDragMove(e.clientX, e.clientY));
         window.addEventListener('touchmove', (e) => {
             if (!activeBubble) return;
-            const rect = container.getBoundingClientRect();
             const touch = e.touches[0];
-            activeBubble.x = touch.clientX - rect.left - offsetX;
-            activeBubble.y = touch.clientY - rect.top - offsetY;
-        }, { passive: false });
+            onDragMove(touch.clientX, touch.clientY);
+        }, { passive: true });
 
-        window.addEventListener('mouseup', () => {
+        const onDragEnd = () => {
             if (activeBubble) {
                 activeBubble.el.style.zIndex = '';
-                // Release with random throw velocity
-                activeBubble.vx = (Math.random() - 0.5) * 3;
-                activeBubble.vy = (Math.random() - 0.5) * 3;
+                // Release with momentum throw velocity
+                activeBubble.vx = (Math.random() - 0.5) * 3.5;
+                activeBubble.vy = (Math.random() - 0.5) * 3.5;
+
+                // If movement was minimal, treat as click to open explore link
+                if (totalMoved < 10) {
+                    const targetUrl = activeBubble.el.getAttribute('data-url');
+                    if (targetUrl) {
+                        window.location.href = targetUrl;
+                    }
+                }
                 activeBubble = null;
             }
-        });
+        };
 
-        window.addEventListener('touchend', () => {
-            if (activeBubble) {
-                activeBubble.el.style.zIndex = '';
-                activeBubble.vx = (Math.random() - 0.5) * 3;
-                activeBubble.vy = (Math.random() - 0.5) * 3;
-                activeBubble = null;
-            }
-        });
+        window.addEventListener('mouseup', onDragEnd);
+        window.addEventListener('touchend', onDragEnd);
 
-        // Animation Loop (Screensaver Bouncing Physics)
+        // Screensaver Physics Animation Loop (Wall bounce + Bubble-to-Bubble elastic collision)
         function animate() {
             const maxX = container.clientWidth - bubbleSize;
             const maxY = container.clientHeight - bubbleSize;
 
+            // Update positions
             bubbleData.forEach(data => {
                 if (!data.isDragging) {
                     data.x += data.vx;
@@ -258,7 +291,56 @@
                     if (data.y <= 0) { data.y = 0; data.vy *= -1; }
                     if (data.y >= maxY) { data.y = maxY; data.vy *= -1; }
                 }
+            });
 
+            // Bubble-to-Bubble Ball Collision Check
+            for (let i = 0; i < bubbleData.length; i++) {
+                for (let j = i + 1; j < bubbleData.length; j++) {
+                    let b1 = bubbleData[i];
+                    let b2 = bubbleData[j];
+
+                    let x1 = b1.x + radius, y1 = b1.y + radius;
+                    let x2 = b2.x + radius, y2 = b2.y + radius;
+
+                    let dx = x2 - x1;
+                    let dy = y2 - y1;
+                    let dist = Math.sqrt(dx * dx + dy * dy);
+                    let minDist = bubbleSize; // sum of radii (170)
+
+                    if (dist < minDist && dist > 0) {
+                        let overlap = (minDist - dist) / 2;
+                        let nx = dx / dist;
+                        let ny = dy / dist;
+
+                        // Separate overlapping bubbles
+                        if (!b1.isDragging) {
+                            b1.x -= nx * overlap;
+                            b1.y -= ny * overlap;
+                        }
+                        if (!b2.isDragging) {
+                            b2.x += nx * overlap;
+                            b2.y += ny * overlap;
+                        }
+
+                        // Elastic velocity exchange (ball bounce effect)
+                        let kx = b1.vx - b2.vx;
+                        let ky = b1.vy - b2.vy;
+                        let p = 2 * (nx * kx + ny * ky) / 2;
+
+                        if (!b1.isDragging) {
+                            b1.vx -= p * nx * 0.9;
+                            b1.vy -= p * ny * 0.9;
+                        }
+                        if (!b2.isDragging) {
+                            b2.vx += p * nx * 0.9;
+                            b2.vy += p * ny * 0.9;
+                        }
+                    }
+                }
+            }
+
+            // Apply to DOM
+            bubbleData.forEach(data => {
                 data.el.style.left = data.x + 'px';
                 data.el.style.top = data.y + 'px';
             });
