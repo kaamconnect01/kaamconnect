@@ -1,27 +1,172 @@
 {% extends 'base.html' %}
 {% block content %}
+<style>
+    /* =========================================
+       PREMIUM WORKER DASHBOARD REDESIGN
+       ========================================= */
+    :root {
+        --indigo-primary: #4f46e5;
+        --indigo-hover: #4338ca;
+        --indigo-light: #eef2ff;
+        --success-soft: #dcfce7;
+        --success-text: #166534;
+        --dark-slate: #0f172a;
+    }
+
+    body {
+        background-color: #f8fafc;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    }
+
+    /* Hero Banner */
+    .hero-welcome-card {
+        background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+        border-radius: 20px;
+        box-shadow: 0 10px 30px rgba(15, 23, 42, 0.12);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    /* Status Alert Boxes */
+    .status-active-box {
+        background: #ffffff;
+        border-radius: 16px;
+        border: 1px solid #e2e8f0;
+        border-left: 5px solid #10b981;
+        box-shadow: 0 4px 20px rgba(16, 185, 129, 0.06);
+    }
+
+    .status-hidden-box {
+        background: #fff5f5;
+        border-radius: 16px;
+        border: 1px solid #fed7d7;
+        border-left: 5px solid #ef4444;
+        box-shadow: 0 4px 20px rgba(239, 68, 68, 0.06);
+    }
+
+    /* Custom Navigation Pills */
+    .custom-nav-pills {
+        background: #ffffff;
+        border: 1px solid #e2e8f0;
+        border-radius: 50px;
+        padding: 6px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.03);
+    }
+
+    .custom-nav-pills .nav-link {
+        border-radius: 50px;
+        font-weight: 600;
+        color: #64748b;
+        transition: all 0.25s ease;
+        font-size: 0.9rem;
+        padding: 10px 20px;
+    }
+
+    .custom-nav-pills .nav-link.active {
+        background-color: var(--indigo-primary) !important;
+        color: #ffffff !important;
+        box-shadow: 0 4px 12px rgba(79, 70, 229, 0.25);
+    }
+
+    /* Job Card Styling */
+    .job-card {
+        background: #ffffff;
+        border-radius: 18px;
+        border: 1px solid #e2e8f0;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
+        transition: all 0.25s ease;
+    }
+
+    .job-card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 12px 30px rgba(79, 70, 229, 0.08);
+        border-color: #cbd5e1;
+    }
+
+    /* Profile Edit Form Card */
+    .profile-card {
+        background: #ffffff;
+        border-radius: 20px;
+        border: 1px solid #e2e8f0;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.04);
+    }
+
+    /* Premium Input Elements */
+    .form-control-modern {
+        background-color: #f8fafc;
+        border: 1.5px solid #e2e8f0;
+        border-radius: 10px;
+        padding: 10px 14px;
+        font-size: 0.9rem;
+        color: #1e293b;
+        transition: all 0.2s ease;
+    }
+
+    .form-control-modern:focus {
+        border-color: var(--indigo-primary);
+        background-color: #ffffff;
+        box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.12);
+        outline: none;
+    }
+
+    .input-group-text-modern {
+        background-color: #f1f5f9;
+        border: 1.5px solid #e2e8f0;
+        border-right: none;
+        border-radius: 10px 0 0 10px;
+        color: #64748b;
+    }
+
+    .input-group .form-control-modern {
+        border-top-left-radius: 0;
+        border-bottom-left-radius: 0;
+    }
+
+    /* Buttons */
+    .btn-indigo-glow {
+        background: linear-gradient(135deg, #4f46e5 0%, #4338ca 100%);
+        color: white;
+        border-radius: 12px;
+        padding: 11px 20px;
+        font-weight: 700;
+        border: none;
+        box-shadow: 0 4px 15px rgba(79, 70, 229, 0.25);
+        transition: all 0.2s ease;
+    }
+
+    .btn-indigo-glow:hover {
+        background: linear-gradient(135deg, #4338ca 0%, #3730a3 100%);
+        color: white;
+        box-shadow: 0 6px 20px rgba(79, 70, 229, 0.35);
+        transform: translateY(-1px);
+    }
+
+    .width-15 { width: 20px; text-align: center; }
+</style>
+
 <div class="container py-4">
     <div class="row justify-content-center">
         <div class="col-lg-10 col-12">
 
-            <div class="card bg-dark text-white shadow-sm border-0 mb-4 p-4 rounded-4 position-relative overflow-hidden">
-                <div class="position-absolute top-0 end-0 p-3 opacity-10">
+            <!-- Hero Welcome Header -->
+            <div class="hero-welcome-card text-white p-4 mb-4 position-relative overflow-hidden">
+                <div class="position-absolute top-0 end-0 p-3 opacity-10 pe-none">
                     <i class="fa-solid fa-screwdriver-wrench fa-6x"></i>
                 </div>
-                <div class="card-body p-0 z-1">
+                <div class="card-body p-0 position-relative z-1">
                     <h3 class="fw-bold mb-1 text-white">Welcome Back, {{ current_user.name }}! 👋</h3>
                     <p class="mb-0 text-white-50 small">
-                        <i class="fa-solid fa-briefcase me-1"></i> Showing live jobs matching your skill: 
-                        <span class="badge bg-primary text-white rounded-pill px-3 py-1 ms-1 fw-bold">{{ current_user.expertise }}</span>
+                        <i class="fa-solid fa-briefcase me-1 text-success"></i> Showing live jobs matching your skill: 
+                        <span class="badge bg-success text-white rounded-pill px-3 py-1 ms-1 fw-bold">{{ current_user.expertise }}</span>
                     </p>
                 </div>
             </div>
 
+            <!-- Profile Availability Alert Bar -->
             {% if current_user.is_available %}
-                <div class="card border-0 shadow-sm bg-white rounded-4 p-4 mb-4 border-start border-4 border-success">
+                <div class="status-active-box p-4 mb-4">
                     <div class="d-flex flex-column flex-md-row align-items-md-center justify-content-between gap-3">
-                        <div class="d-flex align-items-start">
-                            <div class="bg-success bg-opacity-10 text-success p-3 rounded-3 me-3">
+                        <div class="d-flex align-items-center">
+                            <div class="bg-success text-white p-3 rounded-3 me-3 shadow-sm" style="background-color: #10b981 !important;">
                                 <i class="fa-solid fa-circle-check fa-xl"></i>
                             </div>
                             <div>
@@ -30,88 +175,86 @@
                             </div>
                         </div>
                         <form action="{{ url_for('worker_hide_profile') }}" method="POST" class="m-0" onsubmit="return confirm('Kya aap apni availability ko temporary chhipana chahte hain?');">
-                            <button type="submit" class="btn btn-warning btn-sm fw-bold px-3 py-2 rounded-pill shadow-sm text-dark w-100">
+                            <button type="submit" class="btn btn-warning btn-sm fw-bold px-4 py-2 rounded-pill shadow-sm text-dark w-100" style="background-color: #f59e0b; border: none;">
                                 <i class="fa-solid fa-eye-slash me-1"></i> Temporary Hide Profile
                             </button>
                         </form>
                     </div>
                 </div>
             {% else %}
-                <div class="card border-0 shadow-sm bg-danger bg-opacity-10 rounded-4 p-4 mb-4 border-start border-4 border-danger">
+                <div class="status-hidden-box p-4 mb-4">
                     <div class="d-flex flex-column flex-md-row align-items-md-center justify-content-between gap-3">
-                        <div class="d-flex align-items-start">
-                            <div class="bg-danger bg-opacity-20 text-danger p-3 rounded-3 me-3">
+                        <div class="d-flex align-items-center">
+                            <div class="bg-danger text-white p-3 rounded-3 me-3 shadow-sm" style="background-color: #ef4444 !important;">
                                 <i class="fa-solid fa-eye-slash fa-xl"></i>
                             </div>
                             <div>
-                                <h6 class="fw-bold text-danger mb-1">Aapki Profile Abhi Chhipat (Hidden) Hai!</h6>
-                                <p class="text-muted small mb-0">Dukanwalo ko aapka number nahi dikhega. Dobara active karne ke liye neeche <b>'My Profile'</b> tab me jakar <b>'Save Updates'</b> par click karein.</p>
+                                <h6 class="fw-bold text-danger mb-1">Aapki Profile Abhi Hidden Hai!</h6>
+                                <p class="text-muted small mb-0">Dukanwalo ko aapka number nahi dikhega. Dobara active karne ke liye <b>'My Profile'</b> tab me jakar save karein.</p>
                             </div>
                         </div>
-                        <button class="btn btn-secondary btn-sm px-4 py-2 rounded-pill shadow-sm fw-bold border-0 text-white w-100" style="opacity: 0.6;" disabled>
+                        <button class="btn btn-secondary btn-sm px-4 py-2 rounded-pill shadow-sm fw-bold border-0 text-white w-100 opacity-75" disabled>
                             <i class="fa-solid fa-lock me-1"></i> Profile Hidden
                         </button>
                     </div>
                 </div>
             {% endif %}
 
-            <ul class="nav nav-pills nav-fill bg-white shadow-sm border rounded-pill p-1 mb-4" id="workerTab" role="tablist">
+            <!-- Navigation Tabs -->
+            <ul class="nav nav-pills nav-fill custom-nav-pills mb-4" id="workerTab" role="tablist">
                 <li class="nav-item" role="presentation">
-                    <button class="nav-link active rounded-pill fw-bold py-2" data-bs-toggle="tab" data-bs-target="#jobs" type="button">
-                        <i class="fa-solid fa-bolt me-1"></i> Live Jobs Today
+                    <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#jobs" type="button">
+                        <i class="fa-solid fa-bolt me-2"></i> Live Jobs Today
                     </button>
                 </li>
                 <li class="nav-item" role="presentation">
-                    <button class="nav-link rounded-pill fw-bold py-2" data-bs-toggle="tab" data-bs-target="#profile" type="button">
-                        <i class="fa-solid fa-user-gear me-1"></i> My Profile Details
+                    <button class="nav-link" data-bs-toggle="tab" data-bs-target="#profile" type="button">
+                        <i class="fa-solid fa-user-gear me-2"></i> My Profile Details
                     </button>
                 </li>
             </ul>
 
             <div class="tab-content" id="workerTabContent">
                 
+                <!-- Tab 1: Live Jobs -->
                 <div class="tab-pane fade show active" id="jobs" role="tabpanel">
                     <div class="row g-3">
                         {% for vac in vacancies %}
                         <div class="col-md-6 col-12">
-                            <div class="card border-0 shadow-sm rounded-4 h-100 bg-white border border-light">
-                                <div class="card-body p-4 d-flex flex-column justify-content-between">
-                                    
-                                    <div>
-                                        <div class="d-flex justify-content-between align-items-start mb-3 gap-2">
-                                            <h5 class="fw-bold text-dark mb-0">{{ vac.person_need }}</h5>
-                                            <span class="badge bg-success bg-opacity-10 text-success fs-6 fw-bold px-3 py-2 rounded-3 border border-success border-opacity-10">
-                                                ₹{{ vac.per_day_pay }} <small class="text-muted fs-6 font-normal">/day</small>
-                                            </span>
-                                        </div>
-                                        
-                                        <p class="text-secondary small mb-4 bg-light p-3 rounded-3 border border-light" style="min-height: 60px;">
-                                            {{ vac.description }}
-                                        </p>
+                            <div class="job-card h-100 p-4 d-flex flex-column justify-content-between">
+                                <div>
+                                    <div class="d-flex justify-content-between align-items-start mb-3 gap-2">
+                                        <h5 class="fw-bold text-dark mb-0">{{ vac.person_need }}</h5>
+                                        <span class="badge bg-success bg-opacity-10 text-success fs-6 fw-bold px-3 py-2 rounded-pill border border-success border-opacity-25">
+                                            ₹{{ vac.per_day_pay }} <small class="text-muted fw-normal">/day</small>
+                                        </span>
                                     </div>
                                     
-                                    <div>
-                                        <div class="p-3 rounded-3 bg-light border border-light mb-3 text-sm">
-                                            <div class="d-flex align-items-center mb-2 text-dark">
-                                                <i class="fa-solid fa-location-dot text-danger me-2 width-15"></i>
-                                                <span>{{ vac.address }}</span>
-                                            </div>
-                                            <div class="d-flex align-items-center text-dark">
-                                                <i class="fa-solid fa-store text-primary me-2 width-15"></i>
-                                                <span class="fw-semibold">{{ shop_owners[vac.shop_owner_id].name }}</span>
-                                            </div>
+                                    <p class="text-secondary small mb-4 bg-light p-3 rounded-3 border" style="min-height: 60px;">
+                                        {{ vac.description }}
+                                    </p>
+                                </div>
+                                
+                                <div>
+                                    <div class="p-3 rounded-3 bg-light border mb-3 small">
+                                        <div class="d-flex align-items-center mb-2 text-dark">
+                                            <i class="fa-solid fa-location-dot text-danger me-2 width-15"></i>
+                                            <span class="text-truncate">{{ vac.address }}</span>
                                         </div>
-                                        
-                                        <a href="tel:{{ shop_owners[vac.shop_owner_id].mobile }}" class="btn btn-success w-100 fw-bold rounded-pill py-2 shadow-sm transition-all hover-scale">
-                                            <i class="fa-solid fa-phone me-2"></i> Call Shopkeeper Now
-                                        </a>
+                                        <div class="d-flex align-items-center text-dark">
+                                            <i class="fa-solid fa-store text-primary me-2 width-15"></i>
+                                            <span class="fw-semibold">{{ shop_owners[vac.shop_owner_id].name }}</span>
+                                        </div>
                                     </div>
-
+                                    
+                                    <a href="tel:{{ shop_owners[vac.shop_owner_id].mobile }}" class="btn btn-success w-100 fw-bold rounded-pill py-2 shadow-sm text-white" style="background-color: #10b981; border: none;">
+                                        <i class="fa-solid fa-phone me-2"></i> Call Shopkeeper Now
+                                    </a>
                                 </div>
                             </div>
                         </div>
                         {% else %}
-                        <div class="col-12 text-center py-5 bg-white rounded-4 shadow-sm border border-dashed border-2">
+                        <div class="col-12 text-center py-5 bg-white rounded-4 shadow-sm border border-2 border-dashed">
                             <i class="fa-solid fa-mug-hot fa-3x mb-3 text-muted opacity-50"></i>
                             <h5 class="fw-bold text-secondary mb-1">No Jobs Posted Today</h5>
                             <p class="text-muted small mb-0">Aapki expertise se match khane wale kaam aate hi yahan dikh jayenge.</p>
@@ -120,58 +263,58 @@
                     </div>
                 </div>
 
+                <!-- Tab 2: Profile Edit -->
                 <div class="tab-pane fade" id="profile" role="tabpanel">
-                    <div class="card shadow-sm border-0 p-4 rounded-4 mx-auto bg-white border border-light" style="max-width: 650px;">
+                    <div class="profile-card p-4 p-md-5 mx-auto" style="max-width: 650px;">
                         <div class="text-center mb-4 border-bottom pb-3">
-                            <h5 class="fw-bold text-dark mb-1"><i class="fa-solid fa-user-pen text-primary me-1"></i> Edit Profile Details</h5>
+                            <h5 class="fw-bold text-dark mb-1"><i class="fa-solid fa-user-pen text-indigo me-1 text-primary"></i> Edit Profile Details</h5>
                             <p class="text-muted small mb-0">Apni jankari update karein taaki contractors ko sahi data mile.</p>
                         </div>
                         
                         <form action="{{ url_for('update_worker_profile') }}" method="POST">
                             
                             <div class="mb-3">
-                                <label class="small fw-bold text-dark mb-1">Your Full Name</label>
+                                <label class="small fw-bold text-secondary mb-1">Your Full Name</label>
                                 <div class="input-group">
-                                    <span class="input-group-text bg-light text-muted border-0"><i class="fa-solid fa-user"></i></span>
-                                    <input type="text" name="name" class="form-control bg-light border-0 shadow-none ps-2" value="{{ current_user.name }}" placeholder="Enter full name" required>
+                                    <span class="input-group-text input-group-text-modern"><i class="fa-solid fa-user"></i></span>
+                                    <input type="text" name="name" class="form-control form-control-modern" value="{{ current_user.name }}" placeholder="Enter full name" required>
                                 </div>
                             </div>
 
                             <div class="mb-3">
-                                <label class="small fw-bold text-dark mb-1">Current Full Address</label>
-                                <textarea name="address" class="form-control bg-light border-0 shadow-none" rows="2" placeholder="Enter complete address details" required>{{ current_user.address }}</textarea>
+                                <label class="small fw-bold text-secondary mb-1">Current Full Address</label>
+                                <textarea name="address" class="form-control form-control-modern" rows="2" placeholder="Enter complete address details" required>{{ current_user.address }}</textarea>
                             </div>
 
                             <div class="row g-3 mb-3">
-                                <div class="col-6">
-                                    <label class="small fw-bold text-dark mb-1">Experience (Years/Months)</label>
+                                <div class="col-md-6">
+                                    <label class="small fw-bold text-secondary mb-1">Experience (Years/Months)</label>
                                     <div class="input-group">
-                                        <span class="input-group-text bg-light text-muted border-0"><i class="fa-solid fa-star"></i></span>
-                                        <input type="text" name="experience" class="form-control bg-light border-0 shadow-none ps-2" value="{{ current_user.experience }}" placeholder="e.g., 5 Years" required>
+                                        <span class="input-group-text input-group-text-modern"><i class="fa-solid fa-star"></i></span>
+                                        <input type="text" name="experience" class="form-control form-control-modern" value="{{ current_user.experience }}" placeholder="e.g., 5 Years" required>
                                     </div>
                                 </div>
-                                <div class="col-6">
-                                    <label class="small fw-bold text-dark mb-1">Your Main Expertise</label>
+                                <div class="col-md-6">
+                                    <label class="small fw-bold text-secondary mb-1">Your Main Expertise</label>
                                     <div class="input-group">
-                                        <span class="input-group-text bg-light text-muted border-0"><i class="fa-solid fa-user-gear"></i></span>
-                                        <input type="text" name="expertise" class="form-control bg-light border-0 shadow-none ps-2" value="{{ current_user.expertise }}" placeholder="e.g., Carpenter" required>
+                                        <span class="input-group-text input-group-text-modern"><i class="fa-solid fa-user-gear"></i></span>
+                                        <input type="text" name="expertise" class="form-control form-control-modern" value="{{ current_user.expertise }}" placeholder="e.g., Carpenter" required>
                                     </div>
                                 </div>
                             </div>
 
                             <div class="mb-4">
-                                <label class="small fw-bold text-dark mb-1">Daily Wage Expectation (₹ / Day)</label>
+                                <label class="small fw-bold text-secondary mb-1">Daily Wage Expectation (₹ / Day)</label>
                                 <div class="input-group">
-                                    <span class="input-group-text bg-light text-success fw-bold border-0">₹</span>
-                                    <input type="number" name="per_day_amount" class="form-control bg-light border-0 shadow-none ps-2" value="{{ current_user.per_day_amount }}" placeholder="Expected rate per day" required>
+                                    <span class="input-group-text input-group-text-modern text-success fw-bold">₹</span>
+                                    <input type="number" name="per_day_amount" class="form-control form-control-modern" value="{{ current_user.per_day_amount }}" placeholder="Expected rate per day" required>
                                 </div>
                             </div>
 
-                            <button type="submit" class="btn btn-primary w-100 rounded-pill py-2 fw-bold shadow-sm transition-all hover-scale">
-                                <i class="fa-solid fa-cloud-arrow-up me-1"></i> SAVE UPDATES & ACTIVATE PROFILE
+                            <button type="submit" class="btn btn-indigo-glow w-100 rounded-pill py-3 fw-bold shadow-sm">
+                                <i class="fa-solid fa-cloud-arrow-up me-2"></i> SAVE UPDATES & ACTIVATE PROFILE
                             </button>
                         </form>
-
                     </div>
                 </div>
 
@@ -180,13 +323,4 @@
         </div>
     </div>
 </div>
-
-<style>
-    .width-15 { width: 15px; text-align: center; }
-    .font-normal { font-weight: normal; }
-    .transition-all { transition: all 0.2s ease-in-out; }
-    .hover-scale:hover { transform: translateY(-2px); box-shadow: 0 .5rem 1rem rgba(0,0,0,.15)!important; }
-    .nav-pills .nav-link.active { background-color: var(--bs-primary) !important; color: white !important; }
-    .nav-pills .nav-link { color: var(--bs-secondary); }
-</style>
 {% endblock %}
