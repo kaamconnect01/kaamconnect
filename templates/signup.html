@@ -2,365 +2,263 @@
 {% block content %}
 <style>
     /* =========================================
-       GROWW-INSPIRED CLEAN & MODERN SIGNUP DESIGN
+       MODERN INDIGO SAAS ONBOARDING REDESIGN
        ========================================= */
     :root {
-        --groww-green: #00d09c;
-        --groww-green-dark: #00b386;
-        --groww-dark: #191c1f;
-        --groww-gray: #7c828a;
-        --groww-bg: #f8f9fa;
+        --indigo-primary: #4f46e5;
+        --indigo-hover: #4338ca;
+        --indigo-light: #eef2ff;
+        --dark-slate: #0f172a;
     }
 
     body {
-        background-color: var(--groww-bg);
+        background-color: #f4f6fb;
         font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
     }
 
-    .signup-container {
+    .auth-card {
         background: #ffffff;
-        border-radius: 24px;
-        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.04);
-        overflow: hidden;
-        border: 1px solid #edf2f7;
+        border-radius: 28px;
+        box-shadow: 0 20px 45px rgba(79, 70, 229, 0.08);
+        border: 1px solid rgba(79, 70, 229, 0.06);
     }
 
-    /* Left Branding Sidebar */
-    .brand-side {
-        background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
-        color: white;
-        padding: 40px;
-        display: flex;
-        flex-direction: column;
-        justify-content: space-between;
-        position: relative;
-    }
-    .brand-side::before {
-        content: ''; position: absolute; top: -10%; right: -10%;
-        width: 250px; height: 250px; background: radial-gradient(circle, rgba(0, 208, 156, 0.12) 0%, transparent 70%);
-    }
-
-    .form-side {
-        padding: 40px;
-    }
-
-    /* Role Cards Selection */
-    .role-card-group {
-        display: flex;
-        flex-direction: column;
-        gap: 12px;
-    }
-    
+    /* Modern 3-Column Horizontal Role Grid */
     .role-card {
         border: 2px solid #e2e8f0;
-        border-radius: 14px;
-        padding: 14px 16px;
+        border-radius: 18px;
         cursor: pointer;
-        transition: all 0.2s ease;
+        transition: all 0.25s ease;
         background-color: #ffffff;
-        display: flex;
-        align-items: center;
         position: relative;
     }
     
     .role-card:hover {
         border-color: #cbd5e1;
+        transform: translateY(-2px);
         background-color: #fafbfc;
     }
     
     .role-card.active {
-        border-color: var(--groww-green);
-        background-color: rgba(0, 208, 156, 0.03);
-        box-shadow: 0 4px 12px rgba(0, 208, 156, 0.08);
-    }
-    
-    .role-card input[type="radio"] {
-        position: absolute;
-        right: 20px;
-        top: 50%;
-        transform: translateY(-50%);
-        width: 18px;
-        height: 18px;
-        accent-color: var(--groww-green);
-        cursor: pointer;
+        border-color: var(--indigo-primary);
+        background-color: var(--indigo-light);
+        box-shadow: 0 8px 20px rgba(79, 70, 229, 0.12);
     }
     
     .role-icon-box {
-        width: 44px;
-        height: 44px;
-        border-radius: 10px;
+        width: 50px;
+        height: 50px;
+        border-radius: 14px;
         background-color: #f1f5f9;
         display: flex;
         align-items: center;
         justify-content: center;
-        margin-right: 14px;
-        font-size: 1.1rem;
-        transition: all 0.2s ease;
+        transition: all 0.25s ease;
     }
     
     .role-card.active .role-icon-box {
-        background-color: var(--groww-green);
+        background-color: var(--indigo-primary);
         color: white !important;
     }
 
-    .form-control, .form-select {
-        border-radius: 10px;
-        padding: 11px 14px;
-        border: 1px solid #cbd5e1;
+    /* Custom Form Styling */
+    .custom-input {
+        border-radius: 12px;
+        padding: 12px 16px;
+        border: 1.5px solid #e2e8f0;
         background-color: #ffffff;
-        font-size: 0.92rem;
+        font-size: 0.95rem;
         transition: all 0.2s ease;
     }
-    .form-control:focus, .form-select:focus {
-        border-color: var(--groww-green);
-        box-shadow: 0 0 0 3px rgba(0, 208, 156, 0.15);
+    
+    .custom-input:focus {
+        border-color: var(--indigo-primary);
+        box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.12);
         background-color: #ffffff;
     }
 
-    .input-group-text {
-        background-color: #f8fafc;
-        border: 1px solid #cbd5e1;
-        border-radius: 10px 0 0 10px;
-        color: var(--groww-gray);
-    }
-    .has-icon .form-control {
-        border-radius: 0 10px 10px 0;
-    }
-
-    .groww-btn-primary {
-        background: var(--groww-green);
-        color: #0f172a;
-        border-radius: 12px;
-        padding: 13px;
-        font-weight: 700;
+    .btn-indigo {
+        background: linear-gradient(135deg, #4f46e5 0%, #4338ca 100%);
+        color: white;
         border: none;
         transition: all 0.2s ease;
-        box-shadow: 0 4px 12px rgba(0, 208, 156, 0.25);
     }
-    .groww-btn-primary:hover {
-        background: var(--groww-green-dark);
-        color: #0f172a;
-        box-shadow: 0 6px 16px rgba(0, 208, 156, 0.35);
-    }
-
-    .trust-item {
-        background: rgba(255, 255, 255, 0.04);
-        border: 1px solid rgba(255, 255, 255, 0.07);
-        padding: 14px;
-        border-radius: 12px;
-        margin-bottom: 12px;
+    
+    .btn-indigo:hover {
+        background: linear-gradient(135deg, #4338ca 0%, #3730a3 100%);
+        color: white;
+        transform: scale(1.01);
+        box-shadow: 0 10px 25px rgba(79, 70, 229, 0.3);
     }
 
+    .badge-pill {
+        display: inline-block;
+        padding: 6px 16px;
+        background-color: var(--indigo-light);
+        color: var(--indigo-primary);
+        border-radius: 50px;
+        font-weight: 700;
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    /* Smooth Field Reveal Animation */
     @keyframes fadeInUp {
-        0% { opacity: 0; transform: translateY(10px); }
+        0% { opacity: 0; transform: translateY(12px); }
         100% { opacity: 1; transform: translateY(0); }
     }
     .dynamic-field-anim {
-        animation: fadeInUp 0.3s ease forwards;
-    }
-
-    @media (max-width: 991.98px) {
-        .form-side { padding: 24px 20px; }
-        .brand-side { padding: 30px 20px; }
+        animation: fadeInUp 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
     }
 </style>
 
-<div class="container mt-4 mb-5">
-    <div class="row signup-container g-0 d-flex flex-column-reverse flex-lg-row">
-        
-        <!-- Left Banner Sidebar -->
-        <div class="col-lg-5 brand-side">
-            <div>
-                <h3 class="fw-bold mb-2 tracking-tight">Kaamconnect</h3>
-                <p class="text-white-50 small">India's clean and trusted ecosystem connecting verified customers, expert workers, and local businesses seamlessly.</p>
-            </div>
-
-            <div class="my-3">
-                <div class="trust-item">
-                    <div class="d-flex align-items-center">
-                        <i class="fa-solid fa-shield-halved text-success fa-lg me-3"></i>
-                        <div>
-                            <h6 class="mb-0 fw-bold text-white small">100% Verified Network</h6>
-                            <small class="text-white-50" style="font-size: 0.73rem;">Direct connection with zero spam.</small>
-                        </div>
-                    </div>
-                </div>
-                <div class="trust-item">
-                    <div class="d-flex align-items-center">
-                        <i class="fa-solid fa-bolt text-warning fa-lg me-3"></i>
-                        <div>
-                            <h6 class="mb-0 fw-bold text-white small">Instant Lead Matching</h6>
-                            <small class="text-white-50" style="font-size: 0.73rem;">Get matched with relevant daily requirements.</small>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div>
-                <small class="text-white-50" style="font-size: 0.73rem;"><i class="fa-solid fa-lock me-2 text-success"></i> Bank-grade secure platform data.</small>
-            </div>
-        </div>
-
-        <!-- Right Form Side -->
-        <div class="col-lg-7 form-side">
-            <div class="mb-4">
-                <h4 class="fw-bold text-dark mb-1">Create Account</h4>
-                <p class="text-muted small">Select your profile category to get started.</p>
-            </div>
-
-            <form method="POST">
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8 col-xl-7">
+            
+            <div class="auth-card p-4 p-md-5">
                 
-                <div class="mb-4">
-                    <label class="form-label fw-bold small text-secondary mb-2">Select Account Type <span class="text-danger">*</span></label>
-                    <div class="role-card-group">
-                        
-                        <div class="role-card" id="card_customer" onclick="selectRole('customer')">
-                            <div class="role-icon-box text-primary">
-                                <i class="fa-solid fa-user-tie"></i>
-                            </div>
-                            <div class="flex-grow-1 pe-4">
-                                <h6 class="fw-bold text-dark mb-0 small">Customer</h6>
-                                <p class="text-muted mb-0" style="font-size: 0.76rem;">Ghar ya Dukan ka kaam karwana hai</p>
-                            </div>
-                            <input type="radio" name="role" id="role_customer" value="customer" required>
-                        </div>
-
-                        <div class="role-card" id="card_shop_owner" onclick="selectRole('shop_owner')">
-                            <div class="role-icon-box text-success">
-                                <i class="fa-solid fa-shop"></i>
-                            </div>
-                            <div class="flex-grow-1 pe-4">
-                                <h6 class="fw-bold text-dark mb-0 small">Shop Owner / Contractor</h6>
-                                <p class="text-muted mb-0" style="font-size: 0.76rem;">Business badhana hai & leads chahiye</p>
-                            </div>
-                            <input type="radio" name="role" id="role_shop_owner" value="shop_owner">
-                        </div>
-
-                        <div class="role-card" id="card_worker" onclick="selectRole('worker')">
-                            <div class="role-icon-box text-warning">
-                                <i class="fa-solid fa-helmet-safety"></i>
-                            </div>
-                            <div class="flex-grow-1 pe-4">
-                                <h6 class="fw-bold text-dark mb-0 small">Skilled Worker / Karigar</h6>
-                                <p class="text-muted mb-0" style="font-size: 0.76rem;">Daily ya monthly base par job chahiye</p>
-                            </div>
-                            <input type="radio" name="role" id="role_worker" value="worker">
-                        </div>
-
-                    </div>
+                <!-- Page Header -->
+                <div class="text-center mb-5">
+                    <span class="badge-pill mb-3">Kaamconnect Platform</span>
+                    <h2 class="fw-bold text-dark tracking-tight mb-2">Create Your Account</h2>
+                    <p class="text-muted small">Select your profile type below to unlock your specialized dashboard experience.</p>
                 </div>
 
-                <!-- Common Credentials Fields -->
-                <div id="commonCredentials" style="display: none;" class="dynamic-field-anim">
-                    <div class="row g-3 mb-3">
-                        <div class="col-12">
-                            <label class="form-label small fw-bold text-secondary">Full Name</label>
-                            <div class="input-group has-icon">
-                                <span class="input-group-text"><i class="fa-solid fa-user"></i></span>
-                                <input type="text" name="name" class="form-control" required placeholder="Enter your full name">
+                <form method="POST">
+                    
+                    <!-- Role Selection Section (Horizontal Grid Cards) -->
+                    <div class="mb-4">
+                        <label class="form-label fw-bold small text-uppercase text-secondary mb-3 d-block text-center tracking-wider">Choose Profile Category</label>
+                        <div class="row g-3">
+                            
+                            <!-- Customer Card -->
+                            <div class="col-md-4">
+                                <div class="role-card text-center p-3 h-100" id="card_customer" onclick="selectRole('customer')">
+                                    <div class="role-icon-box mx-auto mb-2 text-primary">
+                                        <i class="fa-solid fa-user-tie fa-lg"></i>
+                                    </div>
+                                    <h6 class="fw-bold text-dark mb-1 small">Customer</h6>
+                                    <p class="text-muted mb-0" style="font-size: 0.73rem;">Kaam karwana hai</p>
+                                    <input type="radio" name="role" id="role_customer" value="customer" required class="d-none">
+                                </div>
                             </div>
-                        </div>
-                        
-                        <div class="col-md-6">
-                            <label class="form-label small fw-bold text-secondary">Mobile Number</label>
-                            <div class="input-group has-icon">
-                                <span class="input-group-text"><i class="fa-solid fa-phone"></i></span>
-                                <input type="text" name="mobile" class="form-control" required placeholder="10-digit mobile number">
+
+                            <!-- Shop Owner Card -->
+                            <div class="col-md-4">
+                                <div class="role-card text-center p-3 h-100" id="card_shop_owner" onclick="selectRole('shop_owner')">
+                                    <div class="role-icon-box mx-auto mb-2 text-success">
+                                        <i class="fa-solid fa-shop fa-lg"></i>
+                                    </div>
+                                    <h6 class="fw-bold text-dark mb-1 small">Shop Owner</h6>
+                                    <p class="text-muted mb-0" style="font-size: 0.73rem;">Business & Leads</p>
+                                    <input type="radio" name="role" id="role_shop_owner" value="shop_owner" class="d-none">
+                                </div>
                             </div>
+
+                            <!-- Worker Card -->
+                            <div class="col-md-4">
+                                <div class="role-card text-center p-3 h-100" id="card_worker" onclick="selectRole('worker')">
+                                    <div class="role-icon-box mx-auto mb-2 text-warning">
+                                        <i class="fa-solid fa-helmet-safety fa-lg"></i>
+                                    </div>
+                                    <h6 class="fw-bold text-dark mb-1 small">Skilled Worker</h6>
+                                    <p class="text-muted mb-0" style="font-size: 0.73rem;">Daily/Monthly Job</p>
+                                    <input type="radio" name="role" id="role_worker" value="worker" class="d-none">
+                                </div>
+                            </div>
+
                         </div>
-                        
-                        <div class="col-md-6">
-                            <label class="form-label small fw-bold text-secondary">Password</label>
-                            <div class="input-group has-icon">
-                                <span class="input-group-text"><i class="fa-solid fa-lock"></i></span>
-                                <input type="password" name="password" class="form-control" required placeholder="Create password">
+                    </div>
+
+                    <!-- Common Credentials Section -->
+                    <div id="commonCredentials" style="display: none;" class="dynamic-field-anim mt-4">
+                        <div class="card bg-light border-0 p-4 rounded-4 mb-4 shadow-sm">
+                            <h6 class="fw-bold text-dark mb-3 small text-uppercase text-indigo tracking-wider"><i class="fa-solid fa-id-card me-2"></i>Basic Credentials</h6>
+                            <div class="row g-3">
+                                <div class="col-12">
+                                    <label class="form-label small fw-bold text-secondary">Full Name</label>
+                                    <input type="text" name="name" class="form-control custom-input" required placeholder="Enter your full name">
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label small fw-bold text-secondary">Mobile Number</label>
+                                    <input type="text" name="mobile" class="form-control custom-input" required placeholder="10-digit mobile number">
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label small fw-bold text-secondary">Password</label>
+                                    <input type="password" name="password" class="form-control custom-input" required placeholder="Create secure password">
+                                </div>
                             </div>
                         </div>
                     </div>
-                </div>
 
-                <!-- Professional & Shop Fields (Dynamic) -->
-                <div id="proFields" style="display: none;" class="dynamic-field-anim">
-                    <hr class="text-muted my-3 opacity-25">
-                    <h6 class="fw-bold text-dark mb-3 small"><i class="fa-solid fa-briefcase me-2 text-success"></i>Professional Details</h6>
+                    <!-- Professional & Business Information Section -->
+                    <div id="proFields" style="display: none;" class="dynamic-field-anim">
+                        <div class="card bg-light border-0 p-4 rounded-4 mb-4 shadow-sm">
+                            <h6 class="fw-bold text-dark mb-3 small text-uppercase text-indigo tracking-wider"><i class="fa-solid fa-briefcase me-2"></i>Professional Details</h6>
+                            
+                            <!-- Shop Name Input Field (Visible ONLY for Shop Owners) -->
+                            <div class="mb-3" id="shopNameContainer" style="display: none;">
+                                <label class="form-label small fw-bold text-secondary">Shop / Business Name</label>
+                                <input type="text" name="shop_name" id="shopNameInput" class="form-control custom-input" placeholder="Enter your shop or business name">
+                            </div>
 
-                    <!-- Shop Name Input Field (Shown ONLY for Shop Owners) -->
-                    <div class="mb-3" id="shopNameContainer" style="display: none;">
-                        <label class="form-label small fw-bold text-secondary">Shop / Business Name</label>
-                        <div class="input-group">
-                            <span class="input-group-text bg-white"><i class="fa-solid fa-shop text-muted"></i></span>
-                            <input type="text" name="shop_name" id="shopNameInput" class="form-control" placeholder="Enter your shop or business name">
+                            <div class="row g-3">
+                                <div class="col-12">
+                                    <label class="form-label small fw-bold text-secondary">Complete Work Address / Location</label>
+                                    <textarea name="address" id="addressInput" class="form-control custom-input" rows="2" placeholder="Gali, Shop No, City, State..."></textarea>
+                                </div>
+                                <div class="col-12">
+                                    <label class="form-label small fw-bold text-secondary">Email Address (Optional)</label>
+                                    <input type="email" name="email" class="form-control custom-input" placeholder="name@example.com">
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label small fw-bold text-secondary">Experience (Years)</label>
+                                    <input type="text" name="experience" id="expInput" class="form-control custom-input" placeholder="e.g. 4">
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label small fw-bold text-secondary">Expertise / Skill Category</label>
+                                    <input type="text" name="expertise" id="expertInput" class="form-control custom-input" placeholder="e.g. Electrician, Painter, Carpenter">
+                                </div>
+                            </div>
                         </div>
+                    </div>
+
+                    <!-- Worker Wage Field Section -->
+                    <div id="workerFields" style="display: none;" class="dynamic-field-anim mb-4">
+                        <div class="card bg-light border-0 p-4 rounded-4 shadow-sm">
+                            <h6 class="fw-bold text-dark mb-3 small text-uppercase text-indigo tracking-wider"><i class="fa-solid fa-indian-rupee-sign me-2"></i>Wage Expectations</h6>
+                            <label class="form-label small fw-bold text-secondary">Expected Daily Wage / Per Day Amount (₹)</label>
+                            <input type="number" name="per_day_amount" id="wageInput" class="form-control custom-input" placeholder="e.g. 700">
+                        </div>
+                    </div>
+
+                    <!-- Submit Button -->
+                    <div id="actionContainer" style="display: none;" class="dynamic-field-anim mt-4">
+                        <button type="submit" class="btn btn-indigo w-100 py-3 fw-bold rounded-pill shadow-sm">Create Account 🚀</button>
                     </div>
                     
-                    <div class="row g-3 mb-3">
-                        <div class="col-12">
-                            <label class="form-label small fw-bold text-secondary">Complete Address / Location</label>
-                            <div class="input-group has-icon">
-                                <span class="input-group-text"><i class="fa-solid fa-location-dot"></i></span>
-                                <textarea name="address" id="addressInput" class="form-control" rows="2" placeholder="Gali, Shop No, City, State..."></textarea>
-                            </div>
-                        </div>
-
-                        <div class="col-12">
-                            <label class="form-label small fw-bold text-secondary">Email Address (Optional)</label>
-                            <div class="input-group has-icon">
-                                <span class="input-group-text"><i class="fa-solid fa-envelope"></i></span>
-                                <input type="email" name="email" class="form-control" placeholder="name@example.com">
-                            </div>
-                        </div>
-
-                        <div class="col-md-6">
-                            <label class="form-label small fw-bold text-secondary">Experience (Years)</label>
-                            <div class="input-group has-icon">
-                                <span class="input-group-text"><i class="fa-solid fa-star"></i></span>
-                                <input type="text" name="experience" id="expInput" class="form-control" placeholder="e.g. 4">
-                            </div>
-                        </div>
-
-                        <div class="col-md-6">
-                            <label class="form-label small fw-bold text-secondary">Expertise / Skill Category</label>
-                            <div class="input-group has-icon">
-                                <span class="input-group-text"><i class="fa-solid fa-screwdriver-wrench"></i></span>
-                                <input type="text" name="expertise" id="expertInput" class="form-control" placeholder="e.g. Electrician, Painter">
-                            </div>
-                        </div>
+                    <div class="text-center mt-4">
+                        <p class="text-muted small mb-0">Already have an account? <a href="{{ url_for('login') }}" class="text-indigo fw-bold text-decoration-none">Sign in here</a></p>
                     </div>
-                </div>
+                </form>
+            </div>
 
-                <!-- Worker Specific Daily Wage Field -->
-                <div id="workerFields" style="display: none;" class="mb-3 dynamic-field-anim">
-                    <div class="col-12">
-                        <label class="form-label small fw-bold text-secondary">Expected Daily Wage / Per Day Amount (₹)</label>
-                        <div class="input-group has-icon">
-                            <span class="input-group-text"><i class="fa-solid fa-indian-rupee-sign"></i></span>
-                            <input type="number" name="per_day_amount" id="wageInput" class="form-control" placeholder="e.g. 700">
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Submit Button Container -->
-                <div id="actionContainer" style="display: none;" class="dynamic-field-anim mt-4">
-                    <button type="submit" class="btn groww-btn-primary w-100 py-3 fw-bold">Create Account</button>
-                </div>
-                
-                <div class="text-center mt-4">
-                    <p class="text-muted small mb-0">Already have an account? <a href="{{ url_for('login') }}" class="text-success fw-bold text-decoration-none">Sign in</a></p>
-                </div>
-            </form>
         </div>
-
     </div>
 </div>
 
 <script>
     function selectRole(role) {
-        // 1. Reset card states and select clicked radio
+        // 1. Reset active class on all role cards
         document.querySelectorAll('.role-card').forEach(card => card.classList.remove('active'));
+        
+        // 2. Select corresponding radio input and add active state to card
         document.getElementById('role_' + role).checked = true;
         document.getElementById('card_' + role).classList.add('active');
 
-        // 2. DOM elements
+        // 3. Target DOM elements for dynamic field control
         const commonCredentials = document.getElementById('commonCredentials');
         const proFields = document.getElementById('proFields');
         const shopNameContainer = document.getElementById('shopNameContainer');
@@ -371,11 +269,11 @@
         const reqInputs = [document.getElementById('addressInput'), document.getElementById('expInput'), document.getElementById('expertInput')];
         const wageInput = document.getElementById('wageInput');
 
-        // Show standard base fields
+        // Display base containers
         commonCredentials.style.display = 'block';
         actionContainer.style.display = 'block';
 
-        // 3. Conditional adjustments per role
+        // 4. Handle dynamic visibility and validation requirements based on selected role
         if (role === 'customer') {
             proFields.style.display = 'none';
             shopNameContainer.style.display = 'none';
@@ -386,7 +284,7 @@
         } 
         else if (role === 'shop_owner') {
             proFields.style.display = 'block';
-            shopNameContainer.style.display = 'block'; // Show shop name for shop owner
+            shopNameContainer.style.display = 'block'; // Show shop name ONLY for shop owners
             workerFields.style.display = 'none';
             shopNameInput.setAttribute('required', 'true');
             reqInputs.forEach(input => input.setAttribute('required', 'true'));
@@ -394,7 +292,7 @@
         } 
         else if (role === 'worker') {
             proFields.style.display = 'block';
-            shopNameContainer.style.display = 'none'; // REMOVED shop name for worker
+            shopNameContainer.style.display = 'none'; // Shop name excluded completely for workers
             workerFields.style.display = 'block';
             shopNameInput.removeAttribute('required');
             reqInputs.forEach(input => input.setAttribute('required', 'true'));
