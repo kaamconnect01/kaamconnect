@@ -157,18 +157,18 @@
                             <input type="date" name="deadline" class="form-control glass-input" required>
                         </div>
                         
-                        <!-- BUDGET RANGE SLIDER -->
+                        <!-- UPDATED BUDGET SECTION: Slider + Typed Input up to 1 CR -->
                         <div class="col-md-6">
-                            <label class="small fw-bold text-dark mb-2">Select Your Budget Range <span class="text-danger">*</span></label>
+                            <label class="small fw-bold text-dark mb-2">Budget Range (Slide or Type) <span class="text-danger">*</span></label>
                             <div class="bg-light p-3 rounded-3 border">
-                                <div class="d-flex align-items-center gap-3">
+                                <div class="d-flex align-items-center gap-2 mb-3">
                                     <span class="small fw-bold text-muted">₹1K</span>
-                                    <input type="range" class="form-range custom-range flex-grow-1" name="budget" id="budgetRange" min="1000" max="500000" step="1000" value="15000">
-                                    <span class="small fw-bold text-muted">₹5L+</span>
+                                    <input type="range" class="form-range custom-range flex-grow-1" id="budgetRange" min="1000" max="10000000" step="1000" value="15000">
+                                    <span class="small fw-bold text-muted">₹1Cr</span>
                                 </div>
-                                <div class="text-center mt-2">
-                                    <span class="text-muted small">Max Budget:</span> 
-                                    <span class="fs-5 fw-bold text-primary" id="budgetAmountDisplay">₹ 15,000</span>
+                                <div class="d-flex align-items-center justify-content-center gap-2">
+                                    <span class="text-muted small fw-bold">Max Budget: ₹</span>
+                                    <input type="number" name="budget" id="budgetInput" class="form-control glass-input text-primary fw-bold px-2 py-1" style="max-width: 140px;" min="1000" max="10000000" value="15000" required>
                                 </div>
                             </div>
                         </div>
@@ -396,16 +396,20 @@
     </div>
 </div>
 
-<!-- Script for Range Slider & Smart Form Merge -->
+<!-- Script for Range Slider Sync & Smart Form Merge -->
 <script>
-    // Update Budget Display live
+    // Two-way syncing of Budget Slider and Number Input
     const budgetSlider = document.getElementById('budgetRange');
-    const budgetDisplay = document.getElementById('budgetAmountDisplay');
+    const budgetInput = document.getElementById('budgetInput');
 
+    // Update Input when Slider moves
     budgetSlider.addEventListener('input', function() {
-        // Format as Indian Rupee
-        let val = parseInt(this.value).toLocaleString('en-IN');
-        budgetDisplay.textContent = '₹ ' + val;
+        budgetInput.value = this.value;
+    });
+
+    // Update Slider when Input is typed
+    budgetInput.addEventListener('input', function() {
+        budgetSlider.value = this.value;
     });
 
     // Merge Extra Fields into Description seamlessly
