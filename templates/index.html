@@ -2,413 +2,464 @@
 {% block content %}
 <style>
     /* =========================================
-       PREMIUM DARK & LIGHT HYBRID DESIGN (EXPANDED)
+       ULTRA-PREMIUM APPLE-STYLE DESIGN 
        ========================================= */
     :root {
-        --brand-blue: #0071e3;
-        --brand-dark: #0b0f19;
-        --brand-darker: #05070c;
-        --brand-gold: #f59e0b;
-        --text-gray: #a1a1aa;
+        --apple-bg: #fbfbfd;
+        --apple-dark: #1d1d1f;
+        --apple-gray: #86868b;
+        --apple-light-gray: #f5f5f7;
+        --apple-blue: #0071e3;
+        --apple-blue-hover: #0077ED;
+        --apple-glass: rgba(255, 255, 255, 0.72);
     }
 
-    /* Animations */
-    @keyframes dropDown {
-        0% { opacity: 0; transform: translateY(-80px) scale(0.95); }
-        70% { transform: translateY(10px) scale(1); }
-        100% { opacity: 1; transform: translateY(0) scale(1); }
-    }
-    @keyframes fadeInUp {
-        0% { opacity: 0; transform: translateY(40px); }
-        100% { opacity: 1; transform: translateY(0); }
-    }
-    @keyframes pulseGlow {
-        0% { text-shadow: 0 0 10px rgba(245, 158, 11, 0.2); }
-        50% { text-shadow: 0 0 30px rgba(245, 158, 11, 0.6); }
-        100% { text-shadow: 0 0 10px rgba(245, 158, 11, 0.2); }
+    body {
+        background-color: var(--apple-bg);
+        font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        color: var(--apple-dark);
+        overflow-x: hidden;
     }
 
-    .animate-drop {
-        animation: dropDown 1.2s cubic-bezier(0.25, 1, 0.5, 1) forwards;
-    }
-    .animate-up {
-        animation: fadeInUp 1s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    /* Scroll Reveal Animations (Apple Style) */
+    .reveal {
         opacity: 0;
+        transform: translateY(40px) scale(0.98);
+        transition: all 1.2s cubic-bezier(0.16, 1, 0.3, 1);
     }
-    .delay-1 { animation-delay: 0.2s; }
-    .delay-2 { animation-delay: 0.4s; }
-    .delay-3 { animation-delay: 0.6s; }
+    .reveal.active {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+    .delay-1 { transition-delay: 0.1s; }
+    .delay-2 { transition-delay: 0.2s; }
+    .delay-3 { transition-delay: 0.3s; }
 
-    /* Hero Section */
-    .hero-dark-section {
-        background: linear-gradient(135deg, var(--brand-darker) 0%, var(--brand-dark) 100%);
-        padding: 140px 20px 120px;
-        border-radius: 30px;
-        margin-top: 10px;
-        color: white;
-        position: relative;
-        overflow: hidden;
-        box-shadow: 0 20px 50px rgba(0,0,0,0.2);
+    /* Section Utilities */
+    .section-padding {
+        padding: 120px 20px;
     }
     
-    .hero-dark-section::before {
-        content: ''; position: absolute; top: -50%; left: 50%; transform: translateX(-50%);
-        width: 80%; height: 100%; background: radial-gradient(circle, rgba(0, 113, 227, 0.15) 0%, transparent 70%);
-        z-index: 0; pointer-events: none;
+    .section-title {
+        font-size: clamp(2.5rem, 5vw, 4rem);
+        font-weight: 700;
+        letter-spacing: -0.04em;
+        line-height: 1.1;
+        margin-bottom: 20px;
+    }
+    
+    .section-subtitle {
+        font-size: clamp(1.2rem, 2vw, 1.5rem);
+        color: var(--apple-gray);
+        font-weight: 400;
+        max-width: 800px;
+        margin: 0 auto;
+        letter-spacing: -0.01em;
+    }
+
+    /* Hero Section (Dark Matte) */
+    .hero-apple {
+        background: #000000;
+        color: #ffffff;
+        padding: 160px 20px 140px;
+        text-align: center;
+        border-bottom-left-radius: 40px;
+        border-bottom-right-radius: 40px;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .hero-apple::before {
+        content: '';
+        position: absolute;
+        top: -30%; left: 50%;
+        transform: translateX(-50%);
+        width: 80%; height: 100%;
+        background: radial-gradient(circle, rgba(0, 113, 227, 0.2) 0%, transparent 60%);
+        z-index: 0;
     }
 
     .hero-content { position: relative; z-index: 1; }
-
+    
     .hero-title {
-        font-weight: 900;
-        letter-spacing: -2px;
-        font-size: clamp(3rem, 6vw, 5.5rem);
-        line-height: 1.1;
-    }
-    .gradient-text-gold {
-        background: linear-gradient(90deg, #fde68a, #f59e0b);
+        font-size: clamp(3.5rem, 8vw, 6rem);
+        font-weight: 700;
+        letter-spacing: -0.05em;
+        line-height: 1.05;
+        background: linear-gradient(180deg, #ffffff 0%, #a1a1a6 100%);
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
-        animation: pulseGlow 3s infinite;
-    }
-    .hero-subtitle {
-        font-size: 1.3rem;
-        color: var(--text-gray);
-        max-width: 700px;
-        margin: 0 auto;
-        font-weight: 300;
     }
 
-    /* Category Badges */
-    .category-scroll {
-        display: flex; gap: 15px; justify-content: center; flex-wrap: wrap; margin-top: 30px;
-    }
-    .cat-badge {
-        background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1);
-        padding: 10px 20px; border-radius: 50px; color: white; font-weight: 500;
-        backdrop-filter: blur(10px); transition: 0.3s;
-    }
-    .cat-badge:hover { background: rgba(255,255,255,0.15); transform: translateY(-3px); }
-
-    /* Vision Section */
-    .vision-section {
-        padding: 120px 20px;
-        text-align: center;
+    .hero-btn {
         background: #ffffff;
+        color: #000000;
+        border-radius: 980px;
+        padding: 16px 36px;
+        font-size: 1.1rem;
+        font-weight: 600;
+        text-decoration: none;
+        transition: all 0.3s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
     }
-    .vision-text {
-        font-size: 2.2rem; font-weight: 700; color: #1d1d1f; max-width: 900px; margin: 0 auto; line-height: 1.4; letter-spacing: -0.5px;
-    }
-
-    /* Benefits Grid */
-    .benefit-wrapper { background: #fbfbfd; padding: 100px 0; }
+    .hero-btn:hover { background: #e8e8ed; transform: scale(1.02); color: #000000; }
     
-    .benefit-card {
-        background: #ffffff; border-radius: 24px; padding: 40px;
-        border: 1px solid rgba(0,0,0,0.04);
-        box-shadow: 0 10px 30px rgba(0,0,0,0.02);
-        transition: transform 0.4s ease, box-shadow 0.4s ease;
-        height: 100%; text-align: left;
-    }
-    .benefit-card:hover {
-        transform: translateY(-10px);
-        box-shadow: 0 20px 50px rgba(0,0,0,0.08);
-    }
-    .icon-box {
-        width: 70px; height: 70px; border-radius: 20px;
-        display: flex; align-items: center; justify-content: center; margin-bottom: 25px;
-    }
-    .icon-blue { background: rgba(0, 113, 227, 0.1); color: var(--brand-blue); }
-    .icon-dark { background: rgba(11, 15, 25, 0.1); color: var(--brand-dark); }
-    .icon-gold { background: rgba(245, 158, 11, 0.1); color: var(--brand-gold); }
-
-    /* Premium Solid Button */
-    .premium-btn {
-        background: linear-gradient(90deg, #0071e3, #005bb5);
-        color: white; border-radius: 980px; padding: 16px 40px; font-size: 1.2rem;
-        font-weight: 600; box-shadow: 0 10px 20px rgba(0, 113, 227, 0.3); border: none;
-        transition: 0.3s; text-decoration: none;
-    }
-    .premium-btn:hover { transform: scale(1.05); color: white; box-shadow: 0 15px 30px rgba(0, 113, 227, 0.4); }
-
-    /* Premium Dark Outline Button (NEW FOR LOGIN) */
-    .premium-outline-btn {
+    .hero-btn-outline {
         background: transparent;
-        color: white; border-radius: 980px; padding: 14px 40px; font-size: 1.2rem;
-        font-weight: 600; border: 2px solid rgba(255, 255, 255, 0.4);
-        transition: 0.3s; text-decoration: none;
+        color: #ffffff;
+        border-radius: 980px;
+        padding: 14px 36px;
+        font-size: 1.1rem;
+        font-weight: 600;
+        text-decoration: none;
+        border: 2px solid rgba(255,255,255,0.3);
+        transition: all 0.3s ease;
     }
-    .premium-outline-btn:hover { 
-        transform: scale(1.05); color: white; 
-        background: rgba(255, 255, 255, 0.1); 
-        border-color: rgba(255, 255, 255, 0.9);
+    .hero-btn-outline:hover { background: rgba(255,255,255,0.1); border-color: #ffffff; color: #ffffff; }
+
+    .category-pills {
+        display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; margin-top: 40px;
+    }
+    .pill {
+        background: rgba(255,255,255,0.08);
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+        padding: 10px 24px;
+        border-radius: 50px;
+        color: #f5f5f7;
+        font-size: 0.95rem;
+        font-weight: 500;
+        border: 1px solid rgba(255,255,255,0.1);
     }
 
-    /* FAQ Accordion Styling */
-    .faq-section { padding: 100px 20px; background-color: #ffffff; }
-    .faq-accordion .accordion-item {
-        border: none; border-radius: 16px !important; margin-bottom: 15px;
-        box-shadow: 0 4px 20px rgba(0,0,0,0.02); overflow: hidden;
-        border: 1px solid #f1f1f4;
-    }
-    .faq-accordion .accordion-button {
-        font-weight: 600; font-size: 1.15rem; color: #1d1d1f; padding: 22px;
-        background-color: #ffffff; box-shadow: none;
-    }
-    .faq-accordion .accordion-button:not(.collapsed) {
-        color: var(--brand-blue); background-color: #f4f9ff;
-    }
-    .faq-accordion .accordion-body {
-        padding: 22px; font-size: 1.05rem; color: #515154; line-height: 1.6; background-color: #ffffff;
+    /* Grid Cards (Benefits) */
+    .bento-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 24px;
+        max-width: 1200px;
+        margin: 0 auto;
     }
 
-    /* Contact Cards */
-    .contact-section { padding: 100px 20px; background-color: #fbfbfd; }
+    .apple-card {
+        background: #ffffff;
+        border-radius: 30px;
+        padding: 40px;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.03);
+        transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        border: 1px solid rgba(0,0,0,0.02);
+        display: flex;
+        flex-direction: column;
+    }
+    
+    .apple-card:hover {
+        transform: translateY(-8px);
+        box-shadow: 0 15px 40px rgba(0,0,0,0.08);
+    }
+
+    .card-icon-wrapper {
+        width: 64px; height: 64px;
+        border-radius: 18px;
+        display: flex; align-items: center; justify-content: center;
+        font-size: 1.8rem;
+        margin-bottom: 24px;
+    }
+
+    /* Privacy & Trust Section */
+    .privacy-section {
+        background: var(--apple-light-gray);
+        border-radius: 40px;
+        margin: 40px 20px;
+        padding: 100px 20px;
+        text-align: center;
+    }
+
+    .shield-icon {
+        font-size: 4rem;
+        background: linear-gradient(135deg, #34c759, #28cd41);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        margin-bottom: 20px;
+    }
+
+    .legal-links a {
+        color: var(--apple-blue);
+        text-decoration: none;
+        font-weight: 500;
+    }
+    .legal-links a:hover { text-decoration: underline; }
+
+    /* FAQ Apple Style */
+    .faq-container { max-width: 800px; margin: 0 auto; }
+    .faq-item {
+        border-bottom: 1px solid #d2d2d7;
+        padding: 24px 0;
+    }
+    .faq-item:last-child { border-bottom: none; }
+    
+    .faq-question {
+        font-size: 1.2rem;
+        font-weight: 600;
+        color: var(--apple-dark);
+        background: none; border: none; width: 100%; text-align: left;
+        display: flex; justify-content: space-between; align-items: center;
+        cursor: pointer; padding: 0;
+    }
+    .faq-answer {
+        font-size: 1.05rem;
+        color: var(--apple-gray);
+        line-height: 1.6;
+        margin-top: 12px;
+        display: none;
+    }
+    .faq-question.active + .faq-answer { display: block; animation: fadeInUp 0.4s ease; }
+
+    @keyframes fadeInUp {
+        from { opacity: 0; transform: translateY(10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Contact Section */
     .contact-card {
-        background: #ffffff; border-radius: 20px; padding: 35px 25px; text-align: center;
-        border: 1px solid rgba(0,0,0,0.03); box-shadow: 0 10px 30px rgba(0,0,0,0.02);
-        transition: 0.3s ease; height: 100%;
-    }
-    .contact-card:hover { transform: translateY(-5px); box-shadow: 0 15px 35px rgba(0,0,0,0.06); }
-    .contact-icon {
-        width: 60px; height: 60px; background: #f4f9ff; color: var(--brand-blue);
-        border-radius: 50%; display: flex; align-items: center; justify-content: center;
-        margin: 0 auto 20px; font-size: 1.5rem;
+        background: rgba(255,255,255,0.6);
+        backdrop-filter: blur(30px);
+        border-radius: 24px;
+        padding: 30px;
+        text-align: center;
+        border: 1px solid rgba(255,255,255,0.8);
+        box-shadow: 0 4px 20px rgba(0,0,0,0.02);
     }
 </style>
 
-<div class="hero-dark-section text-center">
+<!-- HERO SECTION -->
+<div class="hero-apple">
     <div class="container hero-content">
-        <!-- 🌟 Terms Link Button Added Here (Top) -->
-        <div class="mb-4 animate-drop">
-            <a href="{{ url_for('terms') }}" class="btn btn-sm btn-outline-light rounded-pill px-3 py-2 fw-semibold" style="background: rgba(255,255,255,0.1); backdrop-filter: blur(5px);">
-                <i class="fa-solid fa-shield-halved me-1 text-warning"></i> Terms & Conditions & Privacy Policy
-            </a>
+        <div class="reveal mb-4">
+            <span class="badge rounded-pill bg-white bg-opacity-10 text-white border border-white border-opacity-25 px-3 py-2 fw-medium" style="backdrop-filter: blur(10px);">
+                <i class="fa-solid fa-bolt text-warning me-1"></i> The New Standard of Networking
+            </span>
         </div>
 
-        <h1 class="hero-title mb-3 animate-drop">Welcome to <br><span class="gradient-text-gold">Kaamconnect</span></h1>
+        <h1 class="hero-title reveal delay-1 mb-4">Welcome to <br>Kaamconnect.</h1>
         
-        <p class="hero-subtitle mb-4 animate-up delay-1">
-            India's ultimate network bridging the gap between Customers and Skilled Professionals. No Middlemen. No Hidden Fees. Just Direct Connections.
+        <p class="section-subtitle reveal delay-2 text-white text-opacity-75 mb-5" style="max-width: 700px; margin-inline: auto;">
+            India's ultimate network bridging the gap between Customers and Skilled Professionals. No Middlemen. No Hidden Fees. Just Direct Connections[cite: 4].
         </p>
-
-        <div class="category-scroll animate-up delay-2 mb-5">
-            <div class="cat-badge"><i class="fa-solid fa-couch me-2"></i>Furniture</div>
-            <div class="cat-badge"><i class="fa-solid fa-bolt me-2"></i>Electricians</div>
-            <div class="cat-badge"><i class="fa-solid fa-faucet-drip me-2"></i>Plumbers</div>
-            <div class="cat-badge"><i class="fa-solid fa-paint-roller me-2"></i>Painters</div>
-            <div class="cat-badge"><i class="fa-solid fa-hammer me-2"></i>Carpenters</div>
-        </div>
         
-        <div class="animate-up delay-3 d-flex justify-content-center gap-3 flex-wrap">
-            <a href="{{ url_for('signup') }}" class="btn premium-btn">Join the Network <i class="fa-solid fa-arrow-right ms-2"></i></a>
-            <a href="{{ url_for('login') }}" class="btn premium-outline-btn">Sign In / Login <i class="fa-solid fa-right-to-bracket ms-2"></i></a>
+        <div class="reveal delay-3 d-flex justify-content-center gap-3 flex-wrap mb-5">
+            <a href="{{ url_for('signup') }}" class="hero-btn">
+                Join the Network <i class="fa-solid fa-arrow-right"></i>
+            </a>
+            <a href="{{ url_for('login') }}" class="hero-btn-outline">
+                Sign In <i class="fa-solid fa-user"></i>
+            </a>
+        </div>
+
+        <div class="category-pills reveal delay-3">
+            <div class="pill"><i class="fa-solid fa-couch me-2"></i>Furniture[cite: 4]</div>
+            <div class="pill"><i class="fa-solid fa-bolt me-2"></i>Electricians[cite: 4]</div>
+            <div class="pill"><i class="fa-solid fa-faucet-drip me-2"></i>Plumbers[cite: 4]</div>
+            <div class="pill"><i class="fa-solid fa-paint-roller me-2"></i>Painters[cite: 4]</div>
+            <div class="pill"><i class="fa-solid fa-hammer me-2"></i>Carpenters[cite: 4]</div>
         </div>
     </div>
 </div>
 
-<div class="vision-section animate-up">
+<!-- ABOUT / VISION SECTION -->
+<div class="section-padding text-center">
     <div class="container">
-        <span class="text-primary fw-bold text-uppercase tracking-widest small mb-3 d-block">Our Vision</span>
-        <h2 class="vision-text">
-            "To empower every skilled worker in India by providing them direct access to jobs, while giving customers a hassle-free, transparent way to build and maintain their homes."
-        </h2>
+        <h2 class="section-title reveal">Built in India. <br>For every professional.</h2>
+        <p class="section-subtitle reveal delay-1 mt-4" style="font-size: 1.4rem; color: var(--apple-dark);">
+            "To empower every skilled worker in India by providing them direct access to jobs, while giving customers a hassle-free, transparent way to build and maintain their homes[cite: 4]."
+        </p>
     </div>
 </div>
 
-<div class="benefit-wrapper">
+<!-- FEATURES BENTO GRID -->
+<div class="section-padding pt-0">
     <div class="container">
-        <div class="text-center mb-5 animate-up">
-            <h2 class="fw-bold text-dark" style="font-size: 2.5rem; letter-spacing: -1px;">Built for Everyone.</h2>
-            <p class="text-muted fs-5">Ek platform. Teen alag roles. Sabka fayda.</p>
+        <div class="text-center mb-5 reveal">
+            <h2 class="section-title" style="font-size: 3rem;">Three roles.<br>One unified platform.</h2>
         </div>
 
-        <div class="row g-4">
-            <div class="col-lg-4 animate-up delay-1">
-                <div class="benefit-card">
-                    <div class="icon-box icon-blue"><i class="fa-solid fa-user-shield fa-2x"></i></div>
-                    <h3 class="fw-bold text-dark mb-3">I am a Customer</h3>
-                    <p class="text-muted mb-4">Post your home requirements—be it a new sofa, wiring fix, or plumbing leak. Get competitive quotes directly from verified professionals.</p>
-                    
-                    <ul class="list-unstyled text-dark mb-0">
-                        <li class="mb-3 d-flex align-items-start"><i class="fa-solid fa-circle-check text-primary mt-1 me-3"></i> <div><b>Post Free Requests:</b> Submit your task in seconds.</div></li>
-                        <li class="mb-3 d-flex align-items-start"><i class="fa-solid fa-circle-check text-primary mt-1 me-3"></i> <div><b>Privacy Assured:</b> Your number is hidden until you agree.</div></li>
-                        <li class="mb-3 d-flex align-items-start"><i class="fa-solid fa-circle-check text-primary mt-1 me-3"></i> <div><b>Save Money:</b> Compare quotes and choose the best.</div></li>
-                    </ul>
+        <div class="bento-grid">
+            <!-- Customer Card -->
+            <div class="apple-card reveal delay-1">
+                <div class="card-icon-wrapper" style="background: rgba(0, 113, 227, 0.1); color: var(--apple-blue);">
+                    <i class="fa-solid fa-house-user"></i>
+                </div>
+                <h3 class="fw-bold mb-3 fs-4">For Customers</h3>
+                <p class="text-muted mb-4" style="font-size: 1.05rem;">Post your home requirements—be it a new sofa, wiring fix, or plumbing leak. Get competitive quotes directly from verified professionals[cite: 4].</p>
+                <ul class="list-unstyled mt-auto">
+                    <li class="mb-2"><i class="fa-solid fa-check text-success me-2"></i> Post Free Requests[cite: 4]</li>
+                    <li class="mb-2"><i class="fa-solid fa-check text-success me-2"></i> Privacy Assured[cite: 4]</li>
+                    <li><i class="fa-solid fa-check text-success me-2"></i> Save Money[cite: 4]</li>
+                </ul>
+            </div>
+
+            <!-- Shop Owner Card -->
+            <div class="apple-card reveal delay-2">
+                <div class="card-icon-wrapper" style="background: rgba(29, 29, 31, 0.1); color: var(--apple-dark);">
+                    <i class="fa-solid fa-shop"></i>
+                </div>
+                <h3 class="fw-bold mb-3 fs-4">For Shops & Contractors</h3>
+                <p class="text-muted mb-4" style="font-size: 1.05rem;">Scale your business faster. Find direct leads from customers in your city and hire daily-wage workers instantly during peak seasons[cite: 4].</p>
+                <ul class="list-unstyled mt-auto">
+                    <li class="mb-2"><i class="fa-solid fa-check text-dark me-2"></i> Direct Leads[cite: 4]</li>
+                    <li class="mb-2"><i class="fa-solid fa-check text-dark me-2"></i> Hire on Demand[cite: 4]</li>
+                    <li><i class="fa-solid fa-check text-dark me-2"></i> Zero Commission[cite: 4]</li>
+                </ul>
+            </div>
+
+            <!-- Worker Card -->
+            <div class="apple-card reveal delay-3">
+                <div class="card-icon-wrapper" style="background: rgba(245, 158, 11, 0.15); color: #d97706;">
+                    <i class="fa-solid fa-helmet-safety"></i>
+                </div>
+                <h3 class="fw-bold mb-3 fs-4">For Workers</h3>
+                <p class="text-muted mb-4" style="font-size: 1.05rem;">Your skills deserve respect and the right pay. Connect directly with shop owners and contractors looking for your exact expertise[cite: 4].</p>
+                <ul class="list-unstyled mt-auto">
+                    <li class="mb-2"><i class="fa-solid fa-check text-warning me-2"></i> Daily Jobs[cite: 4]</li>
+                    <li class="mb-2"><i class="fa-solid fa-check text-warning me-2"></i> No Middlemen[cite: 4]</li>
+                    <li><i class="fa-solid fa-check text-warning me-2"></i> Direct Calls[cite: 4]</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- PRIVACY & LEGAL SECTION (NEW) -->
+<div class="container reveal">
+    <div class="privacy-section shadow-sm">
+        <i class="fa-solid fa-shield-halved shield-icon"></i>
+        <h2 class="section-title mb-3" style="font-size: 2.8rem;">Privacy. That's our policy.</h2>
+        <p class="section-subtitle mb-4">We believe your data belongs to you. No unauthorized sharing, no hidden data mining. Your contact details remain masked until you explicitly allow a connection.</p>
+        
+        <div class="d-flex justify-content-center gap-4 flex-wrap legal-links mt-4">
+            <a href="{{ url_for('terms') }}"><i class="fa-solid fa-file-contract me-1"></i> Terms & Conditions</a>
+            <a href="{{ url_for('terms') }}"><i class="fa-solid fa-user-shield me-1"></i> Privacy Policy</a>
+            <a href="{{ url_for('terms') }}"><i class="fa-solid fa-scale-balanced me-1"></i> Legal Guidelines</a>
+        </div>
+    </div>
+</div>
+
+<!-- FAQ SECTION -->
+<div class="section-padding bg-white mt-5">
+    <div class="container">
+        <div class="text-center mb-5 reveal">
+            <h2 class="section-title" style="font-size: 2.5rem;">Questions? <br>We've got answers.</h2>
+        </div>
+
+        <div class="faq-container reveal delay-1">
+            <div class="faq-item">
+                <button class="faq-question" onclick="this.classList.toggle('active')">
+                    KaamConnect kya hai aur yeh kaise kaam karta hai?[cite: 4]
+                    <i class="fa-solid fa-plus fs-5 text-muted"></i>
+                </button>
+                <div class="faq-answer">
+                    KaamConnect ek direct professional network hai jo Customers, Shop Owners/Contractors aur Daily-wage Workers ko aapas mein jodta hai[cite: 4]. Yeh koi consultancy nahi hai—yahan koi middlemen nahi hota, sabhi log aapas mein direct call par baat karte hain[cite: 4].
+                </div>
+            </div>
+
+            <div class="faq-item">
+                <button class="faq-question" onclick="this.classList.toggle('active')">
+                    Kya Customers ke liye requirement post karna free hai?[cite: 4]
+                    <i class="fa-solid fa-plus fs-5 text-muted"></i>
+                </button>
+                <div class="faq-answer">
+                    Haan! Kisi bhi customer ke liye apne ghar ya shop ka kaam post karna bilkul 100% free hai[cite: 4]. Aap jitni chahein requirements bina kisi fees ke post kar sakte hain[cite: 4].
+                </div>
+            </div>
+
+            <div class="faq-item">
+                <button class="faq-question" onclick="this.classList.toggle('active')">
+                    Kya KaamConnect kaam pura hone par koi commission leta hai?[cite: 4]
+                    <i class="fa-solid fa-plus fs-5 text-muted"></i>
+                </button>
+                <div class="faq-answer">
+                    Bilkul nahi! Hamara model zero-commission par chalta hai[cite: 4]. Shop owners aur workers jitna bhi kamate hain, wo 100% unka apna hota hai[cite: 4]. Hum deals ke beech mein koi cut ya percentage nahi lete[cite: 4].
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- CONTACT & CTA SECTION -->
+<div class="section-padding">
+    <div class="container">
+        <div class="text-center mb-5 reveal">
+            <h2 class="section-title" style="font-size: 3rem;">We're here to help.</h2>
+            <p class="section-subtitle">Reach out to our support team anytime.</p>
+        </div>
+
+        <div class="row g-4 justify-content-center mb-5 max-w-4xl mx-auto reveal delay-1">
+            <div class="col-md-5">
+                <div class="contact-card h-100">
+                    <i class="fa-solid fa-envelope fs-2 mb-3" style="color: var(--apple-blue);"></i>
+                    <h4 class="fw-bold mb-2">Email Support</h4>
+                    <p class="text-muted small mb-3">Drop us a line and we'll get back to you within 24 hours.</p>
+                    <a href="mailto:kaamconnect7@gmail.com" class="fw-semibold text-decoration-none" style="color: var(--apple-blue);">kaamconnect7@gmail.com</a>
                 </div>
             </div>
             
-            <div class="col-lg-4 animate-up delay-2">
-                <div class="benefit-card" style="border-top: 4px solid var(--brand-dark);">
-                    <div class="icon-box icon-dark"><i class="fa-solid fa-shop fa-2x"></i></div>
-                    <h3 class="fw-bold text-dark mb-3">I am a Shop/Contractor</h3>
-                    <p class="text-muted mb-4">Scale your business faster. Find direct leads from customers in your city and hire daily-wage workers instantly during peak seasons.</p>
-                    
-                    <ul class="list-unstyled text-dark mb-0">
-                        <li class="mb-3 d-flex align-items-start"><i class="fa-solid fa-circle-check text-dark mt-1 me-3"></i> <div><b>Direct Leads:</b> Unlock customer contacts with minimal credits.</div></li>
-                        <li class="mb-3 d-flex align-items-start"><i class="fa-solid fa-circle-check text-dark mt-1 me-3"></i> <div><b>Hire on Demand:</b> Post job vacancies and find workers.</div></li>
-                        <li class="mb-3 d-flex align-items-start"><i class="fa-solid fa-circle-check text-dark mt-1 me-3"></i> <div><b>Zero Commission:</b> Keep 100% of your project profits.</div></li>
-                    </ul>
-                </div>
-            </div>
-
-            <div class="col-lg-4 animate-up delay-3">
-                <div class="benefit-card">
-                    <div class="icon-box icon-gold"><i class="fa-solid fa-helmet-safety fa-2x"></i></div>
-                    <h3 class="fw-bold text-dark mb-3">I am a Worker</h3>
-                    <p class="text-muted mb-4">Your skills deserve respect and the right pay. Connect directly with shop owners and contractors looking for your exact expertise.</p>
-                    
-                    <ul class="list-unstyled text-dark mb-0">
-                        <li class="mb-3 d-flex align-items-start"><i class="fa-solid fa-circle-check text-warning mt-1 me-3"></i> <div><b>Daily Jobs:</b> Find work matching your trade (Paint, Wood, Wire).</div></li>
-                        <li class="mb-3 d-flex align-items-start"><i class="fa-solid fa-circle-check text-warning mt-1 me-3"></i> <div><b>No Middlemen:</b> Say goodbye to contractor cuts.</div></li>
-                        <li class="mb-3 d-flex align-items-start"><i class="fa-solid fa-circle-check text-warning mt-1 me-3"></i> <div><b>Direct Calls:</b> Call employers directly from your dashboard.</div></li>
-                    </ul>
+            <div class="col-md-5">
+                <div class="contact-card h-100">
+                    <i class="fa-solid fa-location-dot fs-2 mb-3 text-dark"></i>
+                    <h4 class="fw-bold mb-2">Headquarters</h4>
+                    <p class="text-muted small mb-0">Rajasthan, India[cite: 4]</p>
+                    <p class="text-muted small">Operating completely digitally across the nation.</p>
                 </div>
             </div>
         </div>
-    </div>
-</div>
 
-<div class="faq-section">
-    <div class="container" style="max-width: 900px;">
-        <div class="text-center mb-5">
-            <span class="text-primary fw-bold text-uppercase small mb-2 d-block">Got Questions?</span>
-            <h2 class="fw-bold text-dark" style="font-size: 2.3rem; letter-spacing: -0.5px;">Frequently Asked Questions</h2>
-            <p class="text-muted">KaamConnect kaise kaam karta hai? Sabhi sawalon ke jawab yahan hain.</p>
-        </div>
-
-        <div class="accordion faq-accordion" id="kaamConnectFaq">
-            
-            <div class="accordion-item">
-                <h2 class="accordion-header">
-                    <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#faq1">
-                        Q1. KaamConnect kya hai aur yeh kaise kaam karta hai?
-                    </button>
-                </h2>
-                <div id="faq1" class="accordion-collapse collapse show" data-bs-parent="#kaamConnectFaq">
-                    <div class="accordion-body">
-                        KaamConnect ek direct professional network hai jo Customers, Shop Owners/Contractors aur Daily-wage Workers ko aapas mein jodta hai. Yeh koi consultancy nahi hai—yahan koi middlemen nahi hota, sabhi log aapas mein direct call par baat karte hain.
-                    </div>
-                </div>
-            </div>
-
-            <div class="accordion-item">
-                <h2 class="accordion-header">
-                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq2">
-                        Q2. Kya Customers ke liye requirement post karna free hai?
-                    </button>
-                </h2>
-                <div id="faq2" class="accordion-collapse collapse" data-bs-parent="#kaamConnectFaq">
-                    <div class="accordion-body">
-                        Haan! Kisi bhi customer ke liye apne ghar ya shop ka kaam post karna bilkul 100% free hai. Aap jitni chahein requirements bina kisi fees ke post kar sakte hain.
-                    </div>
-                </div>
-            </div>
-
-            <div class="accordion-item">
-                <h2 class="accordion-header">
-                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq3">
-                        Q3. Shop Owners ke liye Leads/Requirements system kaise kaam karta hai?
-                    </button>
-                </h2>
-                <div id="faq3" class="accordion-collapse collapse" data-bs-parent="#kaamConnectFaq">
-                    <div class="accordion-body">
-                        Shop owners apne wallet mein wallet balance/credits add karke local area ki customer requirements ko unlock kar sakte hain. Ek baar requirement unlock hote hi unhe customer ka direct contact number mil jata hai.
-                    </div>
-                </div>
-            </div>
-
-            <div class="accordion-item">
-                <h2 class="accordion-header">
-                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq4">
-                        Q4. Kya KaamConnect kaam pura hone par koi commission leta hai?
-                    </button>
-                </h2>
-                <div id="faq4" class="accordion-collapse collapse" data-bs-parent="#kaamConnectFaq">
-                    <div class="accordion-body">
-                        Bilkul nahi! Hamara model zero-commission par chalta hai. Shop owners aur workers jitna bhi kamate hain, wo 100% unka apna hota hai. Hum deals ke beech mein koi cut ya percentage nahi lete.
-                    </div>
-                </div>
-            </div>
-
-            <div class="accordion-item">
-                <h2 class="accordion-header">
-                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq5">
-                        Q5. Workers ko kaam kaise milta hai?
-                    </button>
-                </h2>
-                <div id="faq5" class="accordion-collapse collapse" data-bs-parent="#kaamConnectFaq">
-                    <div class="accordion-body">
-                        Contractors ya Shop Owners jab bhi naye jobs post karte hain, toh unhe unke dashboard par list dikh jati hai. Workers bina kisi charge ke direct unhe call karke kaam ke liye apply kar sakte hain.
-                    </div>
-                </div>
-            </div>
-
-        </div>
-    </div>
-</div>
-
-<div class="contact-section">
-    <div class="container">
-        <div class="text-center mb-5">
-            <span class="text-primary fw-bold text-uppercase tracking-wider small mb-2 d-block">Get In Touch</span>
-            <h2 class="fw-bold text-dark" style="font-size: 2.3rem; letter-spacing: -0.5px;">Contact Support Team</h2>
-            <p class="text-muted">Koi sawal ho ya dikkat? Hamari team se seedha sampark karein.</p>
-        </div>
-
-        <div class="row g-4 justify-content-center">
-            <div class="col-md-4">
-                <div class="contact-card">
-                    <div class="contact-icon">
-                        <i class="fa-solid fa-phone"></i>
-                    </div>
-                    <h5 class="fw-bold text-dark mb-2">Call / WhatsApp</h5>
-                    <p class="text-muted mb-3">Monday-Sunday (24 hour)</p>
-                    <a href="tel:+919999999999" class="text-primary fw-bold text-decoration-none"></a>
-                </div>
-            </div>
-
-            <div class="col-md-4">
-                <div class="contact-card">
-                    <div class="contact-icon">
-                        <i class="fa-solid fa-envelope"></i>
-                    </div>
-                    <h5 class="fw-bold text-dark mb-2">Email Support</h5>
-                    <p class="text-muted mb-3">24/7 Response Within Hours</p>
-                    <a href="mailto:support@kaamconnect.com" class="text-primary fw-bold text-decoration-none">kaamconnect7@gmail.com</a>
-                </div>
-            </div>
-
-            <div class="col-md-4">
-                <div class="contact-card">
-                    <div class="contact-icon">
-                        <i class="fa-solid fa-location-dot"></i>
-                    </div>
-                    <h5 class="fw-bold text-dark mb-2">Head Office</h5>
-                    <p class="text-muted mb-0">Rajasthan,</p>
-                    <p class="text-muted">India</p>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-
-<div class="container animate-up mb-5 mt-4">
-    <div class="card border-0 rounded-4 p-5 text-center" style="background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%); box-shadow: inset 0 0 50px rgba(0,0,0,0.02);">
-        <h2 class="fw-bold text-dark mb-3">Ready to join India's fastest-growing network?</h2>
-        <p class="text-muted mb-4">Takes less than a minute to set up your free profile.</p>
-        
-        <div class="d-flex justify-content-center gap-3 flex-wrap">
-            <a href="{{ url_for('signup') }}" class="btn premium-btn px-5"><i class="fa-solid fa-rocket me-2"></i> Get Started Today</a>
-            <a href="{{ url_for('login') }}" class="btn btn-outline-dark rounded-pill px-5 py-3 fw-bold" style="border-width: 2px;"><i class="fa-solid fa-right-to-bracket me-2"></i> Already Registered? Login</a>
-        </div>
-
-        <!-- 🌟 Prominent Footer Terms & Conditions Button Added Here -->
-        <div class="mt-4 pt-3 border-top border-secondary-subtle">
-            <a href="{{ url_for('terms') }}" class="text-decoration-none text-muted fw-semibold small px-3 py-2 rounded bg-white border d-inline-block shadow-sm">
-                <i class="fa-solid fa-file-contract text-primary me-1"></i> Read Terms & Conditions / Privacy Policy
+        <!-- Final CTA -->
+        <div class="text-center mt-5 pt-5 reveal delay-2">
+            <a href="{{ url_for('signup') }}" class="btn rounded-pill px-5 py-3 fw-bold shadow-sm" style="background: var(--apple-blue); color: white; font-size: 1.1rem; transition: 0.3s;">
+                Create Your Free Account <i class="fa-solid fa-arrow-right ms-2"></i>
             </a>
         </div>
     </div>
 </div>
+
+<!-- Simple Vanilla JS for Smooth Apple-style Scroll Reveals & FAQ Toggles -->
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        // Intersection Observer for Scroll Animation
+        const reveals = document.querySelectorAll(".reveal");
+        
+        const observerOptions = {
+            root: null,
+            rootMargin: "0px",
+            threshold: 0.15
+        };
+        
+        const observer = new IntersectionObserver(function(entries, observer) {
+            entries.forEach(entry => {
+                if(entry.isIntersecting) {
+                    entry.target.classList.add("active");
+                    observer.unobserve(entry.target); // Run animation only once
+                }
+            });
+        }, observerOptions);
+        
+        reveals.forEach(reveal => {
+            observer.observe(reveal);
+        });
+
+        // FAQ Icon Toggle Logic
+        const faqQuestions = document.querySelectorAll('.faq-question');
+        faqQuestions.forEach(q => {
+            q.addEventListener('click', () => {
+                const icon = q.querySelector('i');
+                if (q.classList.contains('active')) {
+                    icon.classList.replace('fa-plus', 'fa-minus');
+                } else {
+                    icon.classList.replace('fa-minus', 'fa-plus');
+                }
+            });
+        });
+    });
+</script>
 {% endblock %}
