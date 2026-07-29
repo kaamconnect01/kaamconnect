@@ -2,162 +2,377 @@
 {% block content %}
 <style>
     /* =========================================
-       PREMIUM APPLE-STYLE LOGIN DESIGN (MOBILE RESPONSIVE)
+       ULTRA-PREMIUM APPLE-STYLE LOGIN PAGE
        ========================================= */
     :root {
         --apple-blue: #0071e3;
-        --apple-dark: #1d1d1f;
-        --apple-gray: #86868b;
-        --apple-bg: #f5f5f7;
+        --apple-blue-hover: #0077ed;
+        --apple-dark-bg: #0d1117;
+        --apple-card-bg: #ffffff;
+        --apple-border: rgba(0, 0, 0, 0.08);
+        --apple-text-main: #1d1d1f;
+        --apple-text-sub: #86868b;
+        --apple-input-bg: #f5f5f7;
     }
 
     body {
-        background-color: #f5f5f7;
+        background-color: #f2f2f7;
+        font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
     }
 
-    .login-container {
-        background: #ffffff;
-        border-radius: 28px;
-        box-shadow: 0 15px 50px rgba(0,0,0,0.05);
+    .login-wrapper {
+        min-height: calc(85vh - 80px);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 40px 15px;
+    }
+
+    .login-card {
+        background: var(--apple-card-bg);
+        border-radius: 32px;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.06), 0 1px 3px rgba(0, 0, 0, 0.02);
         overflow: hidden;
-        border: 1px solid rgba(0,0,0,0.03);
+        border: 1px solid var(--apple-border);
+        width: 100%;
+        max-width: 1020px;
+        transition: transform 0.4s ease, box-shadow 0.4s ease;
     }
 
-    /* Branding Window Layout */
+    /* -----------------------------------------
+       BRAND PANEL (LEFT / BOTTOM)
+       ----------------------------------------- */
     .brand-side {
-        background: linear-gradient(135deg, #0b0f19 0%, #111827 100%);
-        color: white;
-        padding: 40px;
+        background: linear-gradient(145deg, #0b0f19 0%, #161f33 100%);
+        color: #ffffff;
+        padding: 50px 45px;
         display: flex;
         flex-direction: column;
         justify-content: space-between;
         position: relative;
+        overflow: hidden;
     }
+
+    /* Glowing Radial Backdrop Accent */
     .brand-side::before {
-        content: ''; position: absolute; top: -20%; right: -20%;
-        width: 300px; height: 300px; background: radial-gradient(circle, rgba(0, 113, 227, 0.15) 0%, transparent 70%);
+        content: '';
+        position: absolute;
+        top: -30%;
+        right: -30%;
+        width: 380px;
+        height: 380px;
+        background: radial-gradient(circle, rgba(0, 113, 227, 0.25) 0%, rgba(0,0,0,0) 70%);
+        pointer-events: none;
     }
 
-    .form-side {
-        padding: 40px;
+    .brand-side::after {
+        content: '';
+        position: absolute;
+        bottom: -20%;
+        left: -20%;
+        width: 300px;
+        height: 300px;
+        background: radial-gradient(circle, rgba(16, 185, 129, 0.15) 0%, rgba(0,0,0,0) 70%);
+        pointer-events: none;
     }
 
-    .form-control {
-        border-radius: 12px;
-        padding: 12px 16px;
-        border: 1px solid #d2d2d7;
-        background-color: #fbfbfd;
-        font-size: 0.95rem;
-        transition: all 0.3s ease;
-    }
-    .form-control:focus {
-        border-color: var(--apple-blue);
-        box-shadow: 0 0 0 4px rgba(0, 113, 227, 0.1);
-        background-color: #ffffff;
-    }
-
-    .input-group-text {
-        background-color: #fbfbfd;
-        border: 1px solid #d2d2d7;
-        border-radius: 12px 0 0 12px;
-        color: var(--apple-gray);
-    }
-    .has-icon .form-control {
-        border-radius: 0 12px 12px 0;
-    }
-
-    .apple-btn-primary {
-        background: linear-gradient(90deg, #0071e3, #005bb5);
-        color: white;
-        border-radius: 980px;
-        padding: 14px;
-        font-weight: 600;
-        border: none;
-        transition: all 0.3s ease;
-        box-shadow: 0 5px 15px rgba(0, 113, 227, 0.2);
-    }
-    .apple-btn-primary:hover {
-        transform: scale(1.01);
-        box-shadow: 0 8px 20px rgba(0, 113, 227, 0.3);
-        color: white;
+    .brand-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        background: rgba(255, 255, 255, 0.08);
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        padding: 6px 16px;
+        border-radius: 99px;
+        font-size: 0.82rem;
+        font-weight: 500;
+        letter-spacing: 0.3px;
+        backdrop-filter: blur(12px);
     }
 
     .info-pill {
-        background: rgba(255, 255, 255, 0.05);
+        background: rgba(255, 255, 255, 0.04);
         border: 1px solid rgba(255, 255, 255, 0.08);
-        padding: 15px;
+        padding: 18px 20px;
+        border-radius: 20px;
+        margin-bottom: 16px;
+        backdrop-filter: blur(16px);
+        transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .info-pill:hover {
+        background: rgba(255, 255, 255, 0.08);
+        transform: translateY(-2px);
+        border-color: rgba(0, 113, 227, 0.4);
+    }
+
+    .info-icon-wrapper {
+        width: 42px;
+        height: 42px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.1rem;
+        flex-shrink: 0;
+    }
+
+    /* -----------------------------------------
+       FORM PANEL (RIGHT / TOP)
+       ----------------------------------------- */
+    .form-side {
+        padding: 55px 50px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+    }
+
+    .form-header h3 {
+        font-size: 1.9rem;
+        font-weight: 700;
+        color: var(--apple-text-main);
+        letter-spacing: -0.6px;
+    }
+
+    .form-header p {
+        color: var(--apple-text-sub);
+        font-size: 0.95rem;
+    }
+
+    /* Custom Input Controls */
+    .input-box-group {
+        position: relative;
+        margin-bottom: 22px;
+    }
+
+    .input-box-group label {
+        font-size: 0.83rem;
+        font-weight: 600;
+        color: #48484a;
+        margin-bottom: 8px;
+        display: block;
+        letter-spacing: 0.2px;
+    }
+
+    .custom-input-wrap {
+        position: relative;
+        display: flex;
+        align-items: center;
+    }
+
+    .input-icon {
+        position: absolute;
+        left: 18px;
+        color: #8e8e93;
+        font-size: 1rem;
+        transition: color 0.3s ease;
+        pointer-events: none;
+        z-index: 2;
+    }
+
+    .form-control-apple {
+        width: 100%;
+        padding: 14px 18px 14px 48px;
+        font-size: 0.98rem;
         border-radius: 16px;
-        margin-bottom: 15px;
-        backdrop-filter: blur(10px);
+        border: 1.5px solid #e5e5ea;
+        background-color: var(--apple-input-bg);
+        color: var(--apple-text-main);
+        font-weight: 500;
+        transition: all 0.25s ease;
+    }
+
+    .form-control-apple:focus {
+        outline: none;
+        background-color: #ffffff;
+        border-color: var(--apple-blue);
+        box-shadow: 0 0 0 4px rgba(0, 113, 227, 0.15);
+    }
+
+    .form-control-apple:focus + .input-icon {
+        color: var(--apple-blue);
+    }
+
+    .password-toggle-btn {
+        position: absolute;
+        right: 16px;
+        background: none;
+        border: none;
+        color: #8e8e93;
+        cursor: pointer;
+        padding: 4px;
+        font-size: 0.95rem;
+        transition: color 0.2s ease;
+    }
+
+    .password-toggle-btn:hover {
+        color: var(--apple-text-main);
+    }
+
+    /* Primary Button */
+    .btn-apple-submit {
+        background: linear-gradient(180deg, #0077ed 0%, #0066cc 100%);
+        color: #ffffff;
+        border-radius: 99px;
+        padding: 15px;
+        font-weight: 600;
+        font-size: 1rem;
+        border: none;
+        width: 100%;
+        margin-top: 10px;
+        cursor: pointer;
+        box-shadow: 0 8px 20px rgba(0, 113, 227, 0.25);
+        transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+    }
+
+    .btn-apple-submit:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 12px 28px rgba(0, 113, 227, 0.35);
+        background: linear-gradient(180deg, #0077ed 0%, #005bb5 100%);
+        color: white;
+    }
+
+    .btn-apple-submit:active {
+        transform: translateY(1px);
+    }
+
+    .signup-link-box {
+        margin-top: 28px;
+        padding-top: 20px;
+        border-top: 1px solid #f2f2f7;
+        text-align: center;
+    }
+
+    /* Mobile Responsive Adjustments */
+    @media (max-width: 991.98px) {
+        .brand-side {
+            padding: 40px 30px;
+        }
+        .form-side {
+            padding: 40px 30px;
+        }
     }
 </style>
 
-<div class="container mt-5 mb-5">
-    <div class="row login-container g-0 d-flex flex-column-reverse flex-lg-row">
+<div class="container login-wrapper">
+    <div class="row login-card g-0 d-flex flex-column-reverse flex-lg-row">
         
+        <!-- ================= LEFT BRAND SIDE ================= -->
         <div class="col-lg-5 brand-side">
-            <div>
-                <h2 class="fw-bold mb-3" style="letter-spacing: -1px;">Welcome Back!</h2>
-                <p class="text-white-50">Log in to access your dashboard, manage active requests, check available jobs, or top-up your wallet seamlessly.</p>
+            <div class="position-relative z-1">
+                <div class="mb-4">
+                    <span class="brand-badge text-white-50">
+                        <i class="fa-solid fa-shield-halved text-primary"></i> Kaamconnect Gateway
+                    </span>
+                </div>
+                <h2 class="fw-bold mb-3" style="letter-spacing: -1px; font-size: 2.1rem;">Welcome Back!</h2>
+                <p class="text-white-50" style="font-size: 0.95rem; line-height: 1.6;">
+                    Log in to access your unified dashboard, manage active labor requests, check live leads, or instant top-up your wallet seamlessly.
+                </p>
             </div>
 
-            <div class="my-4">
+            <div class="my-4 position-relative z-1">
+                <!-- Info Pill 1 -->
                 <div class="info-pill">
                     <div class="d-flex align-items-center">
-                        <i class="fa-solid fa-chart-line text-primary fa-lg me-3"></i>
+                        <div class="info-icon-wrapper bg-primary bg-opacity-20 text-primary me-3">
+                            <i class="fa-solid fa-chart-line"></i>
+                        </div>
                         <div>
-                            <h6 class="mb-0 fw-bold text-white">Live Dashboard Control</h6>
-                            <small class="text-white-50">Track customer leads and profile interactions.</small>
+                            <h6 class="mb-0 fw-bold text-white" style="font-size: 0.93rem;">Live Dashboard Control</h6>
+                            <small class="text-white-50" style="font-size: 0.82rem;">Track customer leads and profile interactions in real-time.</small>
                         </div>
                     </div>
                 </div>
+
+                <!-- Info Pill 2 -->
                 <div class="info-pill">
                     <div class="d-flex align-items-center">
-                        <i class="fa-solid fa-circle-nodes text-success fa-lg me-3"></i>
+                        <div class="info-icon-wrapper bg-success bg-opacity-20 text-success me-3">
+                            <i class="fa-solid fa-circle-nodes"></i>
+                        </div>
                         <div>
-                            <h6 class="mb-0 fw-bold text-white">Direct Marketplace Access</h6>
-                            <small class="text-white-50">Connect with users without any middleman cuts.</small>
+                            <h6 class="mb-0 fw-bold text-white" style="font-size: 0.93rem;">Direct Marketplace Access</h6>
+                            <small class="text-white-50" style="font-size: 0.82rem;">Connect directly with clients without commission fees.</small>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <div>
-                <small class="text-white-50"><i class="fa-solid fa-user-shield me-2"></i> Secure & Verified Gateway.</small>
+            <div class="position-relative z-1 pt-2">
+                <small class="text-white-50 d-flex align-items-center gap-2" style="font-size: 0.82rem;">
+                    <i class="fa-solid fa-lock text-success"></i> 256-bit Encrypted SSL Connection
+                </small>
             </div>
         </div>
 
+        <!-- ================= RIGHT FORM SIDE ================= -->
         <div class="col-lg-7 form-side">
-            <div class="mb-4">
-                <h3 class="fw-bold text-dark" style="letter-spacing: -0.5px;">Account Sign In</h3>
-                <p class="text-muted small">Please enter your registered mobile number and password.</p>
+            <div class="form-header mb-4">
+                <h3>Account Sign In</h3>
+                <p class="mt-1">Please enter your registered mobile number and password below.</p>
             </div>
 
             <form method="POST">
-                <div class="mb-4">
-                    <label class="form-label small fw-bold text-secondary">Registered Mobile Number</label>
-                    <div class="input-group has-icon">
-                        <span class="input-group-text"><i class="fa-solid fa-phone"></i></span>
-                        <input type="text" name="mobile" class="form-control" required placeholder="Enter 10-digit number">
+                <!-- Mobile Number Input -->
+                <div class="input-box-group">
+                    <label>REGISTERED MOBILE NUMBER</label>
+                    <div class="custom-input-wrap">
+                        <input type="tel" name="mobile" class="form-control-apple" required placeholder="e.g. 9876543210" pattern="[0-9]{10}" maxlength="10">
+                        <i class="fa-solid fa-mobile-screen input-icon"></i>
                     </div>
                 </div>
                 
-                <div class="mb-4">
-                    <label class="form-label small fw-bold text-secondary">Password</label>
-                    <div class="input-group has-icon">
-                        <span class="input-group-text"><i class="fa-solid fa-lock"></i></span>
-                        <input type="password" name="password" class="form-control" required placeholder="Enter account password">
+                <!-- Password Input -->
+                <div class="input-box-group">
+                    <label>ACCOUNT PASSWORD</label>
+                    <div class="custom-input-wrap">
+                        <input type="password" id="passwordInput" name="password" class="form-control-apple" required placeholder="Enter your password">
+                        <i class="fa-solid fa-lock input-icon"></i>
+                        <button type="button" class="password-toggle-btn" onclick="togglePasswordVisibility()" aria-label="Toggle password visibility">
+                            <i class="fa-regular fa-eye" id="toggleIcon"></i>
+                        </button>
                     </div>
                 </div>
 
-                <button type="submit" class="btn apple-btn-primary w-100 py-3 mt-2 fw-bold">Sign In to Dashboard</button>
+                <!-- Submit Button -->
+                <button type="submit" class="btn-apple-submit">
+                    <span>Sign In to Dashboard</span>
+                    <i class="fa-solid fa-arrow-right fs-6"></i>
+                </button>
                 
-                <div class="text-center mt-4">
-                    <p class="text-muted small mb-0">Don't have an account yet? <a href="{{ url_for('signup') }}" class="text-primary fw-bold text-decoration-none">Create an account here</a></p>
+                <!-- Signup Redirection -->
+                <div class="signup-link-box">
+                    <p class="text-muted small mb-0">
+                        Don't have an account yet? 
+                        <a href="{{ url_for('signup') }}" class="text-primary fw-bold text-decoration-none ms-1">Create an account here</a>
+                    </p>
                 </div>
             </form>
         </div>
 
     </div>
 </div>
+
+<script>
+    // Password visibility toggle handler
+    function togglePasswordVisibility() {
+        const passwordInput = document.getElementById('passwordInput');
+        const toggleIcon = document.getElementById('toggleIcon');
+        
+        if (passwordInput.type === 'password') {
+            passwordInput.type = 'text';
+            toggleIcon.classList.remove('fa-eye');
+            toggleIcon.classList.add('fa-eye-slash');
+        } else {
+            passwordInput.type = 'password';
+            toggleIcon.classList.remove('fa-eye-slash');
+            toggleIcon.classList.add('fa-eye');
+        }
+    }
+</script>
 {% endblock %}
