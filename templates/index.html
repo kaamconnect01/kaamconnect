@@ -208,6 +208,90 @@
         color: var(--text-muted);
         line-height: 1.7;
     }
+
+    /* =========================================
+       7. MOBILE RESPONSIVE TWEAKS 
+       (Changes only apply to Mobile Screens)
+       ========================================= */
+    @media (max-width: 767.98px) {
+        /* Reduce Hero Section sizes for phone */
+        .hero-section {
+            padding: 80px 15px 50px 15px;
+            min-height: auto;
+        }
+        .hero-title {
+            font-size: 2.5rem; /* Much smaller on mobile */
+            letter-spacing: -1px;
+            margin-bottom: 15px;
+        }
+        .hero-subtitle {
+            font-size: 1rem;
+            margin-bottom: 30px;
+            padding: 0 10px;
+        }
+
+        /* Scale down buttons */
+        .btn-primary-custom {
+            padding: 12px 25px;
+            font-size: 1rem;
+            width: 100%; /* Full width button on mobile */
+            margin-right: 0 !important;
+        }
+        .hero-section .btn-outline-dark {
+            padding: 12px 25px !important;
+            font-size: 1rem !important;
+            width: 100%; /* Full width button on mobile */
+        }
+        .welcome-anim.delay-2 {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            padding: 0 15px;
+        }
+
+        /* Scale down badges */
+        .badge.fs-6 {
+            font-size: 0.85rem !important;
+            padding: 8px 15px !important;
+        }
+        .hero-section .gap-3 {
+            gap: 10px !important;
+        }
+
+        /* Reduce overall section paddings */
+        .section-padding { padding: 60px 0; }
+        .section-title {
+            font-size: 1.8rem;
+        }
+        
+        /* Typography adjustments for paragraphs */
+        .fs-5 {
+            font-size: 1rem !important;
+        }
+
+        /* Cards and Boxes scale down */
+        .feature-card {
+            padding: 25px;
+        }
+        .terms-box {
+            padding: 20px;
+            border-radius: 0 10px 10px 0;
+        }
+
+        /* Accordion scale down */
+        .custom-accordion .accordion-button {
+            font-size: 1rem;
+            padding: 15px;
+        }
+        .custom-accordion .accordion-body {
+            font-size: 0.95rem;
+        }
+        
+        /* Footer Icon */
+        .fa-paper-plane.fs-1 {
+            font-size: 2.5rem !important;
+        }
+    }
 </style>
 
 <!-- ==============================================
