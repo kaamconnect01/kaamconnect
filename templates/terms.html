@@ -181,21 +181,21 @@
     .delay-1 { transition-delay: 0.1s; }
 
     /* =========================================
-       MOBILE RESPONSIVE ADJUSTMENTS (NEW)
+       MOBILE RESPONSIVE ADJUSTMENTS
        ========================================= */
     @media (max-width: 768px) {
         .legal-hero {
-            padding: 80px 15px 40px; /* Reduced top/bottom padding */
+            padding: 80px 15px 40px; 
         }
         .legal-subtitle {
             font-size: 1rem;
         }
         .legal-container {
-            padding: 20px 10px; /* Reduced side padding for mobile */
+            padding: 20px 10px; 
             flex-direction: column;
         }
         .legal-content {
-            padding: 25px 15px; /* Fixed huge 50px padding squishing text */
+            padding: 25px 15px; 
             border-radius: 16px;
         }
         .legal-section {
@@ -203,14 +203,14 @@
             scroll-margin-top: 80px;
         }
         .legal-section h2 {
-            font-size: 1.35rem; /* Slightly smaller headings */
+            font-size: 1.35rem; 
             align-items: flex-start;
         }
         .legal-section p {
             font-size: 0.95rem;
         }
         .hindi-text {
-            padding: 15px 15px 15px 20px; /* Reduced padding inside hindi box */
+            padding: 15px 15px 15px 20px; 
             font-size: 0.95rem;
             margin: 15px 0 25px 0;
         }
@@ -268,11 +268,11 @@
         </ul>
     </aside>
 
-    <!-- EXHAUSTIVE LEGAL CONTENT -->
-    <main class="legal-content scroll-reveal delay-1">
+    <!-- EXHAUSTIVE LEGAL CONTENT (Removed buggy animation from main container) -->
+    <main class="legal-content">
 
-        <!-- SECTION 1 -->
-        <section id="section-1" class="legal-section">
+        <!-- SECTION 1 (Added animation to individual sections instead) -->
+        <section id="section-1" class="legal-section scroll-reveal">
             <h2><i class="fa-solid fa-file-contract text-muted"></i> 1. Introduction / Parichay</h2>
             <p>Welcome to Kaamconnect. By accessing or using our website and services, you agree to be bound by these Terms and Conditions[cite: 4]. Please read them carefully[cite: 4]. These Terms form a legally binding contract between you (the "User", "Customer", "Shop Owner", or "Worker") and Kaamconnect. If you do not agree with any part of these terms, you are strictly prohibited from using our services or platform.</p>
             <div class="hindi-text">
@@ -281,7 +281,7 @@
         </section>
 
         <!-- SECTION 2 -->
-        <section id="section-2" class="legal-section">
+        <section id="section-2" class="legal-section scroll-reveal">
             <h2><i class="fa-solid fa-network-wired text-muted"></i> 2. Nature of Platform (Intermediary Role)</h2>
             <p>Kaamconnect is purely an online marketplace and technology platform that connects Customers, Shop Owners, and Workers[cite: 4]. We do not directly provide any employment, contracting services, or manual labor[cite: 4]. We are an "Intermediary" as defined under the Information Technology Act, 2000. The actual transaction, agreement, or service delivery happens solely between the users at their own discretion and risk[cite: 4]. We do not guarantee the quality, safety, or legality of the services advertised by workers or the jobs posted by customers.</p>
             <div class="hindi-text">
@@ -289,8 +289,8 @@
             </div>
         </section>
 
-        <!-- SECTION 3 (NEW) -->
-        <section id="section-3" class="legal-section">
+        <!-- SECTION 3 -->
+        <section id="section-3" class="legal-section scroll-reveal">
             <h2><i class="fa-solid fa-user-check text-muted"></i> 3. Eligibility & Registration</h2>
             <p>To use Kaamconnect, you must be at least 18 years of age and capable of entering into a legally binding agreement under the Indian Contract Act, 1872. By creating an account, you represent and warrant that all information provided is accurate, current, and complete. If you are registering on behalf of a business (Shop Owner/Contractor), you declare that you have the legal authority to bind that business to these Terms.</p>
             <div class="hindi-text">
@@ -299,7 +299,7 @@
         </section>
 
         <!-- SECTION 4 -->
-        <section id="section-4" class="legal-section">
+        <section id="section-4" class="legal-section scroll-reveal">
             <h2><i class="fa-solid fa-wallet text-muted"></i> 4. User Accounts, Credits & Security</h2>
             <p>Users must provide accurate information during registration[cite: 4]. For Shop Owners purchasing leads using credits/wallet balance, please note that credits used to unlock leads are non-refundable once the lead details are accessed[cite: 4]. Kaamconnect holds no responsibility if a lead does not convert into a successful job. Account security is the sole responsibility of the user[cite: 4]. You are strictly prohibited from sharing your OTP, password, or account access with unauthorized individuals.</p>
             <div class="hindi-text">
@@ -307,8 +307,8 @@
             </div>
         </section>
 
-        <!-- SECTION 5 (NEW) -->
-        <section id="section-5" class="legal-section">
+        <!-- SECTION 5 -->
+        <section id="section-5" class="legal-section scroll-reveal">
             <h2><i class="fa-solid fa-ban text-muted"></i> 5. User Conduct & Prohibited Activities</h2>
             <p>While using our platform, you agree NOT to engage in any of the following activities:
                 <br>• Posting fake, fraudulent, or misleading job requirements.
@@ -326,8 +326,8 @@
             </div>
         </section>
 
-        <!-- SECTION 6 (NEW) -->
-        <section id="section-6" class="legal-section">
+        <!-- SECTION 6 -->
+        <section id="section-6" class="legal-section scroll-reveal">
             <h2><i class="fa-solid fa-money-bill-wave text-muted"></i> 6. Fees, Payments & Taxes</h2>
             <p>Kaamconnect does not charge any commission on the jobs completed. All financial settlements for services rendered are strictly between the Customer and the Worker/Shop Owner. Users are independently responsible for understanding and fulfilling their tax obligations (including GST, Income Tax, etc.) arising from the payments they make or receive through offline or online means outside this platform.</p>
             <div class="hindi-text">
@@ -336,7 +336,7 @@
         </section>
 
         <!-- SECTION 7 -->
-        <section id="section-7" class="legal-section">
+        <section id="section-7" class="legal-section scroll-reveal">
             <h2><i class="fa-solid fa-scale-unbalanced text-muted"></i> 7. Limitation of Liability</h2>
             <p>Kaamconnect shall not be held liable for any disputes, financial losses, quality issues, safety incidents, or frauds occurring between customers, shop owners, or workers[cite: 4]. Users are strongly advised to verify the identity and credentials of the other party before engaging in any financial transaction or physical work[cite: 4]. Under no circumstances shall Kaamconnect, its directors, employees, or affiliates be liable for any direct, indirect, incidental, special, or consequential damages resulting from your use of the platform.</p>
             <div class="hindi-text">
@@ -344,8 +344,8 @@
             </div>
         </section>
 
-        <!-- SECTION 8 (NEW) -->
-        <section id="section-8" class="legal-section">
+        <!-- SECTION 8 -->
+        <section id="section-8" class="legal-section scroll-reveal">
             <h2><i class="fa-solid fa-shield-halved text-muted"></i> 8. Indemnification</h2>
             <p>You agree to indemnify, defend, and hold harmless Kaamconnect and its affiliates from and against any and all claims, liabilities, damages, losses, costs, expenses, or fees (including reasonable attorneys' fees) that such parties may incur as a result of or arising from your (or anyone using your account's) violation of these Terms, your misuse of the Services, or your violation of any rights of any other person or entity.</p>
             <div class="hindi-text">
@@ -353,8 +353,8 @@
             </div>
         </section>
 
-        <!-- SECTION 9 (NEW) -->
-        <section id="section-9" class="legal-section">
+        <!-- SECTION 9 -->
+        <section id="section-9" class="legal-section scroll-reveal">
             <h2><i class="fa-solid fa-copyright text-muted"></i> 9. Intellectual Property Rights</h2>
             <p>All content on this website, including but not limited to the text, graphics, logos, icons, software, and source code, is the exclusive property of Kaamconnect and is protected by Indian and international copyright laws. You may not copy, reproduce, distribute, or create derivative works from our platform without our explicit written permission. By uploading content (like job descriptions), you grant us a non-exclusive license to use, display, and distribute that content to facilitate our services.</p>
             <div class="hindi-text">
@@ -363,7 +363,7 @@
         </section>
 
         <!-- SECTION 10 -->
-        <section id="section-10" class="legal-section">
+        <section id="section-10" class="legal-section scroll-reveal">
             <h2><i class="fa-solid fa-user-lock text-muted"></i> 10. Privacy Policy & Data Protection</h2>
             <p>We respect your privacy[cite: 4]. We collect basic details such as name, mobile number, email, and address solely for the purpose of service matching and platform communication[cite: 4]. We do not sell or share your personal data with unauthorized third parties[cite: 4]. Your data is stored securely[cite: 4]. However, we may disclose your information to law enforcement agencies if required by a valid legal subpoena or court order under the laws of India.</p>
             <div class="hindi-text">
@@ -371,8 +371,8 @@
             </div>
         </section>
 
-        <!-- SECTION 11 (NEW) -->
-        <section id="section-11" class="legal-section">
+        <!-- SECTION 11 -->
+        <section id="section-11" class="legal-section scroll-reveal">
             <h2><i class="fa-solid fa-cookie-bite text-muted"></i> 11. Cookies & Tracking Technologies</h2>
             <p>We use cookies and similar tracking technologies to track activity on our platform and hold certain information. Cookies are files with a small amount of data which may include an anonymous unique identifier. You can instruct your browser to refuse all cookies or to indicate when a cookie is being sent. However, if you do not accept cookies, you may not be able to use some portions of our service (such as staying logged in).</p>
             <div class="hindi-text">
@@ -380,8 +380,8 @@
             </div>
         </section>
 
-        <!-- SECTION 12 (NEW) -->
-        <section id="section-12" class="legal-section">
+        <!-- SECTION 12 -->
+        <section id="section-12" class="legal-section scroll-reveal">
             <h2><i class="fa-solid fa-user-xmark text-muted"></i> 12. Termination & Suspension</h2>
             <p>We reserve the right to suspend or terminate your account instantly and without prior notice or liability, for any reason whatsoever, including without limitation if you breach the Terms. Upon termination, your right to use the Service will immediately cease. All provisions of the Terms which by their nature should survive termination shall survive termination, including ownership provisions, warranty disclaimers, indemnity, and limitations of liability.</p>
             <div class="hindi-text">
@@ -389,8 +389,8 @@
             </div>
         </section>
 
-        <!-- SECTION 13 (NEW) -->
-        <section id="section-13" class="legal-section">
+        <!-- SECTION 13 -->
+        <section id="section-13" class="legal-section scroll-reveal">
             <h2><i class="fa-solid fa-bolt text-muted"></i> 13. Force Majeure (Acts of God)</h2>
             <p>Kaamconnect shall not be liable for any failure or delay in performance of its obligations under these Terms arising out of or caused, directly or indirectly, by circumstances beyond its reasonable control, including, without limitation, acts of God, earthquakes, fires, floods, wars, civil or military disturbances, acts of terrorism, sabotage, strikes, epidemics, pandemics, riots, power failures, or internet service provider failures.</p>
             <div class="hindi-text">
@@ -398,8 +398,8 @@
             </div>
         </section>
 
-        <!-- SECTION 14 (NEW) -->
-        <section id="section-14" class="legal-section">
+        <!-- SECTION 14 -->
+        <section id="section-14" class="legal-section scroll-reveal">
             <h2><i class="fa-solid fa-gavel text-muted"></i> 14. Dispute Resolution & Governing Law</h2>
             <p>These Terms shall be governed and construed in accordance with the laws of India. Any disputes arising out of or in connection with these Terms or the use of Kaamconnect shall be subject to the exclusive jurisdiction of the competent courts located in Udaipur, Rajasthan, India. By using the platform, you expressly waive any objection to such jurisdiction or venue.</p>
             <div class="hindi-text">
@@ -408,7 +408,7 @@
         </section>
 
         <!-- SECTION 15 -->
-        <section id="section-15" class="legal-section">
+        <section id="section-15" class="legal-section scroll-reveal">
             <h2><i class="fa-solid fa-pen-to-square text-muted"></i> 15. Changes to Terms</h2>
             <p>Kaamconnect reserves the right to modify these terms at any time[cite: 4]. Continued use of the platform after changes implies acceptance of the updated terms[cite: 4]. We will make reasonable efforts to notify you of any major material changes via email or platform notifications, but it remains your responsibility to review this page periodically.</p>
             <div class="hindi-text">
@@ -417,7 +417,7 @@
         </section>
 
         <!-- SECTION 16 -->
-        <section id="section-16" class="legal-section mb-0">
+        <section id="section-16" class="legal-section scroll-reveal mb-0">
             <h2><i class="fa-solid fa-headset text-muted"></i> 16. Contact Us & Grievance Officer</h2>
             <p>If you have any questions regarding these Terms, you can contact us through our official support channels or email provided on the platform[cite: 4]. In accordance with the Information Technology Act, 2000 and rules made there under, the name and contact details of the Grievance Officer are provided below for your reference.</p>
             <div class="p-4 bg-light rounded-3 mt-3 border">
@@ -440,11 +440,11 @@
 <script>
     document.addEventListener("DOMContentLoaded", function() {
         
-        // 1. Intersection Observer for Fade/Slide Up Animations
+        // 1. Fixed Intersection Observer - Lowered threshold for mobile
         const observerOptions = {
             root: null,
-            rootMargin: '0px',
-            threshold: 0.1
+            rootMargin: '0px 0px -20px 0px', // Triggers just before element fully enters
+            threshold: 0.02 // Changed from 0.1 to 0.02 so it works perfectly on small screens
         };
 
         const observer = new IntersectionObserver((entries, observer) => {
