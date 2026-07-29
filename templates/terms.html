@@ -2,459 +2,232 @@
 {% block content %}
 <style>
     /* =========================================
-       ULTRA-PREMIUM LEGAL PAGE DESIGN
+       TERMS & CONDITIONS - MOBILE OPTIMIZED
        ========================================= */
     :root {
-        --primary-blue: #0066cc;
-        --secondary-blue: #004499;
-        --light-bg: #f8f9fc;
-        --text-dark: #1a1a24;
-        --text-muted: #6c757d;
-        --card-bg: #ffffff;
-        --hindi-bg: #f0f7ff;
-        --hindi-border: #0d6efd;
+        --apple-blue: #0071e3;
+        --apple-dark: #1d1d1f;
+        --apple-gray: #86868b;
+        --apple-bg: #f5f5f7;
+        --apple-border: rgba(0, 0, 0, 0.08);
     }
 
     body {
-        background-color: var(--light-bg);
-        font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
-        color: var(--text-dark);
-        overflow-x: hidden;
-        line-height: 1.7;
+        background-color: var(--apple-bg);
+        font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        color: var(--apple-dark);
+        line-height: 1.5;
     }
 
-    /* -----------------------------------------
-       HERO SECTION
-       ----------------------------------------- */
-    .legal-hero {
-        background: radial-gradient(circle at top right, #e0f0ff 0%, #f8f9fc 50%, #ffffff 100%);
-        padding: 120px 20px 80px;
-        text-align: center;
-        border-bottom: 1px solid rgba(0,0,0,0.05);
-        position: relative;
-    }
-    .legal-hero-title {
-        font-size: clamp(2.5rem, 5vw, 4.5rem);
-        font-weight: 800;
-        letter-spacing: -1.5px;
-        background: linear-gradient(135deg, #004499, #00aaff);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        margin-bottom: 20px;
-    }
-    .legal-subtitle {
-        font-size: 1.2rem;
-        color: var(--text-muted);
-        max-width: 600px;
-        margin: 0 auto;
+    .terms-wrapper {
+        padding: 20px 10px;
     }
 
-    /* -----------------------------------------
-       LAYOUT & SIDEBAR (TOC)
-       ----------------------------------------- */
-    .legal-container {
-        max-width: 1300px;
-        margin: 0 auto;
-        padding: 50px 20px;
-        display: flex;
-        gap: 40px;
-        align-items: flex-start;
-    }
-
-    .toc-sidebar {
-        flex: 0 0 300px;
-        position: sticky;
-        top: 100px;
-        background: var(--card-bg);
-        padding: 30px;
+    .terms-card {
+        background: #ffffff;
         border-radius: 20px;
-        box-shadow: 0 10px 30px rgba(0,0,0,0.03);
-        border: 1px solid rgba(0,0,0,0.02);
-        max-height: calc(100vh - 120px);
-        overflow-y: auto;
-        display: none; /* Hidden on mobile, block on lg */
-    }
-    
-    @media (min-width: 992px) {
-        .toc-sidebar { display: block; }
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.04);
+        border: 1px solid var(--apple-border);
+        padding: 24px 18px;
+        max-width: 900px;
+        margin: 0 auto;
     }
 
-    .toc-title {
-        font-size: 1.2rem;
-        font-weight: 700;
+    /* Header Styling */
+    .terms-header {
+        text-align: center;
+        padding-bottom: 20px;
         margin-bottom: 20px;
-        color: var(--text-dark);
-        border-bottom: 2px solid var(--light-bg);
-        padding-bottom: 10px;
+        border-bottom: 1px solid #f2f2f7;
     }
 
-    .toc-list { list-style: none; padding: 0; margin: 0; }
-    .toc-list li { margin-bottom: 12px; }
-    .toc-list a {
-        text-decoration: none;
-        color: var(--text-muted);
-        font-weight: 500;
-        font-size: 0.95rem;
-        transition: all 0.2s ease;
-        display: block;
-        padding: 5px 10px;
-        border-radius: 8px;
-    }
-    .toc-list a:hover, .toc-list a.active {
-        color: var(--primary-blue);
-        background: var(--hindi-bg);
-    }
-
-    /* -----------------------------------------
-       CONTENT AREA
-       ----------------------------------------- */
-    .legal-content {
-        flex: 1;
-        background: var(--card-bg);
-        padding: 50px;
-        border-radius: 24px;
-        box-shadow: 0 10px 40px rgba(0,0,0,0.04);
-        border: 1px solid rgba(0,0,0,0.02);
-    }
-
-    .legal-section {
-        margin-bottom: 60px;
-        scroll-margin-top: 100px;
-    }
-
-    .legal-section h2 {
-        font-size: 1.8rem;
+    .terms-header h1 {
+        font-size: 1.5rem; /* Mobile first font size */
         font-weight: 700;
-        color: var(--primary-blue);
-        margin-bottom: 20px;
+        letter-spacing: -0.5px;
+        color: var(--apple-dark);
+    }
+
+    .terms-header p {
+        font-size: 0.85rem;
+        color: var(--apple-gray);
+        margin-top: 5px;
+    }
+
+    /* Content Styling */
+    .section-title {
+        font-size: 1.1rem;
+        font-weight: 600;
+        margin-top: 24px;
+        margin-bottom: 12px;
+        color: var(--apple-dark);
         display: flex;
         align-items: center;
-        gap: 10px;
+        gap: 8px;
     }
-    
-    .legal-section p {
-        font-size: 1.05rem;
-        color: #4a4a55;
+
+    .terms-text {
+        font-size: 0.9rem;
+        color: #48484a;
+        margin-bottom: 12px;
+        word-wrap: break-word;
+    }
+
+    .terms-list {
+        padding-left: 18px;
         margin-bottom: 15px;
     }
 
-    /* Premium Hindi Translation Block */
-    .hindi-text {
-        background: var(--hindi-bg);
-        border-left: 4px solid var(--hindi-border);
-        padding: 20px 25px;
-        border-radius: 0 12px 12px 0;
-        margin: 20px 0 30px 0;
-        font-size: 1.05rem;
-        color: #333;
-        position: relative;
-    }
-    .hindi-text::before {
-        content: 'अ';
-        position: absolute;
-        top: -15px;
-        right: 20px;
-        background: var(--hindi-border);
-        color: white;
-        width: 30px;
-        height: 30px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        border-radius: 50%;
-        font-weight: bold;
-        font-size: 0.9rem;
-        box-shadow: 0 4px 10px rgba(13, 110, 253, 0.3);
+    .terms-list li {
+        font-size: 0.88rem;
+        color: #48484a;
+        margin-bottom: 8px;
     }
 
-    /* Scroll Animations */
-    .scroll-reveal {
-        opacity: 0;
-        transform: translateY(30px);
-        transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+    /* Table Fix for Mobile */
+    .table-container {
+        width: 100%;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        margin: 15px 0;
+        border-radius: 12px;
+        border: 1px solid #e5e5ea;
     }
-    .scroll-reveal.visible {
-        opacity: 1;
-        transform: translateY(0);
+
+    .custom-table {
+        width: 100%;
+        min-width: 500px; /* Forces scroll on small screens instead of crushing text */
+        border-collapse: collapse;
+        font-size: 0.85rem;
     }
-    
-    .delay-1 { transition-delay: 0.1s; }
+
+    .custom-table th {
+        background-color: #fbfbfd;
+        color: var(--apple-dark);
+        font-weight: 600;
+        padding: 10px 12px;
+        border-bottom: 1px solid #e5e5ea;
+        text-align: left;
+    }
+
+    .custom-table td {
+        padding: 10px 12px;
+        border-bottom: 1px solid #f2f2f7;
+        color: #48484a;
+    }
+
+    /* Responsive Scaling for Desktop */
+    @media (min-width: 768px) {
+        .terms-wrapper {
+            padding: 40px 20px;
+        }
+        .terms-card {
+            padding: 40px 35px;
+            border-radius: 28px;
+        }
+        .terms-header h1 {
+            font-size: 2.1rem;
+        }
+        .terms-header p {
+            font-size: 0.95rem;
+        }
+        .section-title {
+            font-size: 1.25rem;
+        }
+        .terms-text, .terms-list li {
+            font-size: 0.95rem;
+        }
+        .custom-table {
+            font-size: 0.9rem;
+        }
+    }
 </style>
 
-<!-- ==============================================
-     1. HERO SECTION
-     ============================================== -->
-<div class="legal-hero">
-    <div class="container">
-        <h1 class="legal-hero-title scroll-reveal">Terms & Conditions <br>& Privacy Policy</h1>
-        <p class="legal-subtitle scroll-reveal delay-1">
-            Kaamconnect - Aapka Apna Local Service Marketplace[].<br>
-            <span class="badge bg-primary bg-opacity-10 text-primary mt-3 border border-primary border-opacity-25 px-3 py-2 rounded-pill">Last Updated: July 29, 2026</span>
+<div class="terms-wrapper">
+    <div class="terms-card">
+        
+        <!-- Header -->
+        <div class="terms-header">
+            <h1>Terms & Conditions</h1>
+            <p>Niyama aur Shartein (Hindi & English)</p>
+            <small class="text-muted d-block mt-1" style="font-size: 0.75rem;">Last Updated: July 2026</small>
+        </div>
+
+        <!-- Section 1 -->
+        <h2 class="section-title">
+            <i class="fa-solid fa-file-contract text-primary"></i> 1. Introduction & Acceptance
+        </h2>
+        <p class="terms-text">
+            Welcome to Kaamconnect. By accessing or using our platform, mobile application, or services, you agree to comply with and be bound by these Terms and Conditions.
         </p>
-        <a href="{{ url_for('index') }}" class="btn btn-outline-dark rounded-pill px-4 py-2 mt-4 scroll-reveal delay-1 fw-bold">
-            <i class="fa-solid fa-arrow-left me-2"></i> Back to Home
-        </a>
+        <p class="terms-text">
+            <strong>Hindi Translation:</strong> Kaamconnect par aapka swagat hai. Hamari platform ya mobile app ka upyog karke aap in sabhi niyamo aur sharton ka paalan karne ke liye sehamat hote hain.
+        </p>
+
+        <!-- Section 2 -->
+        <h2 class="section-title">
+            <i class="fa-solid fa-user-shield text-primary"></i> 2. User Roles & Account Responsibilities
+        </h2>
+        <p class="terms-text">
+            Users must register with an accurate 10-digit mobile number. You are responsible for maintaining the confidentiality of your account details.
+        </p>
+        <ul class="terms-list">
+            <li><strong>Customers:</strong> Must provide authentic job request details and correct location info.</li>
+            <li><strong>Labor/Contractors:</strong> Must maintain professional behavior and complete verified work safely.</li>
+        </ul>
+
+        <!-- Section 3: Table Example -->
+        <h2 class="section-title">
+            <i class="fa-solid fa-coins text-primary"></i> 3. Service Fees & Payments
+        </h2>
+        <p class="terms-text">
+            Overview of charges and marketplace fee structure:
+        </p>
+        
+        <div class="table-container">
+            <table class="custom-table">
+                <thead>
+                    <tr>
+                        <th>Service Type</th>
+                        <th>Commission Fee</th>
+                        <th>Payment Method</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Direct Customer Connection</td>
+                        <td>0% (Free)</td>
+                        <td>Direct Cash / UPI</td>
+                    </tr>
+                    <tr>
+                        <td>Wallet Top-up</td>
+                        <td>Standard Gateway Fee</td>
+                        <td>UPI / Net Banking / Cards</td>
+                    </tr>
+                    <tr>
+                        <td>Lead Subscription</td>
+                        <td>Fixed Plan Charges</td>
+                        <td>Wallet Balance</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Section 4 -->
+        <h2 class="section-title">
+            <i class="fa-solid fa-triangle-exclamation text-primary"></i> 4. Prohibited Activities
+        </h2>
+        <p class="terms-text">
+            Users are strictly prohibited from submitting false job postings, abusing contact details, or attempting fraudulent transactions on Kaamconnect.
+        </p>
+
+        <!-- Footer Note -->
+        <div class="mt-4 pt-3 border-top text-center">
+            <p class="text-muted" style="font-size: 0.8rem;">
+                If you have questions regarding our terms, please contact us at <a href="mailto:support@kaamconnect.com" class="text-primary text-decoration-none">support@kaamconnect.com</a>
+            </p>
+        </div>
+
     </div>
 </div>
-
-<!-- ==============================================
-     2. MAIN CONTENT & SIDEBAR
-     ============================================== -->
-<div class="legal-container">
-    
-    <!-- TABLE OF CONTENTS (STICKY SIDEBAR) -->
-    <aside class="toc-sidebar scroll-reveal">
-        <h4 class="toc-title"><i class="fa-solid fa-list me-2"></i> Table of Contents</h4>
-        <ul class="toc-list" id="tocMenu">
-            <li><a href="#section-1">1. Introduction / Parichay</a></li>
-            <li><a href="#section-2">2. Nature of Platform / Bhumika</a></li>
-            <li><a href="#section-3">3. Eligibility / Yogyata</a></li>
-            <li><a href="#section-4">4. User Accounts & Credits</a></li>
-            <li><a href="#section-5">5. Prohibited Activities</a></li>
-            <li><a href="#section-6">6. Fees & Payments</a></li>
-            <li><a href="#section-7">7. Limitation of Liability</a></li>
-            <li><a href="#section-8">8. Indemnification</a></li>
-            <li><a href="#section-9">9. Intellectual Property</a></li>
-            <li><a href="#section-10">10. Privacy Policy & Data</a></li>
-            <li><a href="#section-11">11. Cookies & Tracking</a></li>
-            <li><a href="#section-12">12. Termination & Suspension</a></li>
-            <li><a href="#section-13">13. Force Majeure</a></li>
-            <li><a href="#section-14">14. Dispute Resolution</a></li>
-            <li><a href="#section-15">15. Changes to Terms</a></li>
-            <li><a href="#section-16">16. Contact & Grievance</a></li>
-        </ul>
-    </aside>
-
-    <!-- EXHAUSTIVE LEGAL CONTENT -->
-    <main class="legal-content scroll-reveal delay-1">
-
-        <!-- SECTION 1 -->
-        <section id="section-1" class="legal-section">
-            <h2><i class="fa-solid fa-file-contract text-muted"></i> 1. Introduction / Parichay</h2>
-            <p>Welcome to Kaamconnect. By accessing or using our website and services, you agree to be bound by these Terms and Conditions[]. Please read them carefully[]. These Terms form a legally binding contract between you (the "User", "Customer", "Shop Owner", or "Worker") and Kaamconnect. If you do not agree with any part of these terms, you are strictly prohibited from using our services or platform.</p>
-            <div class="hindi-text">
-                <b>हिंदी अनुवाद:</b> Kaamconnect par aapka swagat hai. Hamari website ya services ka use karke aap in niyamo aur sharto (Terms & Conditions) se sahmat hote hain[]. Kripya ise dhyan se padhein[]. Yeh niyam aapke aur Kaamconnect ke beech ek kanooni samjhauta (legal contract) hain. Agar aap in sharton se sahmat nahi hain, toh kripya is platform ka upyog na karein.
-            </div>
-        </section>
-
-        <!-- SECTION 2 -->
-        <section id="section-2" class="legal-section">
-            <h2><i class="fa-solid fa-network-wired text-muted"></i> 2. Nature of Platform (Intermediary Role)</h2>
-            <p>Kaamconnect is purely an online marketplace and technology platform that connects Customers, Shop Owners, and Workers[]. We do not directly provide any employment, contracting services, or manual labor[]. We are an "Intermediary" as defined under the Information Technology Act, 2000. The actual transaction, agreement, or service delivery happens solely between the users at their own discretion and risk[]. We do not guarantee the quality, safety, or legality of the services advertised by workers or the jobs posted by customers.</p>
-            <div class="hindi-text">
-                <b>हिंदी अनुवाद:</b> Kaamconnect sirf ek online marketplace aur tech platform hai jo Customers, Shop Owners aur Workers ko aapas mein jorta hai[]. Hum seedhe taur par koi naukri ya labour service provide nahi karte[]. Asli len-den ya kaam ki zimmedari kewal unhi users ki hoti hai jo aapas mein deal kar rahe hain[]. Kaam ki quality, suraksha, ya payments ki guarantee Kaamconnect nahi leta hai. Hum sirf ek bridge (pul) ka kaam karte hain.
-            </div>
-        </section>
-
-        <!-- SECTION 3 (NEW) -->
-        <section id="section-3" class="legal-section">
-            <h2><i class="fa-solid fa-user-check text-muted"></i> 3. Eligibility & Registration</h2>
-            <p>To use Kaamconnect, you must be at least 18 years of age and capable of entering into a legally binding agreement under the Indian Contract Act, 1872. By creating an account, you represent and warrant that all information provided is accurate, current, and complete. If you are registering on behalf of a business (Shop Owner/Contractor), you declare that you have the legal authority to bind that business to these Terms.</p>
-            <div class="hindi-text">
-                <b>हिंदी अनुवाद:</b> Kaamconnect ka upyog karne ke liye aapki umar kam se kam 18 saal honi chahiye aur aap kanooni roop se contract karne ke yogya hone chahiye. Account banate samay aap yeh vishwas dilate hain ki aapke dwara di gayi sabhi jankari 100% sahi aur current hai. Agar aap kisi dukan (shop) ya business ke liye register kar rahe hain, toh aapke paas us business ko in niyamo se jodne ka kanooni adhikar hona chahiye.
-            </div>
-        </section>
-
-        <!-- SECTION 4 -->
-        <section id="section-4" class="legal-section">
-            <h2><i class="fa-solid fa-wallet text-muted"></i> 4. User Accounts, Credits & Security</h2>
-            <p>Users must provide accurate information during registration[]. For Shop Owners purchasing leads using credits/wallet balance, please note that credits used to unlock leads are non-refundable once the lead details are accessed[]. Kaamconnect holds no responsibility if a lead does not convert into a successful job. Account security is the sole responsibility of the user[]. You are strictly prohibited from sharing your OTP, password, or account access with unauthorized individuals.</p>
-            <div class="hindi-text">
-                <b>हिंदी अनुवाद:</b> Register karte samay sahi jankari dein[]. Shop owners dwara leads unlock karne ke liye use kiye gaye credits non-refundable hain (ek baar lead dekhne ke baad paise wapas nahi honge)[]. Agar customer se aapki deal final nahi hoti hai, tab bhi credits wapas nahi kiye jayenge. Apne account aur password ki suraksha ki zimmedari aapki khud ki hogi[]. Apna OTP ya password kisi ke sath share na karein.
-            </div>
-        </section>
-
-        <!-- SECTION 5 (NEW) -->
-        <section id="section-5" class="legal-section">
-            <h2><i class="fa-solid fa-ban text-muted"></i> 5. User Conduct & Prohibited Activities</h2>
-            <p>While using our platform, you agree NOT to engage in any of the following activities:
-                <br>• Posting fake, fraudulent, or misleading job requirements.
-                <br>• Harassing, abusing, or threatening any other user over call, chat, or in person.
-                <br>• Requesting or offering illegal services, banned substances, or adult content.
-                <br>• Scraping data, hacking, or deploying bots to extract phone numbers from the platform.
-                <br>Any violation of these rules will result in immediate permanent suspension of your account and potential legal action under cyber laws.</p>
-            <div class="hindi-text">
-                <b>हिंदी अनुवाद:</b> Platform ka upyog karte samay aap in kaamo ko NAHI karenge:
-                <br>• Jhoothi (fake) ya fraud job requirements post karna.
-                <br>• Kisi bhi anya user ko call ya chat par pareshan karna, gaali dena ya dhamki dena.
-                <br>• Gair-kanooni (illegal) kaam ki maang karna ya offer dena.
-                <br>• Website ko hack karna ya bot lagakar dusre users ke phone numbers churana.
-                <br>In niyam ko todne par aapka account turant aur hamesha ke liye block kar diya jayega aur kanooni karyawahi bhi ki ja sakti hai.
-            </div>
-        </section>
-
-        <!-- SECTION 6 (NEW) -->
-        <section id="section-6" class="legal-section">
-            <h2><i class="fa-solid fa-money-bill-wave text-muted"></i> 6. Fees, Payments & Taxes</h2>
-            <p>Kaamconnect does not charge any commission on the jobs completed. All financial settlements for services rendered are strictly between the Customer and the Worker/Shop Owner. Users are independently responsible for understanding and fulfilling their tax obligations (including GST, Income Tax, etc.) arising from the payments they make or receive through offline or online means outside this platform.</p>
-            <div class="hindi-text">
-                <b>हिंदी अनुवाद:</b> Kaamconnect kisi bhi kaam ke pura hone par koi commission nahi leta hai. Kaam ke paise ka len-den sidhe Customer aur Worker ya Shop Owner ke beech hota hai. Is len-den par lagne wale kisi bhi tax (jaise GST ya Income Tax) ki zimmedari puri tarah se users ki apni hogi, isme Kaamconnect ka koi role nahi hai.
-            </div>
-        </section>
-
-        <!-- SECTION 7 -->
-        <section id="section-7" class="legal-section">
-            <h2><i class="fa-solid fa-scale-unbalanced text-muted"></i> 7. Limitation of Liability</h2>
-            <p>Kaamconnect shall not be held liable for any disputes, financial losses, quality issues, safety incidents, or frauds occurring between customers, shop owners, or workers[]. Users are strongly advised to verify the identity and credentials of the other party before engaging in any financial transaction or physical work[]. Under no circumstances shall Kaamconnect, its directors, employees, or affiliates be liable for any direct, indirect, incidental, special, or consequential damages resulting from your use of the platform.</p>
-            <div class="hindi-text">
-                <b>हिंदी अनुवाद:</b> Agar users (customer, shop owner ya worker) ke beech aapas mein koi vivad (dispute), nuksan, quality ki problem ya fraud hota hai, toh uske liye Kaamconnect zimmedar nahi hoga[]. Kisi bhi financial transaction ya kaam se pehle dono paksh apni zimmedari par ek dusre ki jaanch kar lein[]. Kisi bhi sthiti mein Kaamconnect ya uske karmchari aapke kisi bhi nuksan (chot, chori, ya paise ka nuksan) ke liye jawabdeh nahi honge.
-            </div>
-        </section>
-
-        <!-- SECTION 8 (NEW) -->
-        <section id="section-8" class="legal-section">
-            <h2><i class="fa-solid fa-shield-halved text-muted"></i> 8. Indemnification</h2>
-            <p>You agree to indemnify, defend, and hold harmless Kaamconnect and its affiliates from and against any and all claims, liabilities, damages, losses, costs, expenses, or fees (including reasonable attorneys' fees) that such parties may incur as a result of or arising from your (or anyone using your account's) violation of these Terms, your misuse of the Services, or your violation of any rights of any other person or entity.</p>
-            <div class="hindi-text">
-                <b>हिंदी अनुवाद:</b> Aap is baat se sahmat hain ki agar aapke dwara platform ka galat upyog karne, niyam todne, ya kisi teesre vyakti ko nuksan pahunchane ki wajah se Kaamconnect par koi kanooni case ya jurmana lagta hai, toh uski bharpai (wakil ki fees sahit) aapko karni hogi. Kaamconnect ko aapki galti ka khamiyaza nahi bhugatna padega.
-            </div>
-        </section>
-
-        <!-- SECTION 9 (NEW) -->
-        <section id="section-9" class="legal-section">
-            <h2><i class="fa-solid fa-copyright text-muted"></i> 9. Intellectual Property Rights</h2>
-            <p>All content on this website, including but not limited to the text, graphics, logos, icons, software, and source code, is the exclusive property of Kaamconnect and is protected by Indian and international copyright laws. You may not copy, reproduce, distribute, or create derivative works from our platform without our explicit written permission. By uploading content (like job descriptions), you grant us a non-exclusive license to use, display, and distribute that content to facilitate our services.</p>
-            <div class="hindi-text">
-                <b>हिंदी अनुवाद:</b> Is website par maujood sabhi design, logo, text, aur software Kaamconnect ki property hain aur copyright kanoon dwara surakshit hain. Aap bina hamari likhit permission ke inki copy nahi bana sakte. Jab aap platform par koi jankari (jaise kaam ka vivaran) dalte hain, toh aap hume us jankari ko dusre users ko dikhane ka adhikar dete hain.
-            </div>
-        </section>
-
-        <!-- SECTION 10 -->
-        <section id="section-10" class="legal-section">
-            <h2><i class="fa-solid fa-user-lock text-muted"></i> 10. Privacy Policy & Data Protection</h2>
-            <p>We respect your privacy[]. We collect basic details such as name, mobile number, email, and address solely for the purpose of service matching and platform communication[]. We do not sell or share your personal data with unauthorized third parties[]. Your data is stored securely[]. However, we may disclose your information to law enforcement agencies if required by a valid legal subpoena or court order under the laws of India.</p>
-            <div class="hindi-text">
-                <b>हिंदी अनुवाद:</b> Hum aapki privacy ka samman karte hain[]. Hum kewal aapka naam, mobile number, email aur address jaisi jankari platform par connect karne ke liye collect karte hain[]. Aapka data kisi unauthorized third party ko nahi becha jata[]. Aapka data safe rakha jata hai[]. Halanki, agar police ya court kanooni roop se kisi jaanch ke liye aapki jankari maangti hai, toh hume wo jankari kanoon ke mutabiq unhe deni pad sakti hai.
-            </div>
-        </section>
-
-        <!-- SECTION 11 (NEW) -->
-        <section id="section-11" class="legal-section">
-            <h2><i class="fa-solid fa-cookie-bite text-muted"></i> 11. Cookies & Tracking Technologies</h2>
-            <p>We use cookies and similar tracking technologies to track activity on our platform and hold certain information. Cookies are files with a small amount of data which may include an anonymous unique identifier. You can instruct your browser to refuse all cookies or to indicate when a cookie is being sent. However, if you do not accept cookies, you may not be able to use some portions of our service (such as staying logged in).</p>
-            <div class="hindi-text">
-                <b>हिंदी अनुवाद:</b> Hum platform ko behtar banane aur aapke login ko yaad rakhne ke liye 'Cookies' (chhoti data files) ka upyog karte hain. Aap chahein toh apne browser setting se cookies ko band kar sakte hain, lekin aisa karne par ho sakta hai ki website ke kuch features theek se kaam na karein (jaise baar-baar login karna padna).
-            </div>
-        </section>
-
-        <!-- SECTION 12 (NEW) -->
-        <section id="section-12" class="legal-section">
-            <h2><i class="fa-solid fa-user-xmark text-muted"></i> 12. Termination & Suspension</h2>
-            <p>We reserve the right to suspend or terminate your account instantly and without prior notice or liability, for any reason whatsoever, including without limitation if you breach the Terms. Upon termination, your right to use the Service will immediately cease. All provisions of the Terms which by their nature should survive termination shall survive termination, including ownership provisions, warranty disclaimers, indemnity, and limitations of liability.</p>
-            <div class="hindi-text">
-                <b>हिंदी अनुवाद:</b> Kaamconnect ke paas yeh poora adhikar hai ki agar aap in niyamo ka ullanghan karte hain, toh hum bina kisi purv-suchna (notice) ke aapka account turant block ya delete kar sakte hain. Account block hone ke baad aap platform ka upyog nahi kar payenge.
-            </div>
-        </section>
-
-        <!-- SECTION 13 (NEW) -->
-        <section id="section-13" class="legal-section">
-            <h2><i class="fa-solid fa-bolt text-muted"></i> 13. Force Majeure (Acts of God)</h2>
-            <p>Kaamconnect shall not be liable for any failure or delay in performance of its obligations under these Terms arising out of or caused, directly or indirectly, by circumstances beyond its reasonable control, including, without limitation, acts of God, earthquakes, fires, floods, wars, civil or military disturbances, acts of terrorism, sabotage, strikes, epidemics, pandemics, riots, power failures, or internet service provider failures.</p>
-            <div class="hindi-text">
-                <b>हिंदी अनुवाद:</b> Agar kisi aisi ghatna ke karan jo hamare control se bahar hai (jaise bhukamp, baadh, yuddh, dange, internet band hona, ya mahamari), Kaamconnect ki services ruk jati hain, toh iske liye Kaamconnect ko zimmedar nahi thehraya ja sakta. Is sthiti ko kanooni bhasha mein 'Force Majeure' kaha jata hai.
-            </div>
-        </section>
-
-        <!-- SECTION 14 (NEW) -->
-        <section id="section-14" class="legal-section">
-            <h2><i class="fa-solid fa-gavel text-muted"></i> 14. Dispute Resolution & Governing Law</h2>
-            <p>These Terms shall be governed and construed in accordance with the laws of India. Any disputes arising out of or in connection with these Terms or the use of Kaamconnect shall be subject to the exclusive jurisdiction of the competent courts located in Udaipur, Rajasthan, India. By using the platform, you expressly waive any objection to such jurisdiction or venue.</p>
-            <div class="hindi-text">
-                <b>हिंदी अनुवाद:</b> Yeh sabhi niyam Bharat ke kanoon ke anusar lagu honge. Agar Kaamconnect aur aapke beech koi kanooni vivad (dispute) hota hai, toh uski sunwayi aur kanooni karyawahi kewal Udaipur, Rajasthan ke nyayalayon (Courts) mein hi ki jayegi. Aap is jurisdiction se poori tarah sahmat hote hain.
-            </div>
-        </section>
-
-        <!-- SECTION 15 -->
-        <section id="section-15" class="legal-section">
-            <h2><i class="fa-solid fa-pen-to-square text-muted"></i> 15. Changes to Terms</h2>
-            <p>Kaamconnect reserves the right to modify these terms at any time[]. Continued use of the platform after changes implies acceptance of the updated terms[]. We will make reasonable efforts to notify you of any major material changes via email or platform notifications, but it remains your responsibility to review this page periodically.</p>
-            <div class="hindi-text">
-                <b>हिंदी अनुवाद:</b> Kaamconnect ke paas in niyamo mein kabhi bhi badlav karne ka adhikar surakshit hai[]. Badlav ke baad bhi platform ka use karne ka matlab hai ki aap naye niyamo se sahmat hain[]. Hum bade badlavo ki jankari email ke zariye dene ki koshish karenge, lekin is page ko samay-samay par padhna aapki zimmedari hai.
-            </div>
-        </section>
-
-        <!-- SECTION 16 -->
-        <section id="section-16" class="legal-section mb-0">
-            <h2><i class="fa-solid fa-headset text-muted"></i> 16. Contact Us & Grievance Officer</h2>
-            <p>If you have any questions regarding these Terms, you can contact us through our official support channels or email provided on the platform[]. In accordance with the Information Technology Act, 2000 and rules made there under, the name and contact details of the Grievance Officer are provided below for your reference.</p>
-            <div class="p-4 bg-light rounded-3 mt-3 border">
-                <strong>Grievance Redressal Team</strong><br>
-                Email: kaamconnect7@gmail.com<br>
-                Location: Udaipur, Rajasthan, India<br>
-                Working Hours: 10:00 AM to 6:00 PM (Monday to Saturday)
-            </div>
-            <div class="hindi-text mt-4">
-                <b>हिंदी अनुवाद:</b> Agar aapko in niyamo se jude koi bhi sawal hain, toh aap hamare official support email ya channel ke zariye humse contact kar sakte hain[]. Kisi bhi shikayat (grievance) ke liye aap upar diye gaye email `kaamconnect7@gmail.com` par sampark kar sakte hain.
-            </div>
-        </section>
-
-    </main>
-</div>
-
-<!-- ==============================================
-     JAVASCRIPT FOR SCROLL & TOC HIGHLIGHTING
-     ============================================== -->
-<script>
-    document.addEventListener("DOMContentLoaded", function() {
-        
-        // 1. Intersection Observer for Fade/Slide Up Animations
-        const observerOptions = {
-            root: null,
-            rootMargin: '0px',
-            threshold: 0.1
-        };
-
-        const observer = new IntersectionObserver((entries, observer) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    entry.target.classList.add('visible');
-                    observer.unobserve(entry.target);
-                }
-            });
-        }, observerOptions);
-
-        const animatedElements = document.querySelectorAll('.scroll-reveal');
-        animatedElements.forEach(el => observer.observe(el));
-
-
-        // 2. Table of Contents (TOC) Active State Highlighting on Scroll
-        const sections = document.querySelectorAll('.legal-section');
-        const navLinks = document.querySelectorAll('.toc-list a');
-
-        window.addEventListener('scroll', () => {
-            let current = '';
-            
-            sections.forEach(section => {
-                const sectionTop = section.offsetTop;
-                const sectionHeight = section.clientHeight;
-                if (pageYOffset >= (sectionTop - 150)) {
-                    current = section.getAttribute('id');
-                }
-            });
-
-            navLinks.forEach(link => {
-                link.classList.remove('active');
-                if (link.getAttribute('href').includes(current) && current !== "") {
-                    link.classList.add('active');
-                }
-            });
-        });
-
-        // Smooth scrolling for TOC links
-        navLinks.forEach(link => {
-            link.addEventListener('click', function(e) {
-                e.preventDefault();
-                const targetId = this.getAttribute('href').substring(1);
-                const targetSection = document.getElementById(targetId);
-                if (targetSection) {
-                    window.scrollTo({
-                        top: targetSection.offsetTop - 100,
-                        behavior: 'smooth'
-                    });
-                }
-            });
-        });
-
-    });
-</script>
 {% endblock %}
