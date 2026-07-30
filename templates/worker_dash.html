@@ -143,14 +143,95 @@
     .width-15 { width: 20px; text-align: center; }
 </style>
 
-<!-- Push Notification Enable Button -->
-<div id="notification-section" style="margin: 20px 0; padding: 15px; background: #f8f9fa; border-radius: 8px; border: 1px solid #dee2e6;">
+<!-- Push Notification Section -->
+<div id="notification-section" style="margin: 20px auto; padding: 15px; background: #fff; border-radius: 8px; border: 1px solid #dee2e6; max-width: 800px; text-align: center;">
     <h4>🔔 Push Notifications</h4>
-    <p id="notif-status">Real-time alerts पाने के लिए नोटिफिकेशन इनेबल करें।</p>
-    <button id="enable-notif-btn" onclick="subscribeUser()" class="btn btn-primary" style="display:none;">
+    <p id="notif-status" style="margin-bottom: 10px;">Real-time alerts पाने के लिए नीचे दिए गए बटन पर क्लिक करें।</p>
+    <button id="enable-notif-btn" onclick="subscribeUser()" class="btn btn-primary" style="display:inline-block; background: #0d6efd; color: white; padding: 8px 16px; border: none; border-radius: 4px; cursor: pointer;">
         Enable Notifications
     </button>
 </div>
+
+<script>
+    const publicVapidKey = "{{ public_key }}";
+
+    function urlBase64ToUint8Array(base64String) {
+        const padding = '='.repeat((4 - base64String.length % 4) % 4);
+        const base64 = (base64String + padding).replace(/\-/g, '+').replace(/_/g, '/');
+        const rawData = window.atob(base64);
+        const outputArray = new Uint8Array(rawData.length);
+        for (let i = 0; i < rawData.length; ++i) {
+            outputArray[i] = rawData.charCodeAt(i);
+        }
+        return outputArray;
+    }
+
+    async function checkNotificationSupport() {
+        const btn = document.getElementById('enable-notif-btn');
+        const statusText = document.getElementById('notif-status');
+
+        if (!('serviceWorker' in navigator && 'PushManager' in window)) {
+            statusText.innerText = "आपका ब्राउज़र Push Notifications सपोर्ट नहीं करता है।";
+            btn.style.display = 'none';
+            return;
+        }
+
+        // अगर यूजर ने पहले ही ब्लॉक किया हुआ है
+        if (Notification.permission === 'denied') {
+            statusText.innerText = "❌ आपने नोटिफिकेशन ब्लॉक किए हैं। कृपया एड्रेस बार (URL के पास 🔒 ताले वाले आइकॉन) पर क्लिक करके इसे 'Allow' करें।";
+            btn.style.display = 'none';
+            return;
+        }
+
+        try {
+            const registration = await navigator.serviceWorker.register('/sw.js');
+            const subscription = await registration.pushManager.getSubscription();
+
+            if (subscription) {
+                statusText.innerText = "✅ Notifications are enabled!";
+                btn.style.display = 'none';
+            } else {
+                btn.style.display = 'inline-block'; // बटन साफ़ दिखेगा
+            }
+        } catch (err) {
+            console.error('Service Worker error:', err);
+            btn.style.display = 'inline-block';
+        }
+    }
+
+    async function subscribeUser() {
+        const btn = document.getElementById('enable-notif-btn');
+        btn.innerText = "Enabling...";
+        
+        try {
+            const registration = await navigator.serviceWorker.ready;
+            const subscription = await registration.pushManager.subscribe({
+                userVisibleOnly: true,
+                applicationServerKey: urlBase64ToUint8Array(publicVapidKey)
+            });
+
+            const response = await fetch('/save-token', {
+                method: 'POST',
+                body: JSON.stringify(subscription),
+                headers: { 'Content-Type': 'application/json' }
+            });
+
+            if (response.ok) {
+                document.getElementById('notif-status').innerText = "✅ Notifications successfully enabled!";
+                btn.style.display = 'none';
+            } else {
+                alert('Token save करने में दिक्कत आई।');
+                btn.innerText = "Enable Notifications";
+            }
+        } catch (error) {
+            console.error('Failed to subscribe:', error);
+            alert('Notification permission deny कर दी गई है या कोई एरर आया है।');
+            btn.innerText = "Enable Notifications";
+        }
+    }
+
+    window.addEventListener('load', checkNotificationSupport);
+</script>
 
 <div class="container py-4">
     <div class="row justify-content-center">
