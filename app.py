@@ -277,7 +277,7 @@ def signup():
 
         user_exists = User.query.filter_by(mobile=mobile).first()
         if user_exists:
-            flash('Mobile number pehle se registered hai!', 'danger')
+            flash('Mobile number pehle से registered hai!', 'danger')
             return redirect(url_for('signup', role=role))
 
         hashed_password = generate_password_hash(password, method='scrypt')
@@ -409,7 +409,7 @@ def shop_dash():
 
     if request.method == 'POST':
         if not current_user.is_plan_active:
-            flash("Aapka plan inactive hai. Nayi vacancy dalne ke liye pehle recharge karein.", "danger")
+            flash("Aapka plan inactive hai. Nayi vacancy dalنے ke liye pehle recharge karein.", "danger")
             return redirect(url_for('shop_dash'))
 
         person_need = request.form.get('person_need')
