@@ -552,7 +552,7 @@ def delete_user(user_id):
     if user:
         try:
             # Clean up connected Quotations safely
-            Quotation.query.filter((Quotation.shop_owner_id == user.id) | (Quotation.== user.id)).delete(synchronize_session=False)
+            Quotation.query.filter(Quotation.shop_owner_id == user.id).delete(synchronize_session=False)
 
             if user.role == 'customer':
                 user_reqs = Requirement.query.filter_by(customer_id=user.id).all()
