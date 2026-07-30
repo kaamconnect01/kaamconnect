@@ -332,4 +332,88 @@
         </div>
     </div>
 </div>
+
+<script>
+    // Flask से आई हुई VAPID Public Key को JavaScript में लेना
+    const publicVapidKey = "{{ public_key }}";
+
+    // VAPID Key को Uint8Array में बदलने के लिए helper function
+    function urlBase64ToUint8Array(base64String) {
+        const padding = '='.repeat((4 - base64String.length % 4) % 4);
+        const base64 = (base64String + padding).replace(/\-/g, '+').replace(/_/g, '/');
+        const rawData = window.atob(base64);
+        const outputArray = new Uint8Array(rawData.length);
+        for (let i = 0; i < rawData.length; ++i) {
+            outputArray[i] = rawData.charCodeAt(i);
+        }
+        return outputArray;
+    }
+
+    async function checkNotificationSupport() {
+        if ('serviceWorker' in navigator && 'PushManager' in window) {
+            try {
+                // 1. Service Worker Register करें
+                const registration = await navigator.serviceWorker.register('/sw.js');
+                console.log('Service Worker Registered Successfully');
+
+                // 2. Check करें कि क्या यूजर ने पहले से परमिशन दी है?
+                const subscription = await registration.pushManager.getSubscription();
+                const btn = document.getElementById('enable-notif-btn');
+                const statusText = document.getElementById('notif-status');
+
+                if (subscription) {
+                    statusText.innerText = "✅ Notifications are enabled!";
+                    btn.style.display = 'none'; // अगर पहले से चालू है तो बटन छुपा दें
+                } else {
+                    btn.style.display = 'inline-block'; // बटन दिखाएं ताकि यूजर क्लिक कर सके
+                }
+            } catch (err) {
+                console.error('Service Worker registration failed:', err);
+            }
+        } else {
+            document.getElementById('notif-status').innerText = "आपका ब्राउज़र Push Notifications सपोर्ट नहीं करता है।";
+        }
+    }
+
+    // 3. जब यूजर 'Enable Notifications' बटन पर क्लिक करे
+    async function subscribeUser() {
+        const btn = document.getElementById('enable-notif-btn');
+        btn.innerText = "Enabling...";
+        
+        try {
+            const registration = await navigator.serviceWorker.ready;
+            
+            // ब्राउज़र से नोटिफिकेशन की परमिशन मांगना
+            const subscription = await registration.pushManager.subscribe({
+                userVisibleOnly: true,
+                applicationServerKey: urlBase64ToUint8Array(publicVapidKey)
+            });
+
+            // टोकन को सर्वर पर भेजना (/save-token रूट पर)
+            const response = await fetch('/save-token', {
+                method: 'POST',
+                body: JSON.stringify(subscription),
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            });
+
+            if (response.ok) {
+                document.getElementById('notif-status').innerText = "✅ Notifications successfully enabled!";
+                btn.style.display = 'none';
+            } else {
+                alert('Token save करने में दिक्कत आई।');
+                btn.innerText = "Enable Notifications";
+            }
+        } catch (error) {
+            console.error('Failed to subscribe the user: ', error);
+            alert('Notification permission deny कर दी गई है या कोई एरर आया है।');
+            btn.innerText = "Enable Notifications";
+        }
+    }
+
+    // पेज लोड होते ही चेक करें
+    window.addEventListener('load', checkNotificationSupport);
+</script>
+
 {% endblock %}
