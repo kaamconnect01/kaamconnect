@@ -73,117 +73,6 @@
     </div>
 </div>
 
-<!-- Push Notification Section -->
-<div class="container mb-4">
-    <div id="notification-section" class="card border-0 shadow-sm rounded-4 p-4 text-center bg-white mx-auto" style="max-width: 800px; border: 1px solid #dee2e6;">
-        <h4 class="fw-bold text-dark mb-2">🔔 Push Notifications</h4>
-        <p id="notif-status" class="text-muted small mb-3">Real-time alerts पाने के लिए नीचे दिए गए बटन पर क्लिक करें।</p>
-        <button id="enable-notif-btn" onclick="subscribeUser()" class="btn btn-primary rounded-pill px-4 fw-bold shadow-sm mx-auto" style="display: none; background: #0d6efd; color: white; border: none; cursor: pointer;">
-            Enable Notifications
-        </button>
-    </div>
-</div>
-
-<script>
-    const publicVapidKey = "{{ public_key }}";
-
-    function urlBase64ToUint8Array(base64String) {
-        const padding = '='.repeat((4 - base64String.length % 4) % 4);
-        const base64 = (base64String + padding).replace(/\-/g, '+').replace(/_/g, '/');
-        const rawData = window.atob(base64);
-        const outputArray = new Uint8Array(rawData.length);
-        for (let i = 0; i < rawData.length; ++i) {
-            outputArray[i] = rawData.charCodeAt(i);
-        }
-        return outputArray;
-    }
-
-    async function checkNotificationSupport() {
-        const btn = document.getElementById('enable-notif-btn');
-        const statusText = document.getElementById('notif-status');
-
-        if (!btn || !statusText) return;
-
-        if (!('serviceWorker' in navigator && 'PushManager' in window)) {
-            statusText.innerText = "आपका ब्राउज़र Push Notifications सपोर्ट नहीं करता है।";
-            btn.style.display = 'none';
-            return;
-        }
-
-        if (Notification.permission === 'denied') {
-            statusText.innerText = "❌ आपने नोटिफिकेशन ब्लॉक किए हैं। कृपया एड्रेस बार (URL के पास 🔒 ताले वाले आइकॉन) पर क्लिक करके इसे 'Allow' करें।";
-            btn.style.display = 'none';
-            return;
-        }
-
-        try {
-            const registration = await navigator.serviceWorker.register('/sw.js');
-            const subscription = await registration.pushManager.getSubscription();
-
-            if (subscription) {
-                statusText.innerText = "✅ Notifications are enabled!";
-                btn.style.display = 'none';
-            } else {
-                statusText.innerText = "Real-time alerts पाने के लिए नीचे दिए गए बटन पर क्लिक करें।";
-                btn.style.display = 'inline-block';
-            }
-        } catch (err) {
-            console.error('Service Worker error:', err);
-            btn.style.display = 'inline-block';
-        }
-    }
-
-    async function subscribeUser() {
-        const btn = document.getElementById('enable-notif-btn');
-        const statusText = document.getElementById('notif-status');
-        if (!btn) return;
-
-        btn.innerText = "Enabling...";
-        btn.disabled = true;
-        
-        try {
-            const registration = await navigator.serviceWorker.ready;
-            
-            if (Notification.permission === 'default') {
-                const permissionResult = await Notification.requestPermission();
-                if (permissionResult !== 'granted') {
-                    statusText.innerText = "❌ Notification permission denied.";
-                    btn.innerText = "Enable Notifications";
-                    btn.disabled = false;
-                    return;
-                }
-            }
-
-            const subscription = await registration.pushManager.subscribe({
-                userVisibleOnly: true,
-                applicationServerKey: urlBase64ToUint8Array(publicVapidKey)
-            });
-
-            const response = await fetch('/save-token', {
-                method: 'POST',
-                body: JSON.stringify(subscription),
-                headers: { 'Content-Type': 'application/json' }
-            });
-
-            if (response.ok) {
-                statusText.innerText = "✅ Notifications successfully enabled!";
-                btn.style.display = 'none';
-            } else {
-                alert('Token save करने में दिक्कत आई।');
-                btn.innerText = "Enable Notifications";
-                btn.disabled = false;
-            }
-        } catch (error) {
-            console.error('Failed to subscribe:', error);
-            alert('Notification permission deny कर दी गई है या कोई एरर आया है।');
-            btn.innerText = "Enable Notifications";
-            btn.disabled = false;
-        }
-    }
-
-    window.addEventListener('load', checkNotificationSupport);
-</script>
-
 <!-- NAVIGATION TABS -->
 <ul class="nav nav-pills nav-fill bg-white shadow-sm rounded-pill p-2 mb-4 gap-2" id="myTab" role="tablist">
   <li class="nav-item" role="presentation">
@@ -339,7 +228,7 @@
                             <form method="POST" action="{{ url_for('unlock_lead', req_id=req.id) }}">
                                 <div class="modal-body p-4 bg-light">
                                     <div class="alert alert-warning small border-0 mb-4 rounded-3 shadow-sm">
-                                        <i class="fa-solid fa-circle-info me-1"></i> Is lead ko unlock karne par aapke wallet से <strong>{{ cost }} credits</strong> katenge.
+                                        <i class="fa-solid fa-circle-info me-1"></i> Is lead ko unlock karne par aapke wallet se <strong>{{ cost }} credits</strong> katenge.
                                     </div>
                                     
                                     <div class="mb-3 text-start">
@@ -498,7 +387,7 @@
                 <div class="alert alert-danger text-start border-danger shadow-sm rounded-3 mb-0" role="alert">
                     <h6 class="alert-heading fw-bold text-dark"><i class="fa-solid fa-triangle-exclamation text-danger me-2 fs-5"></i>Platform Active Rule</h6>
                     <hr class="border-danger opacity-50">
-                    <p class="mb-2 small text-dark">Aapke Kaamconnect account से har mahine ki <strong>1 tareek ko automatic 200 credits (₹199)</strong> cut honge. Iske baad aap poore mahine unlimited leads aur workers dekh sakte hain.</p>
+                    <p class="mb-2 small text-dark">Aapke Kaamconnect account se har mahine ki <strong>1 tareek ko automatic 200 credits (₹199)</strong> cut honge. Iske baad aap poore mahine unlimited leads aur workers dekh sakte hain.</p>
                     <p class="mb-0 small fw-bold text-danger">Agar 1 tareek ko wallet mein 200 credits nahi hue, toh aapka account band ho jayega, aur aapko naya kaam nahi dikhega.</p>
                 </div>
             </div>
@@ -585,7 +474,6 @@
         var successModal = new bootstrap.Modal(document.getElementById('reactivationModal'));
         successModal.show();
     });
-</script>                            
-                                
+</script>
 {% endif %}
 {% endblock %}
