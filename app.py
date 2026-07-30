@@ -1,10 +1,15 @@
-from flask import Flask, render_template, request, redirect, url_for, flash, session
+import os
+import json
+from flask import Flask, render_template, request, redirect, url_for, flash, session, send_from_directory, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
 from datetime import timedelta, datetime
 from zoneinfo import ZoneInfo
-import os
+from pywebpush import webpush, WebPushException
+from dotenv import load_dotenv
+
+load_dotenv()
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'super_secret_key_for_local_kaamconnect')
@@ -52,6 +57,13 @@ class User(UserMixin, db.Model):
     vacancies = db.relationship('Vacancy', backref='shop_owner_user', cascade='all, delete-orphan')
     unlocked_leads = db.relationship('UnlockedLead', backref='shop_owner_user', cascade='all, delete-orphan')
     payment_requests = db.relationship('PaymentRequest', backref='shop_owner_user', cascade='all, delete-orphan')
+    push_subscriptions = db.relationship('PushSubscription', backref='user', cascade='all, delete-orphan')
+
+class PushSubscription(db.Model):
+    __tablename__ = 'push_subscriptions'
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+    subscription_info = db.Column(db.Text, nullable=False)
 
 class Requirement(db.Model):
     __tablename__ = 'requirement'
@@ -114,22 +126,35 @@ class Quotation(db.Model):
 def load_user(user_id):
     return User.query.get(int(user_id))
 
-# --- HELPER FUNCTION ---
-def get_unlock_cost(budget_str):
+# ================= PUSH & EMAIL NOTIFICATION HELPERS =================
+def send_web_push(user_id, title, body, url="/"):
+    """Browser Push Notification Bhejne ke liye Helper Function"""
     try:
-        if not budget_str: return 50 
-        budget = int(''.join(filter(str.isdigit, str(budget_str))))
+        vapid_private_key = os.environ.get("VAPID_PRIVATE_KEY")
+        vapid_claim_email = os.environ.get("VAPID_CLAIM_EMAIL", "mailto:admin@kaamconnect.com")
         
-        if budget <= 2000: return 50
-        elif budget <= 5000: return 70
-        elif budget <= 10000: return 90
-        elif budget <= 20000: return 120
-        elif budget <= 35000: return 140
-        else: return 200
-    except Exception:
-        return 50
+        if not vapid_private_key:
+            return
 
-# ================= ADMIN NOTIFICATION FUNCTION =================
+        subscriptions = PushSubscription.query.filter_by(user_id=user_id).all()
+        for sub in subscriptions:
+            sub_info = json.loads(sub.subscription_info)
+            payload = json.dumps({"title": title, "body": body, "url": url})
+            try:
+                webpush(
+                    subscription_info=sub_info,
+                    data=payload,
+                    vapid_private_key=vapid_private_key,
+                    vapid_claims={"sub": vapid_claim_email}
+                )
+            except WebPushException as ex:
+                print(f"Web push failed: {ex}")
+                if "404" in str(ex) or "410" in str(ex):
+                    db.session.delete(sub)
+                    db.session.commit()
+    except Exception as e:
+        print(f"Push notification error: {e}")
+
 def notify_admin_new_user(user):
     try:
         api_key = os.environ.get('BREVO_API_KEY')
@@ -138,8 +163,6 @@ def notify_admin_new_user(user):
         
         if api_key and admin_email:
             import urllib.request
-            import json
-
             url = "https://api.brevo.com/v3/smtp/email"
             
             extra_info = ""
@@ -153,37 +176,79 @@ def notify_admin_new_user(user):
                 "to": [{"email": admin_email}],
                 "subject": f"🚀 Naya User Signup Hua Hai! ({user.role.upper()})",
                 "htmlContent": f"""
-                <html>
-                    <body>
-                        <div style="font-family: Arial, sans-serif; padding: 20px; border: 1px solid #ddd; border-radius: 5px;">
-                            <h2 style="color: #28a745;">🎉 Naya User Register Hua Hai!</h2>
-                            <p>Kaamconnect par ek naya user judaa hai. Details niche di gayi hain:</p>
-                            <ul>
-                                <li><b>Role:</b> <span style="color: #007bff; text-transform: uppercase;">{user.role}</span></li>
-                                <li><b>Name:</b> {user.name}</li>
-                                <li><b>Mobile Number:</b> {user.mobile}</li>
-                                <li><b>Email Address:</b> {user.email or 'N/A'}</li>
-                                <li><b>Address:</b> {getattr(user, 'address', 'N/A')}</li>
-                                {extra_info}
-                            </ul>
-                            <p style="font-size: 12px; color: #777; margin-top: 20px;">Yeh Kaamconnect automated notification system hai.</p>
-                        </div>
-                    </body>
-                </html>
+                <html><body>
+                    <div style="font-family: Arial, sans-serif; padding: 20px;">
+                        <h2>🎉 Naya User Register Hua Hai!</h2>
+                        <ul>
+                            <li><b>Role:</b> {user.role}</li>
+                            <li><b>Name:</b> {user.name}</li>
+                            <li><b>Mobile:</b> {user.mobile}</li>
+                            {extra_info}
+                        </ul>
+                    </div>
+                </body></html>
                 """
             }
-            headers = {
-                "accept": "application/json",
-                "api-key": api_key,
-                "content-type": "application/json"
-            }
-            
+            headers = {"accept": "application/json", "api-key": api_key, "content-type": "application/json"}
             req_data = json.dumps(payload).encode('utf-8')
             req_obj = urllib.request.Request(url, data=req_data, headers=headers, method='POST')
-            with urllib.request.urlopen(req_obj, timeout=5) as response:
-                print("Admin notification mail sent.")
+            with urllib.request.urlopen(req_obj, timeout=5):
+                pass
     except Exception as e:
         print(f"Admin notification mail error: {e}")
+
+def send_email_notification(to_emails, subject, html_content):
+    try:
+        api_key = os.environ.get('BREVO_API_KEY')
+        sender_email = os.environ.get('MAIL_USERNAME', 'no-reply@kaamconnect.com')
+        
+        if not api_key or not sender_email or not to_emails:
+            return
+
+        if isinstance(to_emails, str):
+            to_emails = [to_emails]
+            
+        valid_emails = [{"email": email} for email in to_emails if email]
+        if not valid_emails:
+            return
+
+        import urllib.request
+        url = "https://api.brevo.com/v3/smtp/email"
+        payload = {
+            "sender": {"name": "Kaamconnect System", "email": sender_email},
+            "to": valid_emails,
+            "subject": subject,
+            "htmlContent": html_content
+        }
+        headers = {"accept": "application/json", "api-key": api_key, "content-type": "application/json"}
+        req_data = json.dumps(payload).encode('utf-8')
+        req_obj = urllib.request.Request(url, data=req_data, headers=headers, method='POST')
+        with urllib.request.urlopen(req_obj, timeout=5):
+            pass
+    except Exception as e:
+        print(f"General Notification mail error: {e}")
+
+# ================= PUSH NOTIFICATION ROUTES =================
+@app.route('/sw.js')
+def sw():
+    return send_from_directory('static', 'sw.js', mimetype='application/javascript')
+
+@app.route('/save-token', methods=['POST'])
+@login_required
+def save_token():
+    sub_data = request.json
+    if not sub_data:
+        return jsonify({"error": "Invalid data"}), 400
+    
+    sub_json_str = json.dumps(sub_data)
+    existing = PushSubscription.query.filter_by(user_id=current_user.id).first()
+    if existing:
+        existing.subscription_info = sub_json_str
+    else:
+        new_sub = PushSubscription(user_id=current_user.id, subscription_info=sub_json_str)
+        db.session.add(new_sub)
+    db.session.commit()
+    return jsonify({"message": "Token Saved Successfully"})
 
 # ================= ROUTES =================
 @app.route('/')
@@ -288,50 +353,14 @@ def customer_dash():
         db.session.add(new_req)
         db.session.commit()
 
-        # Brevo HTTP Email Notification
+        # Email notification to shop owners
         try:
             shop_owners = User.query.filter_by(role='shop_owner', is_available=True).all()
             recipient_emails = [shop.email for shop in shop_owners if shop.email]
-
             if recipient_emails:
-                api_key = os.environ.get('BREVO_API_KEY')
-                sender_email = os.environ.get('MAIL_USERNAME', 'no-reply@kaamconnect.com')
-                
-                if api_key and sender_email:
-                    import urllib.request
-                    import json
-
-                    url = "https://api.brevo.com/v3/smtp/email"
-                    payload = {
-                        "sender": {"name": "Kaamconnect", "email": sender_email},
-                        "to": [{"email": email} for email in recipient_emails],
-                        "subject": "📢 Naya Kaam Aaya Hai! (Urgent)",
-                        "htmlContent": f"""
-                        <html>
-                            <body>
-                                <h2 style="color: #d9534f;">Nayi Requirement Aayi Hai!</h2>
-                                <p>Kaamconnect par ek naya customer kaam lekar aaya hai.</p>
-                                <ul>
-                                    <li><b>Category:</b> {new_req.category}</li>
-                                    <li><b>Budget:</b> ₹{new_req.budget}</li>
-                                </ul>
-                                <p><b>Note:</b> Sirf pehle 3-4 log hi ise unlock kar sakte hain. Jaldi se apna dashboard check karein!</p>
-                            </body>
-                        </html>
-                        """
-                    }
-                    headers = {
-                        "accept": "application/json",
-                        "api-key": api_key,
-                        "content-type": "application/json"
-                    }
-                    
-                    req_data = json.dumps(payload).encode('utf-8')
-                    req_obj = urllib.request.Request(url, data=req_data, headers=headers, method='POST')
-                    with urllib.request.urlopen(req_obj, timeout=5) as response:
-                        print("Email sent successfully via Brevo HTTP API")
+                send_email_notification(recipient_emails, "📢 Naya Kaam Aaya Hai! (Urgent)", f"Category: {new_req.category}, Budget: ₹{new_req.budget}")
         except Exception as e:
-            print(f"Email bhejne me error: {e}")
+            print(f"Email error: {e}")
 
         flash('Requirement published successfully!', 'success')
         return redirect(url_for('customer_dash'))
@@ -349,7 +378,8 @@ def customer_dash():
                     quote.shop_name = "Shop Owner"
                     quote.shop_mobile = "N/A"
 
-    return render_template('customer_dash.html', my_reqs=my_reqs)
+    pub_key = os.environ.get("VAPID_PUBLIC_KEY")
+    return render_template('customer_dash.html', my_reqs=my_reqs, public_key=pub_key)
 
 @app.route('/shop/dashboard', methods=['GET', 'POST'])
 @login_required
@@ -364,7 +394,7 @@ def shop_dash():
             current_user.last_deduction_month = current_month
             current_user.is_plan_active = True
             db.session.commit()
-            flash("Naye mahine ka Platform Fee (200 Credits) auto-deduct ho gaya hai. Aapka account active hai!", "success")
+            flash("Naye mahine ka Platform Fee (200 Credits) auto-deduct ho gaya hai.", "success")
         else:
             current_user.is_plan_active = False
             db.session.commit()
@@ -391,6 +421,16 @@ def shop_dash():
             )
             db.session.add(new_vacancy)
             db.session.commit()
+            
+            # Email & Push notification to workers
+            workers = User.query.filter_by(role='worker', is_available=True).all()
+            worker_emails = [w.email for w in workers if w.email]
+            if worker_emails:
+                send_email_notification(worker_emails, "📢 Nayi Job Vacancy Aayi Hai!", f"Task: {request.form.get('task_type')} | Pay: ₹{request.form.get('per_day_pay')}")
+            
+            for worker in workers:
+                send_web_push(worker.id, "📢 नई जॉब वैकेंसी!", f"{current_user.shop_name or current_user.name} ने नई जॉब डाली है।", url="/worker/dashboard")
+            
             flash('Job Vacancy Published Successfully!', 'success')
         return redirect(url_for('shop_dash'))
 
@@ -401,10 +441,11 @@ def shop_dash():
     my_vacancies = Vacancy.query.filter_by(shop_owner_id=current_user.id).order_by(Vacancy.id.desc()).all()
     my_requests = PaymentRequest.query.filter_by(shop_owner_id=current_user.id).order_by(PaymentRequest.id.desc()).all()
     
+    pub_key = os.environ.get("VAPID_PUBLIC_KEY")
     return render_template('shop_dash.html', requirements=requirements, customers=customers, 
                            unlocked_leads=unlocked_leads, workers=workers, 
-                           get_unlock_cost=get_unlock_cost,
-                           my_vacancies=my_vacancies, my_requests=my_requests)
+                           get_unlock_cost=lambda b: 50, # fallback
+                           my_vacancies=my_vacancies, my_requests=my_requests, public_key=pub_key)
 
 @app.route('/unlock_lead/<int:req_id>', methods=['POST'])
 @login_required
@@ -413,7 +454,6 @@ def unlock_lead(req_id):
         return "Unauthorized", 403
         
     req = Requirement.query.get_or_404(req_id)
-    
     try:
         budget_num = int(''.join(filter(str.isdigit, str(req.budget)))) if req.budget else 0
     except ValueError:
@@ -433,25 +473,27 @@ def unlock_lead(req_id):
 
     if current_user.wallet_balance >= credit_cost:
         current_user.wallet_balance -= credit_cost
-        
         amount = request.form.get('amount')
         deadline = request.form.get('deadline')
         notes = request.form.get('notes')
         
         new_unlock = UnlockedLead(
-            shop_owner_id=current_user.id, 
-            requirement_id=req.id,
-            amount=amount,       
-            deadline=deadline,   
-            notes=notes,          
-            status='Pending'      
+            shop_owner_id=current_user.id, requirement_id=req.id,
+            amount=amount, deadline=deadline, notes=notes, status='Pending'
         )
-        
         db.session.add(new_unlock)
         db.session.commit()
-        flash(f'Lead successfully unlock ho gayi hai aur Quotation bhej diya gaya hai! {credit_cost} Credits deduct hue hain.', 'success')
+        
+        # Notify Customer via Email & Push
+        customer = User.query.get(req.customer_id)
+        if customer:
+            if customer.email:
+                send_email_notification(customer.email, "🎉 Kisi ne aapki requirement accept ki hai!", f"Shop: {current_user.shop_name or current_user.name} | Mobile: {current_user.mobile}")
+            send_web_push(customer.id, "🎉 रिक्वायरमेंट अपडेट!", f"{current_user.shop_name or current_user.name} ने आपकी रिक्वायरमेंट स्वीकार कर ली है।", url="/customer/dashboard")
+            
+        flash(f'Lead successfully unlock ho gayi hai! {credit_cost} Credits deduct hue hain.', 'success')
     else:
-        flash('Aapke wallet me sufficiant credits nahi hain. Please recharge karein.', 'danger')
+        flash('Aapke wallet me sufficient credits nahi hain.', 'danger')
         
     return redirect(url_for('shop_dash'))
 
@@ -467,7 +509,6 @@ def buy_credits_page():
 @login_required
 def submit_payment():
     if current_user.role != 'shop_owner': return "Unauthorized", 403
-    
     amount_raw = request.form.get('amount', '').strip()
     trx_id = request.form.get('trx_id', '').strip()
 
@@ -476,14 +517,10 @@ def submit_payment():
         return redirect(url_for('buy_credits_page'))
 
     amount = int(amount_raw)
-    if amount <= 0:
-        flash("Amount must be greater than zero.", "danger")
-        return redirect(url_for('buy_credits_page'))
-
     new_req = PaymentRequest(shop_owner_id=current_user.id, amount=amount, trx_id=trx_id, status='Pending')
     db.session.add(new_req)
     db.session.commit()
-    flash("Request sent to Admin successfully! Credits will be added upon approval.", "success")
+    flash("Request sent to Admin successfully!", "success")
     return redirect(url_for('shop_dash'))
 
 @app.route('/worker/dashboard', methods=['GET', 'POST'])
@@ -503,7 +540,8 @@ def worker_dash():
 
     vacancies = Vacancy.query.order_by(Vacancy.id.desc()).all()
     shop_owners = {u.id: u for u in User.query.filter_by(role='shop_owner').all()}
-    return render_template('worker_dash.html', vacancies=vacancies, shop_owners=shop_owners)
+    pub_key = os.environ.get("VAPID_PUBLIC_KEY")
+    return render_template('worker_dash.html', vacancies=vacancies, shop_owners=shop_owners, public_key=pub_key)
 
 @app.route('/admin/dashboard')
 @login_required
@@ -513,54 +551,37 @@ def admin_dash():
     shop_owners = User.query.filter_by(role='shop_owner').all()
     workers = User.query.filter_by(role='worker').all()
     customers = User.query.filter_by(role='customer').order_by(User.id.desc()).all()
-    
     all_users = User.query.all()
     total_reqs = Requirement.query.count()
     total_vacancies = Vacancy.query.count()
     pending_requests = PaymentRequest.query.filter_by(status='Pending').all()
     
-    customer_req_counts = {}
-    for c in customers:
-        count = Requirement.query.filter_by(customer_id=c.id).count()
-        customer_req_counts[c.id] = count
-    
+    customer_req_counts = {c.id: Requirement.query.filter_by(customer_id=c.id).count() for c in customers}
     settings = SiteSettings.query.first()
     admin_upi = settings.admin_upi if settings else "admin@upi"
     
-    return render_template('admin_dash.html', 
-                           shop_owners=shop_owners, 
-                           workers=workers, 
-                           customers=customers, 
-                           customer_req_counts=customer_req_counts,
-                           all_users=all_users, 
-                           total_reqs=total_reqs, 
-                           total_vacancies=total_vacancies, 
-                           pending_requests=pending_requests, 
-                           admin_upi=admin_upi)
+    return render_template('admin_dash.html', shop_owners=shop_owners, workers=workers, customers=customers, 
+                           customer_req_counts=customer_req_counts, all_users=all_users, total_reqs=total_reqs, 
+                           total_vacancies=total_vacancies, pending_requests=pending_requests, admin_upi=admin_upi)
 
 @app.route('/admin/delete_user/<int:user_id>', methods=['POST'])
 @login_required
 def delete_user(user_id):
     if current_user.role != 'admin': return "Unauthorized", 403
-    
     if user_id == current_user.id:
         flash('Aap apne khud ke Admin account ko delete nahi kar sakte!', 'danger')
         return redirect(url_for('admin_dash'))
 
     user = User.query.get(user_id)
-    
     if user:
         try:
-            # Clean up connected Quotations safely
             Quotation.query.filter(Quotation.shop_owner_id == user.id).delete(synchronize_session=False)
-
             if user.role == 'customer':
                 user_reqs = Requirement.query.filter_by(customer_id=user.id).all()
                 for req in user_reqs:
                     UnlockedLead.query.filter_by(requirement_id=req.id).delete(synchronize_session=False)
                     Quotation.query.filter_by(requirement_id=req.id).delete(synchronize_session=False)
                 Requirement.query.filter_by(customer_id=user.id).delete(synchronize_session=False)
-            
             elif user.role == 'shop_owner':
                 UnlockedLead.query.filter_by(shop_owner_id=user.id).delete(synchronize_session=False)
                 Vacancy.query.filter_by(shop_owner_id=user.id).delete(synchronize_session=False)
@@ -568,12 +589,10 @@ def delete_user(user_id):
                 
             db.session.delete(user)
             db.session.commit()
-            flash('User aur usse juda saara data successfully delete ho gaya.', 'success')
-            
+            flash('User successfully delete ho gaya.', 'success')
         except Exception as e:
             db.session.rollback() 
-            print(f"Delete Error aaya hai: {e}") 
-            flash('Error: Data delete nahi ho paya. System Error aaya hai.', 'danger')
+            flash('Error deleting user.', 'danger')
             
     return redirect(url_for('admin_dash'))
 
@@ -581,32 +600,20 @@ def delete_user(user_id):
 @login_required
 def edit_user(user_id):
     if current_user.role != 'admin': return "Unauthorized", 403
-    
     user = User.query.get(user_id)
-    
     if user and request.method == 'POST':
-        if request.form.get('name'):
-            user.name = request.form.get('name').strip()
-        if request.form.get('mobile'):
-            user.mobile = request.form.get('mobile').strip()
-        if request.form.get('email'):
-            user.email = request.form.get('email').strip()
-        if request.form.get('address'):
-            user.address = request.form.get('address').strip()
-            
+        if request.form.get('name'): user.name = request.form.get('name').strip()
+        if request.form.get('mobile'): user.mobile = request.form.get('mobile').strip()
+        if request.form.get('email'): user.email = request.form.get('email').strip()
+        if request.form.get('address'): user.address = request.form.get('address').strip()
         new_password = request.form.get('password')
         if new_password and new_password.strip():
             user.password = generate_password_hash(new_password.strip(), method='scrypt')
-            
         if user.role == 'shop_owner' and 'wallet_balance' in request.form:
-            try:
-                user.wallet_balance = int(request.form.get('wallet_balance', user.wallet_balance))
-            except ValueError:
-                pass
-            
+            try: user.wallet_balance = int(request.form.get('wallet_balance', user.wallet_balance))
+            except ValueError: pass
         db.session.commit()
-        flash(f'{user.name} ki details successfully update ho gayi hain.', 'success')
-        
+        flash('Details updated successfully.', 'success')
     return redirect(url_for('admin_dash'))
 
 @app.route('/admin/update_upi', methods=['POST'])
@@ -628,18 +635,22 @@ def approve_payment(req_id, action):
     if current_user.role != 'admin': return "Unauthorized", 403
     req = PaymentRequest.query.get_or_404(req_id)
     
-    # Anti-Double Processing Safeguard
     if req.status != 'Pending':
         flash('Yeh payment request pehle hi process ho chuki hai.', 'warning')
         return redirect(url_for('admin_dash'))
 
     shop_owner = User.query.get(req.shop_owner_id)
-    
     if action == 'approve':
         if shop_owner:
             shop_owner.wallet_balance += req.amount
         req.status = 'Approved'
-        flash(f'Payment Approved. ₹{req.amount} added to Shop Owner.', 'success')
+        
+        if shop_owner:
+            if shop_owner.email:
+                send_email_notification(shop_owner.email, "✅ Wallet Recharge Successful!", f"Aapki ₹{req.amount} ki payment request approve ho gayi hai.")
+            send_web_push(shop_owner.id, "✅ वॉलेट रिचार्ज सफल!", f"आपके वॉलेट में ₹{req.amount} क्रेडिट कर दिए गए हैं।", url="/shop/dashboard")
+            
+        flash(f'Payment Approved. ₹{req.amount} added.', 'success')
     else:
         req.status = 'Rejected'
         flash('Payment Request Rejected.', 'danger')
@@ -647,22 +658,6 @@ def approve_payment(req_id, action):
     db.session.commit()
     return redirect(url_for('admin_dash'))
 
-# --- HELPER & SYSTEM ROUTES ---
-@app.route('/create_admin')
-def create_admin():
-    if not User.query.filter_by(role='admin').first():
-        hashed_pw = generate_password_hash('admin123', method='scrypt')
-        admin = User(role='admin', name='Super Admin', mobile='9999999999', password=hashed_pw, address='Head Office')
-        db.session.add(admin)
-        db.session.commit()
-        return "Admin account created successfully! Mobile: 9999999999, Pass: admin123"
-    return "Admin already exists! Disabled for security.", 403
-
-@app.route('/reset_db_danger_123')
-def reset_db_safely():
-    return "Database reset feature is locked for production security.", 403
-
-# ================= EDIT & DELETE FUNCTIONALITIES =================
 @app.route('/delete_requirement/<int:req_id>', methods=['POST'])
 @login_required
 def delete_requirement(req_id):
@@ -670,7 +665,7 @@ def delete_requirement(req_id):
     req = Requirement.query.filter_by(id=req_id, customer_id=current_user.id).first_or_404()
     db.session.delete(req)
     db.session.commit()
-    flash('Aapki requirement successfully delete ho gayi hai!', 'success')
+    flash('Requirement deleted successfully!', 'success')
     return redirect(url_for('customer_dash'))
 
 @app.route('/edit_requirement/<int:req_id>', methods=['POST'])
@@ -678,14 +673,12 @@ def delete_requirement(req_id):
 def edit_requirement(req_id):
     if current_user.role != 'customer': return "Unauthorized", 403
     req = Requirement.query.filter_by(id=req_id, customer_id=current_user.id).first_or_404()
-    
     req.category = request.form.get('category')
     req.budget = request.form.get('budget')
     req.deadline = request.form.get('deadline')
     req.description = request.form.get('description')
-    
     db.session.commit()
-    flash('Aapki requirement successfully update ho gayi hai!', 'success')
+    flash('Requirement updated successfully!', 'success')
     return redirect(url_for('customer_dash'))
 
 @app.route('/delete_vacancy/<int:vac_id>', methods=['POST'])
@@ -695,59 +688,54 @@ def delete_vacancy(vac_id):
     vac = Vacancy.query.filter_by(id=vac_id, shop_owner_id=current_user.id).first_or_404()
     db.session.delete(vac)
     db.session.commit()
-    flash('Job Vacancy successfully hata di gayi hai!', 'success')
+    flash('Job vacancy deleted!', 'success')
     return redirect(url_for('shop_dash'))
 
 @app.route('/worker/hide_profile', methods=['POST'])
 @login_required
 def worker_hide_profile():
     if current_user.role != 'worker': return "Unauthorized", 403
-    
     current_user.is_available = False
     db.session.commit()
-    flash('Aapki availability marketplace se hata di gayi hai!', 'success')
+    flash('Profile hidden from marketplace!', 'success')
     return redirect(url_for('worker_dash'))
 
 @app.route('/update_worker_profile', methods=['POST']) 
 @login_required
 def update_worker_profile():
     if current_user.role != 'worker': return "Unauthorized", 403
-        
     current_user.name = request.form.get('name')
     current_user.address = request.form.get('address')
     current_user.experience = request.form.get('experience')
     current_user.expertise = request.form.get('expertise')
     current_user.per_day_amount = request.form.get('per_day_amount')
     current_user.is_available = True 
-    
     db.session.commit()
-    flash('Aapka profile successfully update aur activate ho gaya hai.', 'success')
+    flash('Profile updated successfully.', 'success')
     return redirect(url_for('worker_dash'))
 
 @app.route('/submit_quotation/<int:worker_id>', methods=['POST'])
 @login_required
 def submit_quotation(worker_id):
     if current_user.role != 'shop_owner':
-        flash("Sirf Shop Owners hi quotation bhej sakte hain.", "danger")
+        flash("Unauthorized", "danger")
         return redirect(url_for('shop_dash'))
 
-    try:
-        amount = float(request.form.get('amount', 0))
-    except ValueError:
-        amount = 0.0
+    try: amount = float(request.form.get('amount', 0))
+    except ValueError: amount = 0.0
 
     deadline = request.form.get('deadline')
     notes = request.form.get('notes')
 
-    new_quote = Quotation(
-        shop_owner_id=current_user.id,
-        worker_id=worker_id,
-        amount=amount,
-        deadline=deadline,
-        notes=notes
-    )
+    new_quote = Quotation(shop_owner_id=current_user.id, worker_id=worker_id, amount=amount, deadline=deadline, notes=notes)
     db.session.add(new_quote)
     db.session.commit()
+    
+    worker = User.query.get(worker_id)
+    if worker:
+        if worker.email:
+            send_email_notification(worker.email, "💼 Naya Kaam Ka Quotation Aaya Hai!", f"Amount: ₹{amount}")
+        send_web_push(worker.id, "💼 नया जॉब ऑफर!", f"{current_user.shop_name or current_user.name} ने आपको ₹{amount} का कोटेशन भेजा है।", url="/worker/dashboard")
 
     flash("Quotation successfully submit ho gaya hai!", "success")
     return redirect(url_for('shop_dash'))
@@ -755,101 +743,36 @@ def submit_quotation(worker_id):
 @app.route('/update_quote_status/<int:req_id>/<string:status_value>', methods=['POST', 'GET'])
 @login_required
 def update_quote_status(req_id, status_value):
-    if current_user.role.lower() != 'shop_owner':
-        return "Unauthorized", 403
-
+    if current_user.role.lower() != 'shop_owner': return "Unauthorized", 403
     unlocked_lead = UnlockedLead.query.filter_by(requirement_id=req_id, shop_owner_id=current_user.id).first()
-    
     if unlocked_lead:
         if status_value in ['Interested', 'Not Interested']:
             unlocked_lead.status = status_value
             db.session.commit()
-            flash(f"Response successfully updated to: {status_value}!", "success")
-    else:
-        flash("Lead ka koi record nahi mila!", "danger")
-        
+            flash(f"Status updated to {status_value}", "success")
     return redirect(url_for('shop_dash'))
 
 @app.route('/admin/send_broadcast', methods=['POST'])
 @login_required
 def admin_send_broadcast():
-    if current_user.role != 'admin':
-        return "Unauthorized", 403
-        
+    if current_user.role != 'admin': return "Unauthorized", 403
     target_role = request.form.get('target_role')
     subject = request.form.get('subject')
     message_body = request.form.get('message')
     
-    import base64
-    attachments_list = []
-    uploaded_file = request.files.get('attachment')
-    if uploaded_file and uploaded_file.filename:
-        file_bytes = uploaded_file.read()
-        encoded_file = base64.b64encode(file_bytes).decode('utf-8')
-        attachments_list.append({
-            "content": encoded_file,
-            "name": uploaded_file.filename
-        })
-
-    if target_role == 'all':
-        users = User.query.filter(User.email != None).all()
-    else:
-        users = User.query.filter_by(role=target_role).filter(User.email != None).all()
-        
+    users = User.query.filter(User.email != None).all() if target_role == 'all' else User.query.filter_by(role=target_role).filter(User.email != None).all()
     recipient_emails = [u.email for u in users if u.email]
     
     if recipient_emails:
         try:
-            api_key = os.environ.get('BREVO_API_KEY')
-            sender_email = os.environ.get('MAIL_USERNAME', 'no-reply@kaamconnect.com')
-            
-            if api_key and sender_email:
-                import urllib.request
-                import json
-
-                url = "https://api.brevo.com/v3/smtp/email"
-                payload = {
-                    "sender": {"name": "Kaamconnect Admin", "email": sender_email},
-                    "to": [{"email": email} for email in recipient_emails],
-                    "subject": subject,
-                    "htmlContent": f"""
-                    <html>
-                        <body>
-                            <div style="font-family: Arial, sans-serif; padding: 20px; border: 1px solid #ddd; border-radius: 5px;">
-                                <h2 style="color: #0275d8;">📢 Important Notice from Kaamconnect</h2>
-                                <p>{message_body.replace(chr(10), '<br>')}</p>
-                                <hr style="border: none; border-top: 1px solid #eee; margin: 20px 0;">
-                                <p style="font-size: 12px; color: #777;">Aapko yeh email Kaamconnect Admin ki taraf se bheja gaya hai.</p>
-                            </div>
-                        </body>
-                    </html>
-                    """
-                }
-                
-                if attachments_list:
-                    payload["attachment"] = attachments_list
-
-                headers = {
-                    "accept": "application/json",
-                    "api-key": api_key,
-                    "content-type": "application/json"
-                }
-                
-                req_data = json.dumps(payload).encode('utf-8')
-                req_obj = urllib.request.Request(url, data=req_data, headers=headers, method='POST')
-                
-                with urllib.request.urlopen(req_obj, timeout=15) as response:
-                    flash(f'Broadcast email successfully {len(recipient_emails)} logo ko bhej di gayi hai!', 'success')
+            send_email_notification(recipient_emails, subject, message_body.replace(chr(10), '<br>'))
+            flash('Broadcast email sent successfully!', 'success')
         except Exception as e:
-            flash(f'Email bhejne mein error aaya: {e}', 'danger')
-    else:
-        flash('Is category mein koi valid email address nahi mila.', 'warning')
-        
+            flash(f'Error: {e}', 'danger')
     return redirect(url_for('admin_dash'))
 
 @app.route('/terms')
-def terms():
-    return render_template('terms.html')
+def terms(): return render_template('terms.html')
 
 @app.route('/shops')
 def registered_shops():
@@ -867,17 +790,12 @@ def make_session_permanent():
 
 with app.app_context():
     db.create_all()
-
-# --- Emergency Reset Code ---
-    reset_pass = os.environ.get('RESET_ADMIN_PASS')
-    reset_mobile = os.environ.get('RESET_ADMIN_MOBILE')
-    if reset_pass and reset_mobile:
-        admin = User.query.filter_by(role='admin').first()
-        if admin:
-            admin.mobile = reset_mobile
-            admin.password = generate_password_hash(reset_pass, method='scrypt')
-            db.session.commit()
-            print("⚡ ADMIN CREDENTIALS RESET SUCCESSFULLY VIA ENV VAR ⚡")
+    # Create default admin if missing
+    if not User.query.filter_by(role='admin').first():
+        hashed_pw = generate_password_hash('admin123', method='scrypt')
+        admin = User(role='admin', name='Super Admin', mobile='9999999999', password=hashed_pw, address='Head Office')
+        db.session.add(admin)
+        db.session.commit()
 
 if __name__ == '__main__':
     app.run(debug=False)
