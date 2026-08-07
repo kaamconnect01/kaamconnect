@@ -5,6 +5,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from datetime import timedelta, datetime
 from zoneinfo import ZoneInfo
 import os
+import re
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'super_secret_key_for_local_kaamconnect')
@@ -34,9 +35,9 @@ class User(UserMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True)
     role = db.Column(db.String(20), nullable=False)
     name = db.Column(db.String(100), nullable=False)
-    mobile = db.Column(db.String(15), unique=True, nullable=False)
+    mobile = db.Column(db.String(30), unique=True, nullable=False)
     password = db.Column(db.String(200), nullable=False)
-    email = db.Column(db.String(100), nullable=True)
+    email = db.Column(db.String(100), nullable=False)
     address = db.Column(db.Text, nullable=True)
     experience = db.Column(db.String(50), nullable=True)
     expertise = db.Column(db.String(100), nullable=True)
@@ -156,7 +157,7 @@ def notify_admin_new_user(user):
                 <html>
                     <body>
                         <div style="font-family: Arial, sans-serif; padding: 20px; border: 1px solid #ddd; border-radius: 5px;">
-                            <h2 style="color: #28a745;">🎉 Naya User Register Hua Hai!</h2>
+                            <h2 style="color: #28a745;">✨ Naya User Register Hua Hai!</h2>
                             <p>Kaamconnect par ek naya user judaa hai. Details niche di gayi hain:</p>
                             <ul>
                                 <li><b>Role:</b> <span style="color: #007bff; text-transform: uppercase;">{user.role}</span></li>
@@ -194,7 +195,8 @@ def index():
 def signup():
     if request.method == 'POST':
         role = request.form.get('role', 'customer').strip()
-        mobile = request.form.get('mobile', '').strip()
+        country_code = request.form.get('country_code', '+91').strip()
+        raw_mobile = request.form.get('mobile', '').strip()
         password = request.form.get('password', '').strip()
         name = request.form.get('name', '').strip()
         email = request.form.get('email', '').strip()
@@ -206,9 +208,18 @@ def signup():
         per_day_raw = request.form.get('per_day_amount')
         per_day_amount = int(per_day_raw) if per_day_raw and per_day_raw.strip().isdigit() else None
 
-        if not mobile or not password or not name:
-            flash('Please fill all mandatory fields.', 'danger')
+        if not raw_mobile or not password or not name or not email:
+            flash('Please fill all mandatory fields including Email.', 'danger')
             return redirect(url_for('signup', role=role))
+
+        # Validate Email Format via Regex
+        email_regex = r'^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$'
+        if not re.match(email_regex, email, re.IGNORECASE):
+            flash('Kripya ek valid Email address dalein (jaise name@example.com).', 'danger')
+            return redirect(url_for('signup', role=role))
+
+        # Combine Country Code and Mobile Number
+        mobile = f"{country_code} {raw_mobile}"
 
         user_exists = User.query.filter_by(mobile=mobile).first()
         if user_exists:
@@ -247,9 +258,14 @@ def signup():
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
-        mobile = request.form.get('mobile', '').strip()
+        country_code = request.form.get('country_code', '+91').strip()
+        raw_mobile = request.form.get('mobile', '').strip()
         password = request.form.get('password', '').strip()
-        user = User.query.filter_by(mobile=mobile).first()
+        
+        # Check direct mobile or prefixed mobile for login safety
+        user = User.query.filter_by(mobile=f"{country_code} {raw_mobile}").first()
+        if not user:
+            user = User.query.filter_by(mobile=raw_mobile).first()
         
         if user and check_password_hash(user.password, password):
             session.permanent = True
@@ -305,7 +321,7 @@ def customer_dash():
                     payload = {
                         "sender": {"name": "Kaamconnect", "email": sender_email},
                         "to": [{"email": email} for email in recipient_emails],
-                        "subject": "📢 Naya Kaam Aaya Hai! (Urgent)",
+                        "subject": "🎯 Naya Kaam Aaya Hai! (Urgent)",
                         "htmlContent": f"""
                         <html>
                             <body>
@@ -315,7 +331,7 @@ def customer_dash():
                                     <li><b>Category:</b> {new_req.category}</li>
                                     <li><b>Budget:</b> ₹{new_req.budget}</li>
                                 </ul>
-                                <p><b>Note:</b> Sirf pehle 3-4 log hi ise unlock kar sakte hain. Jaldi se apna dashboard check karein!</p>
+                                <p><b>Note:</b> Sirf pehle 3-4 log hi ise unlock kar sakte hain. Jaldi से apna dashboard check karein!</p>
                             </body>
                         </html>
                         """
@@ -428,7 +444,7 @@ def unlock_lead(req_id):
         
     already_unlocked = UnlockedLead.query.filter_by(shop_owner_id=current_user.id, requirement_id=req.id).first()
     if already_unlocked:
-        flash('Yeh lead aapne pehle se hi unlock ki hui hai!', 'info')
+        flash('Yeh lead aapne pehle से hi unlock ki hui hai!', 'info')
         return redirect(url_for('shop_dash'))
 
     if current_user.wallet_balance >= credit_cost:
@@ -652,7 +668,7 @@ def approve_payment(req_id, action):
 def create_admin():
     if not User.query.filter_by(role='admin').first():
         hashed_pw = generate_password_hash('admin123', method='scrypt')
-        admin = User(role='admin', name='Super Admin', mobile='9999999999', password=hashed_pw, address='Head Office')
+        admin = User(role='admin', name='Super Admin', mobile='9999999999', email='admin@kaamconnect.com', password=hashed_pw, address='Head Office')
         db.session.add(admin)
         db.session.commit()
         return "Admin account created successfully! Mobile: 9999999999, Pass: admin123"
@@ -816,7 +832,7 @@ def admin_send_broadcast():
                     <html>
                         <body>
                             <div style="font-family: Arial, sans-serif; padding: 20px; border: 1px solid #ddd; border-radius: 5px;">
-                                <h2 style="color: #0275d8;">📢 Important Notice from Kaamconnect</h2>
+                                <h2 style="color: #0275d8;">🎯 Important Notice from Kaamconnect</h2>
                                 <p>{message_body.replace(chr(10), '<br>')}</p>
                                 <hr style="border: none; border-top: 1px solid #eee; margin: 20px 0;">
                                 <p style="font-size: 12px; color: #777;">Aapko yeh email Kaamconnect Admin ki taraf se bheja gaya hai.</p>
