@@ -212,7 +212,8 @@
                                     <label class="form-label text-secondary mb-1" style="font-size: 0.73rem; font-weight: 600;">Mobile Number</label>
                                     <div class="input-group">
                                         <span class="input-group-text"><i class="fa-solid fa-phone"></i></span>
-                                        <input type="text" name="mobile" class="form-control custom-input" required placeholder="10-digit mobile">
+                                        <!-- Mobile Number strict validation added -->
+                                        <input type="text" name="mobile" class="form-control custom-input" required pattern="[0-9]{10}" minlength="10" maxlength="10" title="Please enter a valid 10-digit mobile number" placeholder="10-digit mobile">
                                     </div>
                                 </div>
                                 <div class="col-md-4">
@@ -220,6 +221,23 @@
                                     <div class="input-group">
                                         <span class="input-group-text"><i class="fa-solid fa-lock"></i></span>
                                         <input type="password" name="password" class="form-control custom-input" required placeholder="Password">
+                                    </div>
+                                </div>
+                                <!-- Email & Address moved to common to be required for everyone -->
+                                <div class="col-md-6">
+                                    <label class="form-label text-secondary mb-1" style="font-size: 0.73rem; font-weight: 600;">Email Address</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text"><i class="fa-solid fa-envelope"></i></span>
+                                        <!-- Email strict validation added -->
+                                        <input type="email" name="email" class="form-control custom-input" required pattern="[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}$" title="Please enter a valid email address" placeholder="name@example.com">
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label text-secondary mb-1" style="font-size: 0.73rem; font-weight: 600;">Address / Location</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text"><i class="fa-solid fa-location-dot"></i></span>
+                                        <!-- Address length validation added -->
+                                        <input type="text" name="address" id="addressInput" class="form-control custom-input" required minlength="8" title="Please enter a complete address" placeholder="Gali, Shop No, City, State...">
                                     </div>
                                 </div>
                             </div>
@@ -254,25 +272,11 @@
                                         <input type="text" name="experience" id="expInput" class="form-control custom-input" placeholder="e.g. 4">
                                     </div>
                                 </div>
-                                <div class="col-md-6">
-                                    <label class="form-label text-secondary mb-1" style="font-size: 0.73rem; font-weight: 600;">Email Address (Optional)</label>
-                                    <div class="input-group">
-                                        <span class="input-group-text"><i class="fa-solid fa-envelope"></i></span>
-                                        <input type="email" name="email" class="form-control custom-input" placeholder="name@example.com">
-                                    </div>
-                                </div>
                                 <div class="col-md-6" id="workerFields" style="display: none;">
                                     <label class="form-label text-secondary mb-1" style="font-size: 0.73rem; font-weight: 600;">Expected Daily Wage (₹)</label>
                                     <div class="input-group">
                                         <span class="input-group-text"><i class="fa-solid fa-indian-rupee-sign"></i></span>
                                         <input type="number" name="per_day_amount" id="wageInput" class="form-control custom-input" placeholder="e.g. 700">
-                                    </div>
-                                </div>
-                                <div class="col-12">
-                                    <label class="form-label text-secondary mb-1" style="font-size: 0.73rem; font-weight: 600;">Address / Location</label>
-                                    <div class="input-group">
-                                        <span class="input-group-text"><i class="fa-solid fa-location-dot"></i></span>
-                                        <input type="text" name="address" id="addressInput" class="form-control custom-input" placeholder="Gali, Shop No, City, State...">
                                     </div>
                                 </div>
                             </div>
@@ -311,7 +315,8 @@
         const workerFields = document.getElementById('workerFields');
         const actionContainer = document.getElementById('actionContainer');
         
-        const reqInputs = [document.getElementById('addressInput'), document.getElementById('expInput'), document.getElementById('expertInput')];
+        // Removed addressInput from dynamic toggle, as it is strictly required now.
+        const reqInputs = [document.getElementById('expInput'), document.getElementById('expertInput')];
         const wageInput = document.getElementById('wageInput');
 
         // Show sections
