@@ -1,70 +1,207 @@
 {% extends 'base.html' %}
 {% block content %}
-<div class="card bg-dark text-white border-0 shadow p-4 rounded-4 mb-4">
+
+<style>
+    /* Premium Glassmorphism & Admin UI Styles */
+    :root {
+        --glass-bg: rgba(255, 255, 255, 0.85);
+        --glass-border: rgba(255, 255, 255, 0.4);
+        --glass-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.07);
+    }
+    
+    body {
+        background-color: #f4f7f6;
+    }
+
+    .glass-panel {
+        background: var(--glass-bg);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+        border: 1px solid var(--glass-border);
+        box-shadow: var(--glass-shadow);
+        border-radius: 1rem;
+    }
+
+    .glass-card-dark {
+        background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+        border: 1px solid rgba(255,255,255,0.1);
+        box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+        color: white;
+    }
+
+    /* Clickable Stat Cards */
+    .stat-card {
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        cursor: pointer;
+        position: relative;
+        overflow: hidden;
+        border: 1px solid rgba(0,0,0,0.05);
+    }
+    
+    .stat-card::before {
+        content: '';
+        position: absolute;
+        top: 0; left: 0; width: 100%; height: 100%;
+        background: linear-gradient(45deg, transparent, rgba(255,255,255,0.2), transparent);
+        transform: translateX(-100%);
+        transition: 0.5s;
+    }
+
+    .stat-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 12px 25px rgba(0,0,0,0.1);
+    }
+    
+    .stat-card:hover::before {
+        transform: translateX(100%);
+    }
+
+    .stat-card.bg-primary-soft { background: linear-gradient(135deg, #e0e7ff 0%, #c7d2fe 100%); color: #3730a3; }
+    .stat-card.bg-info-soft { background: linear-gradient(135deg, #e0f2fe 0%, #bae6fd 100%); color: #075985; }
+    .stat-card.bg-success-soft { background: linear-gradient(135deg, #dcfce7 0%, #bbf7d0 100%); color: #166534; }
+    .stat-card.bg-warning-soft { background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%); color: #92400e; }
+
+    .stat-icon {
+        font-size: 2.5rem;
+        opacity: 0.2;
+        position: absolute;
+        right: 15px;
+        bottom: 10px;
+    }
+
+    /* Customizing Nav Pills */
+    .admin-tabs {
+        background: white;
+        padding: 8px;
+        border-radius: 50px;
+        box-shadow: var(--glass-shadow);
+    }
+    .admin-tabs .nav-link {
+        border-radius: 50px;
+        color: #64748b;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        padding: 10px 20px;
+    }
+    .admin-tabs .nav-link:hover {
+        background: #f1f5f9;
+        color: #0f172a;
+    }
+    .admin-tabs .nav-link.active {
+        background: #3b82f6;
+        color: white;
+        box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+    }
+    
+    .table-glass {
+        background: transparent;
+    }
+    .table-glass th {
+        background: rgba(0,0,0,0.03);
+        border-bottom: 2px solid #e2e8f0;
+        color: #475569;
+        text-transform: uppercase;
+        font-size: 0.8rem;
+        letter-spacing: 0.5px;
+    }
+    .table-glass td {
+        border-bottom: 1px solid #f1f5f9;
+        vertical-align: middle;
+    }
+</style>
+
+<!-- Pre-calculate stats for Analytics -->
+{% set total_users = shop_owners|length + workers|length + customers|length %}
+{% set total_jobs = total_reqs + total_vacancies %}
+
+<!-- Top Header -->
+<div class="card glass-card-dark p-4 rounded-4 mb-4">
     <div class="d-flex justify-content-between align-items-center">
-        <h4 class="fw-bold mb-0"><i class="fa-solid fa-shield-halved text-warning me-2"></i> Super Admin Panel</h4>
-        <span class="badge bg-danger px-3 py-2">Restricted Access</span>
+        <div>
+            <h4 class="fw-bold mb-1"><i class="fa-solid fa-shield-halved text-warning me-2"></i> Super Admin Portal</h4>
+            <p class="mb-0 text-light opacity-75 small">Manage users, jobs, payments, and platform settings.</p>
+        </div>
+        <span class="badge bg-danger bg-opacity-25 border border-danger text-danger px-3 py-2 rounded-pill shadow-sm">
+            <i class="fa-solid fa-lock me-1"></i> Restricted Access
+        </span>
     </div>
 </div>
 
-<ul class="nav nav-pills nav-fill bg-white shadow-sm rounded-pill p-2 mb-4" id="adminTab" role="tablist">
+<!-- Main Navigation Tabs -->
+<ul class="nav nav-pills nav-fill admin-tabs mb-4" id="adminTab" role="tablist">
   <li class="nav-item">
-      <button class="nav-link active rounded-pill fw-bold" data-bs-toggle="tab" data-bs-target="#overview">Overview</button>
+      <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#overview"><i class="fa-solid fa-chart-pie me-1"></i> Overview</button>
   </li>
   <li class="nav-item">
-      <button class="nav-link rounded-pill fw-bold" data-bs-toggle="tab" data-bs-target="#shops">Shops</button>
+      <button class="nav-link" data-bs-toggle="tab" data-bs-target="#shops"><i class="fa-solid fa-shop me-1"></i> Shops</button>
   </li>
   <li class="nav-item">
-      <button class="nav-link rounded-pill fw-bold" data-bs-toggle="tab" data-bs-target="#workers">Workers</button>
+      <button class="nav-link" data-bs-toggle="tab" data-bs-target="#workers"><i class="fa-solid fa-helmet-safety me-1"></i> Workers</button>
   </li>
   <li class="nav-item">
-      <button class="nav-link rounded-pill fw-bold" data-bs-toggle="tab" data-bs-target="#customers-panel">
+      <button class="nav-link" data-bs-toggle="tab" data-bs-target="#customers-panel">
           <i class="fa-solid fa-users me-1"></i> Customers
       </button>
   </li>
   <li class="nav-item">
-      <button class="nav-link rounded-pill fw-bold text-success" data-bs-toggle="tab" data-bs-target="#broadcast-panel">
+      <button class="nav-link text-success" data-bs-toggle="tab" data-bs-target="#broadcast-panel">
           <i class="fa-solid fa-bullhorn me-1"></i> Broadcast Mail
       </button>
   </li>
   <li class="nav-item">
-      <button class="nav-link rounded-pill fw-bold text-danger" data-bs-toggle="tab" data-bs-target="#alldata">Database</button>
+      <button class="nav-link text-danger" data-bs-toggle="tab" data-bs-target="#alldata">
+          <i class="fa-solid fa-database me-1"></i> Database
+      </button>
   </li>
 </ul>
 
+<!-- Top Action Panels (Settings & Payments) -->
 <div class="row g-4 mb-4">
     <div class="col-md-6">
-        <div class="card border-0 shadow-sm h-100">
-            <div class="card-header bg-primary text-white fw-bold"><i class="fa-solid fa-gear me-1"></i> Site Settings</div>
-            <div class="card-body">
+        <div class="glass-panel h-100 p-0 overflow-hidden">
+            <div class="bg-primary bg-opacity-10 text-primary fw-bold p-3 border-bottom border-primary border-opacity-25">
+                <i class="fa-solid fa-gear me-2"></i> Master Site Settings
+            </div>
+            <div class="p-4">
                 <form action="{{ url_for('update_upi') }}" method="POST">
-                    <label class="small fw-bold mb-1">Update Master UPI ID</label>
-                    <div class="input-group">
-                        <input type="text" name="upi_id" class="form-control" value="{{ admin_upi }}" required>
-                        <button type="submit" class="btn btn-primary fw-bold">Update</button>
+                    <label class="small fw-bold mb-2 text-secondary">Update Receiving Master UPI ID</label>
+                    <div class="input-group shadow-sm rounded-pill overflow-hidden">
+                        <span class="input-group-text bg-white border-0"><i class="fa-brands fa-google-pay text-muted"></i></span>
+                        <input type="text" name="upi_id" class="form-control border-0" value="{{ admin_upi }}" required>
+                        <button type="submit" class="btn btn-primary fw-bold px-4">Update</button>
                     </div>
                 </form>
             </div>
         </div>
     </div>
     <div class="col-md-6">
-        <div class="card border-0 shadow-sm h-100 border-start border-4 border-warning">
-            <div class="card-header bg-white text-dark fw-bold border-0"><i class="fa-solid fa-clock text-warning me-1"></i> Pending Payments ({{ pending_requests|length }})</div>
-            <div class="card-body p-2" style="max-height: 200px; overflow-y: auto;">
+        <div class="glass-panel h-100 p-0 overflow-hidden border-start border-4 border-warning">
+            <div class="bg-warning bg-opacity-10 text-dark fw-bold p-3 border-bottom border-warning border-opacity-25 d-flex justify-content-between align-items-center">
+                <span><i class="fa-solid fa-clock text-warning me-2"></i> Pending Payment Approvals</span>
+                <span class="badge bg-warning text-dark rounded-pill">{{ pending_requests|length }}</span>
+            </div>
+            <div class="p-3" style="max-height: 180px; overflow-y: auto;">
                 {% for req in pending_requests %}
                 <div class="d-flex justify-content-between align-items-center border-bottom pb-2 mb-2">
                     <div>
-                        <span class="badge bg-dark">ID: {{ req.shop_owner_id }}</span>
-                        <span class="fw-bold ms-2 text-success">₹{{ req.amount }}</span><br>
-                        <small class="text-muted">TRX: {{ req.trx_id }}</small>
+                        <span class="badge bg-dark rounded-pill">Shop ID: {{ req.shop_owner_id }}</span>
+                        <span class="fw-bold ms-2 text-success fs-5">₹{{ req.amount }}</span><br>
+                        <small class="text-muted"><i class="fa-solid fa-hashtag me-1"></i>TRX: {{ req.trx_id }}</small>
                     </div>
                     <div>
-                        <form action="{{ url_for('approve_payment', req_id=req.id, action='approve') }}" method="POST" class="d-inline"><button class="btn btn-sm btn-success px-3 me-1"><i class="fa-solid fa-check"></i></button></form>
-                        <form action="{{ url_for('approve_payment', req_id=req.id, action='reject') }}" method="POST" class="d-inline"><button class="btn btn-sm btn-danger px-3"><i class="fa-solid fa-xmark"></i></button></form>
+                        <form action="{{ url_for('approve_payment', req_id=req.id, action='approve') }}" method="POST" class="d-inline">
+                            <button class="btn btn-sm btn-success rounded-circle shadow-sm me-1" style="width:32px; height:32px;" title="Approve"><i class="fa-solid fa-check"></i></button>
+                        </form>
+                        <form action="{{ url_for('approve_payment', req_id=req.id, action='reject') }}" method="POST" class="d-inline">
+                            <button class="btn btn-sm btn-danger rounded-circle shadow-sm" style="width:32px; height:32px;" title="Reject"><i class="fa-solid fa-xmark"></i></button>
+                        </form>
                     </div>
                 </div>
                 {% else %}
-                <p class="text-center text-muted mt-3 small">All caught up! No pending requests.</p>
+                <div class="text-center text-muted my-4">
+                    <i class="fa-solid fa-check-circle fa-2x text-success opacity-50 mb-2"></i>
+                    <p class="mb-0 small">All caught up! No pending requests.</p>
+                </div>
                 {% endfor %}
             </div>
         </div>
@@ -72,39 +209,113 @@
 </div>
 
 <div class="tab-content">
+  <!-- OVERVIEW TAB -->
   <div class="tab-pane fade show active" id="overview">
+      
+      <!-- Analytics Mini Dashboard -->
+      {% if total_users > 0 or total_jobs > 0 %}
+      <div class="glass-panel p-4 mb-4">
+          <h6 class="fw-bold text-secondary mb-3"><i class="fa-solid fa-chart-line me-2"></i>Platform Health Analytics</h6>
+          <div class="row align-items-center">
+              <div class="col-md-6 mb-3 mb-md-0">
+                  <div class="d-flex justify-content-between small fw-bold mb-1">
+                      <span class="text-dark">User Demographics (Total: {{ total_users }})</span>
+                  </div>
+                  <div class="progress rounded-pill shadow-sm" style="height: 12px;">
+                      {% if total_users > 0 %}
+                      <div class="progress-bar bg-primary" role="progressbar" style="width: {{ (customers|length / total_users * 100)|round }}%" title="Customers"></div>
+                      <div class="progress-bar bg-info" role="progressbar" style="width: {{ (shop_owners|length / total_users * 100)|round }}%" title="Shop Owners"></div>
+                      <div class="progress-bar bg-warning" role="progressbar" style="width: {{ (workers|length / total_users * 100)|round }}%" title="Workers"></div>
+                      {% endif %}
+                  </div>
+                  <div class="d-flex justify-content-between small text-muted mt-1" style="font-size: 0.7rem;">
+                      <span><i class="fa-solid fa-circle text-primary"></i> Cust ({{customers|length}})</span>
+                      <span><i class="fa-solid fa-circle text-info"></i> Shops ({{shop_owners|length}})</span>
+                      <span><i class="fa-solid fa-circle text-warning"></i> Workers ({{workers|length}})</span>
+                  </div>
+              </div>
+              <div class="col-md-6">
+                  <div class="d-flex justify-content-between small fw-bold mb-1">
+                      <span class="text-dark">Active Jobs vs Vacancies (Total: {{ total_jobs }})</span>
+                  </div>
+                  <div class="progress rounded-pill shadow-sm" style="height: 12px;">
+                      {% if total_jobs > 0 %}
+                      <div class="progress-bar bg-success" role="progressbar" style="width: {{ (total_reqs / total_jobs * 100)|round }}%" title="Customer Jobs"></div>
+                      <div class="progress-bar bg-warning" role="progressbar" style="width: {{ (total_vacancies / total_jobs * 100)|round }}%" title="Shop Vacancies"></div>
+                      {% endif %}
+                  </div>
+                  <div class="d-flex justify-content-between small text-muted mt-1" style="font-size: 0.7rem;">
+                      <span><i class="fa-solid fa-circle text-success"></i> Customer Jobs ({{total_reqs}})</span>
+                      <span><i class="fa-solid fa-circle text-warning"></i> Vacancies ({{total_vacancies}})</span>
+                  </div>
+              </div>
+          </div>
+      </div>
+      {% endif %}
+
+      <!-- Clickable Stat Cards -->
       <div class="row text-center g-3">
-          <div class="col-6 col-md-3"><div class="card shadow-sm border-0 bg-primary text-white py-4 h-100 rounded-4"><h2>{{ shop_owners|length }}</h2><small>Shop Owners</small></div></div>
-          <div class="col-6 col-md-3"><div class="card shadow-sm border-0 bg-info text-white py-4 h-100 rounded-4"><h2>{{ workers|length }}</h2><small>Workers</small></div></div>
-          <div class="col-6 col-md-3"><div class="card shadow-sm border-0 bg-success text-white py-4 h-100 rounded-4"><h2>{{ total_reqs }}</h2><small>Customer Jobs</small></div></div>
-          <div class="col-6 col-md-3"><div class="card shadow-sm border-0 bg-warning text-dark py-4 h-100 rounded-4"><h2>{{ total_vacancies }}</h2><small>Shop Vacancies</small></div></div>
+          <div class="col-6 col-md-3">
+              <div class="card stat-card bg-primary-soft py-4 h-100 rounded-4 shadow-sm border-0" onclick="document.querySelector('[data-bs-target=\'#shops\']').click()">
+                  <i class="fa-solid fa-shop stat-icon"></i>
+                  <h1 class="fw-bold mb-0 display-5">{{ shop_owners|length }}</h1>
+                  <small class="fw-bold text-uppercase" style="letter-spacing: 1px; font-size:0.75rem;">Shop Owners</small>
+              </div>
+          </div>
+          <div class="col-6 col-md-3">
+              <div class="card stat-card bg-info-soft py-4 h-100 rounded-4 shadow-sm border-0" onclick="document.querySelector('[data-bs-target=\'#workers\']').click()">
+                  <i class="fa-solid fa-helmet-safety stat-icon"></i>
+                  <h1 class="fw-bold mb-0 display-5">{{ workers|length }}</h1>
+                  <small class="fw-bold text-uppercase" style="letter-spacing: 1px; font-size:0.75rem;">Registered Workers</small>
+              </div>
+          </div>
+          <div class="col-6 col-md-3">
+              <div class="card stat-card bg-success-soft py-4 h-100 rounded-4 shadow-sm border-0" onclick="document.querySelector('[data-bs-target=\'#customers-panel\']').click()">
+                  <i class="fa-solid fa-briefcase stat-icon"></i>
+                  <h1 class="fw-bold mb-0 display-5">{{ total_reqs }}</h1>
+                  <small class="fw-bold text-uppercase" style="letter-spacing: 1px; font-size:0.75rem;">Customer Jobs</small>
+              </div>
+          </div>
+          <div class="col-6 col-md-3">
+              <!-- Using button click for database since vacancies don't have a direct tab -->
+              <div class="card stat-card bg-warning-soft py-4 h-100 rounded-4 shadow-sm border-0" onclick="document.querySelector('[data-bs-target=\'#alldata\']').click()">
+                  <i class="fa-solid fa-clipboard-list stat-icon"></i>
+                  <h1 class="fw-bold mb-0 display-5">{{ total_vacancies }}</h1>
+                  <small class="fw-bold text-uppercase" style="letter-spacing: 1px; font-size:0.75rem;">Shop Vacancies</small>
+              </div>
+          </div>
       </div>
   </div>
 
   <!-- SHOPS TAB -->
   <div class="tab-pane fade" id="shops">
-      <div class="card border-0 shadow-sm p-3">
+      <div class="glass-panel p-4">
+          <h5 class="fw-bold text-dark mb-4"><i class="fa-solid fa-shop text-primary me-2"></i> Shop Owners Directory</h5>
           <div class="table-responsive">
-              <table class="table align-middle">
-                  <thead class="table-light"><tr><th>ID</th><th>Name</th><th>Mobile</th><th>Joined Date</th><th>Wallet</th><th>Action</th></tr></thead>
+              <table class="table table-glass table-hover align-middle">
+                  <thead><tr><th>ID</th><th>Shop / Name</th><th>Contact</th><th>Joined Details</th><th>Wallet</th><th class="text-end">Actions</th></tr></thead>
                   <tbody>
                       {% for shop in shop_owners %}
                       <tr>
-                          <td>{{ shop.id }}</td><td>{{ shop.name }}</td><td>{{ shop.mobile }}</td>
+                          <td><span class="badge bg-secondary rounded-pill">#{{ shop.id }}</span></td>
+                          <td>
+                              <div class="fw-bold text-dark">{{ shop.name }}</div>
+                          </td>
+                          <td><i class="fa-solid fa-phone text-muted small me-1"></i>{{ shop.mobile }}</td>
                           <td>
                               {% if shop.created_at %}
-                                  <div class="small fw-medium text-dark">{{ shop.created_at.strftime('%d %b %Y') }}</div>
+                                  <div class="small fw-bold text-dark">{{ shop.created_at.strftime('%d %b %Y') }}</div>
                                   <div class="text-muted" style="font-size: 0.75rem;"><i class="fa-regular fa-clock me-1"></i>{{ shop.created_at.strftime('%I:%M %p') }}</div>
                               {% else %}
-                                  <span class="text-muted small">N/A</span>
+                                  <span class="text-muted small border rounded px-2 bg-light">Legacy User</span>
                               {% endif %}
                           </td>
-                          <td class="text-success fw-bold">₹{{ shop.wallet_balance }}</td>
-                          <td>
-                              <button class="btn btn-sm btn-outline-info" data-bs-toggle="modal" data-bs-target="#viewModal{{ shop.id }}" title="View Details"><i class="fa-solid fa-eye"></i></button>
-                              <button class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#editModal{{ shop.id }}" title="Edit"><i class="fa-solid fa-pen"></i></button>
+                          <td class="text-success fw-bold fs-6">₹{{ shop.wallet_balance }}</td>
+                          <td class="text-end">
+                              <button class="btn btn-sm btn-outline-info rounded-circle me-1" style="width:32px; height:32px; padding:0;" data-bs-toggle="modal" data-bs-target="#viewModal{{ shop.id }}" title="View"><i class="fa-solid fa-eye"></i></button>
+                              <button class="btn btn-sm btn-outline-primary rounded-circle me-1" style="width:32px; height:32px; padding:0;" data-bs-toggle="modal" data-bs-target="#editModal{{ shop.id }}" title="Edit"><i class="fa-solid fa-pen"></i></button>
                               <form action="{{ url_for('delete_user', user_id=shop.id) }}" method="POST" class="d-inline" onsubmit="return confirm('WARNING: This will delete ALL data related to this shop. Continue?');">
-                                  <button type="submit" class="btn btn-sm btn-outline-danger" title="Delete"><i class="fa-solid fa-trash"></i></button>
+                                  <button type="submit" class="btn btn-sm btn-outline-danger rounded-circle" style="width:32px; height:32px; padding:0;" title="Delete"><i class="fa-solid fa-trash"></i></button>
                               </form>
                           </td>
                       </tr>
@@ -117,27 +328,30 @@
 
   <!-- WORKERS TAB -->
   <div class="tab-pane fade" id="workers">
-       <div class="card border-0 shadow-sm p-3">
+       <div class="glass-panel p-4">
+          <h5 class="fw-bold text-dark mb-4"><i class="fa-solid fa-helmet-safety text-info me-2"></i> Registered Workers</h5>
           <div class="table-responsive">
-              <table class="table align-middle">
-                  <thead class="table-light"><tr><th>ID</th><th>Name</th><th>Mobile</th><th>Joined Date</th><th>Action</th></tr></thead>
+              <table class="table table-glass table-hover align-middle">
+                  <thead><tr><th>ID</th><th>Worker Name</th><th>Mobile</th><th>Joined Date</th><th class="text-end">Actions</th></tr></thead>
                   <tbody>
                       {% for worker in workers %}
                       <tr>
-                          <td>{{ worker.id }}</td><td>{{ worker.name }}</td><td>{{ worker.mobile }}</td>
+                          <td><span class="badge bg-secondary rounded-pill">#{{ worker.id }}</span></td>
+                          <td><div class="fw-bold text-dark">{{ worker.name }}</div></td>
+                          <td><i class="fa-solid fa-phone text-muted small me-1"></i>{{ worker.mobile }}</td>
                           <td>
                               {% if worker.created_at %}
-                                  <div class="small fw-medium text-dark">{{ worker.created_at.strftime('%d %b %Y') }}</div>
+                                  <div class="small fw-bold text-dark">{{ worker.created_at.strftime('%d %b %Y') }}</div>
                                   <div class="text-muted" style="font-size: 0.75rem;"><i class="fa-regular fa-clock me-1"></i>{{ worker.created_at.strftime('%I:%M %p') }}</div>
                               {% else %}
-                                  <span class="text-muted small">N/A</span>
+                                  <span class="text-muted small border rounded px-2 bg-light">Legacy User</span>
                               {% endif %}
                           </td>
-                          <td>
-                              <button class="btn btn-sm btn-outline-info" data-bs-toggle="modal" data-bs-target="#viewModal{{ worker.id }}" title="View Details"><i class="fa-solid fa-eye"></i></button>
-                              <button class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#editWorkerModal{{ worker.id }}" title="Edit"><i class="fa-solid fa-pen"></i></button>
+                          <td class="text-end">
+                              <button class="btn btn-sm btn-outline-info rounded-circle me-1" style="width:32px; height:32px; padding:0;" data-bs-toggle="modal" data-bs-target="#viewModal{{ worker.id }}" title="View"><i class="fa-solid fa-eye"></i></button>
+                              <button class="btn btn-sm btn-outline-primary rounded-circle me-1" style="width:32px; height:32px; padding:0;" data-bs-toggle="modal" data-bs-target="#editWorkerModal{{ worker.id }}" title="Edit"><i class="fa-solid fa-pen"></i></button>
                               <form action="{{ url_for('delete_user', user_id=worker.id) }}" method="POST" class="d-inline" onsubmit="return confirm('Delete worker?');">
-                                  <button type="submit" class="btn btn-sm btn-outline-danger" title="Delete"><i class="fa-solid fa-trash"></i></button>
+                                  <button type="submit" class="btn btn-sm btn-outline-danger rounded-circle" style="width:32px; height:32px; padding:0;" title="Delete"><i class="fa-solid fa-trash"></i></button>
                               </form>
                           </td>
                       </tr>
@@ -150,132 +364,144 @@
 
   <!-- CUSTOMERS TAB -->
   <div class="tab-pane fade" id="customers-panel" role="tabpanel">
-    <div class="card border-0 shadow-sm rounded-4 mt-3">
-        <div class="card-body p-4">
-            <h5 class="fw-bold mb-4 text-dark"><i class="fa-solid fa-users text-primary me-2"></i> Manage Customers</h5>
-            
-            <div class="table-responsive">
-                <table class="table table-hover align-middle">
-                    <thead class="table-light text-secondary">
-                        <tr>
-                            <th>Name & Details</th>
-                            <th>Mobile Number</th>
-                            <th>Location / Address</th>
-                            <th>Joined Date</th>
-                            <th>Total Requirements</th>
-                            <th class="text-end">Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for customer in customers %}
-                        <tr>
-                            <td>
-                                <div class="fw-bold text-dark">{{ customer.name }}</div>
-                                <div class="small text-muted"><i class="fa-regular fa-envelope me-1"></i>{{ customer.email or 'No Email' }}</div>
-                            </td>
-                            <td class="fw-bold"><i class="fa-solid fa-phone text-secondary me-1 small"></i>{{ customer.mobile }}</td>
-                            <td class="text-muted small">{{ customer.address or 'No Address Provided' }}</td>
-                            <td>
-                                {% if customer.created_at %}
-                                    <div class="small fw-medium text-dark">{{ customer.created_at.strftime('%d %b %Y') }}</div>
-                                    <div class="text-muted" style="font-size: 0.75rem;"><i class="fa-regular fa-clock me-1"></i>{{ customer.created_at.strftime('%I:%M %p') }}</div>
-                                {% else %}
-                                    <span class="text-muted small">N/A</span>
-                                {% endif %}
-                            </td>
-                            <td>
-                                <span class="badge bg-info bg-opacity-10 text-info border border-info rounded-pill px-3 py-2">
-                                    <i class="fa-solid fa-briefcase me-1"></i> {{ customer_req_counts.get(customer.id, 0) }} Jobs Posted
-                                </span>
-                            </td>
-                            <td class="text-end">
-                                <button class="btn btn-sm btn-outline-info rounded-pill me-1 shadow-sm" data-bs-toggle="modal" data-bs-target="#viewModal{{ customer.id }}">
-                                    <i class="fa-solid fa-eye"></i> View
+    <div class="glass-panel p-4 mt-3">
+        <h5 class="fw-bold mb-4 text-dark"><i class="fa-solid fa-users text-primary me-2"></i> Manage Customers</h5>
+        <div class="table-responsive">
+            <table class="table table-glass table-hover align-middle">
+                <thead>
+                    <tr>
+                        <th>Name & Details</th>
+                        <th>Mobile Number</th>
+                        <th>Location</th>
+                        <th>Joined Date</th>
+                        <th>Total Jobs</th>
+                        <th class="text-end">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for customer in customers %}
+                    <tr>
+                        <td>
+                            <div class="fw-bold text-dark">{{ customer.name }}</div>
+                            <div class="small text-muted"><i class="fa-regular fa-envelope me-1"></i>{{ customer.email or 'No Email' }}</div>
+                        </td>
+                        <td class="fw-bold text-dark"><i class="fa-solid fa-phone text-secondary me-1 small"></i>{{ customer.mobile }}</td>
+                        <td class="text-muted small">{{ customer.address or 'N/A' }}</td>
+                        <td>
+                            {% if customer.created_at %}
+                                <div class="small fw-bold text-dark">{{ customer.created_at.strftime('%d %b %Y') }}</div>
+                                <div class="text-muted" style="font-size: 0.75rem;"><i class="fa-regular fa-clock me-1"></i>{{ customer.created_at.strftime('%I:%M %p') }}</div>
+                            {% else %}
+                                <span class="text-muted small border rounded px-2 bg-light">Legacy</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <span class="badge bg-success bg-opacity-10 text-success border border-success rounded-pill px-3 py-2 shadow-sm">
+                                <i class="fa-solid fa-briefcase me-1"></i> {{ customer_req_counts.get(customer.id, 0) }} Posted
+                            </span>
+                        </td>
+                        <td class="text-end">
+                            <button class="btn btn-sm btn-outline-info rounded-pill me-1 shadow-sm" data-bs-toggle="modal" data-bs-target="#viewModal{{ customer.id }}">
+                                <i class="fa-solid fa-eye"></i>
+                            </button>
+                            <button class="btn btn-sm btn-outline-primary rounded-pill me-1 shadow-sm" data-bs-toggle="modal" data-bs-target="#editCustomerModal{{ customer.id }}">
+                                <i class="fa-solid fa-pen-to-square"></i>
+                            </button>
+                            
+                            <form action="{{ url_for('delete_user', user_id=customer.id) }}" method="POST" class="d-inline" onsubmit="return confirm('WARNING: Kya aap sach me is customer ko delete karna chahte hain? Iska saara data clear ho jayega.');">
+                                <button type="submit" class="btn btn-sm btn-outline-danger rounded-pill shadow-sm">
+                                    <i class="fa-solid fa-trash"></i>
                                 </button>
-                                <button class="btn btn-sm btn-outline-primary rounded-pill me-1 shadow-sm" data-bs-toggle="modal" data-bs-target="#editCustomerModal{{ customer.id }}">
-                                    <i class="fa-solid fa-pen-to-square"></i> Edit
-                                </button>
-                                
-                                <form action="{{ url_for('delete_user', user_id=customer.id) }}" method="POST" class="d-inline" onsubmit="return confirm('WARNING: Kya aap sach me is customer ko delete karna chahte hain? Iska saara data clear ho jayega.');">
-                                    <button type="submit" class="btn btn-sm btn-outline-danger rounded-pill shadow-sm">
-                                        <i class="fa-solid fa-trash"></i> Delete
-                                    </button>
-                                </form>
-                            </td>
-                        </tr>
-                        {% else %}
-                        <tr>
-                            <td colspan="6" class="text-center py-5 text-muted">
-                                <i class="fa-solid fa-folder-open fa-3x mb-3 text-light"></i>
-                                <h6>No Customers Found</h6>
-                            </td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </div>
+                            </form>
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="6" class="text-center py-5 text-muted">
+                            <i class="fa-solid fa-folder-open fa-3x mb-3 text-light"></i>
+                            <h6>No Customers Found</h6>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
         </div>
     </div>
   </div>
 
   <!-- BROADCAST MAIL TAB -->
   <div class="tab-pane fade" id="broadcast-panel">
-      <div class="card border-0 shadow-sm p-4 rounded-4 mt-3">
-          <h5 class="fw-bold mb-3 text-dark"><i class="fa-solid fa-bullhorn text-success me-2"></i> Send Broadcast Notice / Mail with Attachments</h5>
+      <div class="glass-panel p-4 mt-3 border-start border-4 border-success">
+          <h5 class="fw-bold mb-4 text-dark"><i class="fa-solid fa-bullhorn text-success me-2"></i> Send Broadcast Notice / Mail with Attachments</h5>
           <form action="{{ url_for('admin_send_broadcast') }}" method="POST" enctype="multipart/form-data">
-              <div class="mb-3">
-                  <label class="form-label fw-bold text-muted">Target Audience (Kisko bhejna hai?):</label>
-                  <select name="target_role" class="form-control" required>
-                      <option value="all">Sare Users ko (All Users - Customers, Shop Owners, Workers)</option>
-                      <option value="shop_owner">Sirf Shop Owners ko</option>
-                      <option value="customer">Sirf Customers ko</option>
-                      <option value="worker">Sirf Workers ko</option>
-                  </select>
+              <div class="row">
+                  <div class="col-md-6 mb-3">
+                      <label class="form-label fw-bold text-muted small text-uppercase">Target Audience</label>
+                      <select name="target_role" class="form-select shadow-sm border-0" required>
+                          <option value="all">Sare Users ko (Customers, Shop Owners, Workers)</option>
+                          <option value="shop_owner">Sirf Shop Owners ko</option>
+                          <option value="customer">Sirf Customers ko</option>
+                          <option value="worker">Sirf Workers ko</option>
+                      </select>
+                  </div>
+                  
+                  <div class="col-md-6 mb-3">
+                      <label class="form-label fw-bold text-muted small text-uppercase">Email Subject</label>
+                      <input type="text" name="subject" class="form-control shadow-sm border-0" placeholder="e.g. 🚀 Exciting Update on Kaamconnect" required>
+                  </div>
               </div>
               
               <div class="mb-3">
-                  <label class="form-label fw-bold text-muted">Email Subject (Mail ka Title):</label>
-                  <input type="text" name="subject" class="form-control" placeholder="Jaise: 🚀 Exciting Update & New Features on Kaamconnect" required>
-              </div>
-              
-              <div class="mb-3">
-                  <label class="form-label fw-bold text-muted">Message / Notice (Aap kya likhna chahte hain?):</label>
-                  <textarea name="message" class="form-control" rows="6" placeholder="Yahan aap poora message, rules, offers ya notice detail mein likhein..." required></textarea>
+                  <label class="form-label fw-bold text-muted small text-uppercase">Message / Notice content</label>
+                  <textarea name="message" class="form-control shadow-sm border-0" rows="6" placeholder="Yahan aap poora message, rules, offers ya notice detail mein likhein..." required></textarea>
               </div>
 
-              <div class="mb-3">
-                  <label class="form-label fw-bold text-muted">Attach File (Optional - PDF, Image, Doc):</label>
-                  <input type="file" name="attachment" class="form-control">
-                  <small class="text-muted">Aap koi bhi poster, banner ya PDF file attach kar sakte hain.</small>
+              <div class="mb-4">
+                  <label class="form-label fw-bold text-muted small text-uppercase">Attach File (Optional)</label>
+                  <input type="file" name="attachment" class="form-control shadow-sm border-0">
+                  <small class="text-muted"><i class="fa-solid fa-circle-info me-1 mt-2"></i>Aap koi bhi poster, banner ya PDF file attach kar sakte hain.</small>
               </div>
               
-              <button type="submit" class="btn btn-success rounded-pill px-4 py-2 fw-bold">🚀 Send Broadcast Mail Now</button>
+              <button type="submit" class="btn btn-success rounded-pill px-5 py-2 fw-bold shadow">
+                  <i class="fa-solid fa-paper-plane me-2"></i> Send Broadcast Mail Now
+              </button>
           </form>
       </div>
   </div>
 
   <!-- DATABASE TAB -->
   <div class="tab-pane fade" id="alldata">
-      <div class="card border-0 shadow-sm p-3">
+      <div class="glass-panel p-4">
+          <h5 class="fw-bold text-dark mb-4"><i class="fa-solid fa-database text-danger me-2"></i> Full Database View</h5>
           <div class="table-responsive">
-              <table class="table table-sm text-center align-middle" style="font-size: 14px;">
-                  <thead class="table-dark"><tr><th>ID</th><th>Role</th><th>Name</th><th>Mobile</th><th>Joined Date</th><th>Action</th></tr></thead>
+              <table class="table table-sm table-glass table-hover text-center align-middle" style="font-size: 14px;">
+                  <thead><tr><th>DB ID</th><th>Role</th><th>Name</th><th>Mobile</th><th>Joined Date</th><th>Action</th></tr></thead>
                   <tbody>
                       {% for user in all_users %}
                       <tr>
-                          <td>{{ user.id }}</td>
-                          <td><span class="badge bg-secondary">{{ user.role.upper() }}</span></td>
-                          <td>{{ user.name }}</td>
-                          <td>{{ user.mobile }}</td>
+                          <td class="fw-bold text-muted">#{{ user.id }}</td>
                           <td>
+                              {% if user.role == 'admin' %}
+                              <span class="badge bg-danger shadow-sm">{{ user.role.upper() }}</span>
+                              {% elif user.role == 'shop_owner' %}
+                              <span class="badge bg-primary shadow-sm">{{ user.role.upper() }}</span>
+                              {% elif user.role == 'worker' %}
+                              <span class="badge bg-info shadow-sm">{{ user.role.upper() }}</span>
+                              {% else %}
+                              <span class="badge bg-success shadow-sm">{{ user.role.upper() }}</span>
+                              {% endif %}
+                          </td>
+                          <td class="fw-bold text-dark">{{ user.name }}</td>
+                          <td>{{ user.mobile }}</td>
+                          <td class="small">
                               {% if user.created_at %}
                                   {{ user.created_at.strftime('%d %b %Y, %I:%M %p') }}
                               {% else %}
-                                  <span class="text-muted">N/A</span>
+                                  <span class="text-muted">Legacy Record</span>
                               {% endif %}
                           </td>
                           <td>
-                              <button class="btn btn-sm btn-outline-info" data-bs-toggle="modal" data-bs-target="#viewModal{{ user.id }}"><i class="fa-solid fa-eye"></i></button>
+                              <button class="btn btn-sm btn-light border rounded-circle shadow-sm" style="width:30px; height:30px; padding:0;" data-bs-toggle="modal" data-bs-target="#viewModal{{ user.id }}"><i class="fa-solid fa-eye text-primary"></i></button>
                           </td>
                       </tr>
                       {% endfor %}
@@ -291,77 +517,77 @@
 {% for user in all_view_users %}
 <div class="modal fade" id="viewModal{{ user.id }}" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content border-0 shadow rounded-4">
+        <div class="modal-content border-0 shadow-lg rounded-4">
             <div class="modal-header bg-light border-0">
-                <h5 class="modal-title fw-bold text-dark"><i class="fa-solid fa-user-shield text-primary me-2"></i> User Full Details</h5>
+                <h5 class="modal-title fw-bold text-dark"><i class="fa-solid fa-user-shield text-primary me-2"></i> User Profile Profile</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
             <div class="modal-body p-4">
                 <div class="text-center mb-3">
-                    <span class="badge bg-primary px-3 py-2 rounded-pill text-uppercase mb-2">{{ user.role }}</span>
+                    <span class="badge bg-primary px-3 py-2 rounded-pill text-uppercase mb-2 shadow-sm">{{ user.role }}</span>
                     <h4 class="fw-bold text-dark mb-0">{{ user.name }}</h4>
-                    <small class="text-muted">User ID: #{{ user.id }}</small>
+                    <small class="text-muted">Database ID: #{{ user.id }}</small>
                 </div>
                 
                 <hr class="text-muted opacity-25">
 
                 <div class="row g-3">
                     <div class="col-6">
-                        <span class="small text-muted d-block">Mobile Number</span>
+                        <span class="small text-muted d-block text-uppercase fw-bold" style="font-size:0.7rem;">Mobile Number</span>
                         <strong class="text-dark"><i class="fa-solid fa-phone text-secondary me-1"></i>{{ user.mobile }}</strong>
                     </div>
                     <div class="col-6">
-                        <span class="small text-muted d-block">Email Address</span>
+                        <span class="small text-muted d-block text-uppercase fw-bold" style="font-size:0.7rem;">Email Address</span>
                         <strong class="text-dark"><i class="fa-solid fa-envelope text-secondary me-1"></i>{{ user.email or 'Not Provided' }}</strong>
                     </div>
 
                     <div class="col-12">
-                        <span class="small text-muted d-block">Address / Location</span>
+                        <span class="small text-muted d-block text-uppercase fw-bold" style="font-size:0.7rem;">Address / Location</span>
                         <strong class="text-dark"><i class="fa-solid fa-location-dot text-secondary me-1"></i>{{ user.address or 'Not Provided' }}</strong>
                     </div>
 
                     {% if user.role == 'shop_owner' %}
                     <div class="col-6">
-                        <span class="small text-muted d-block">Shop Name</span>
+                        <span class="small text-muted d-block text-uppercase fw-bold" style="font-size:0.7rem;">Shop Name</span>
                         <strong class="text-dark"><i class="fa-solid fa-shop text-secondary me-1"></i>{{ user.shop_name or 'Not Provided' }}</strong>
                     </div>
                     <div class="col-6">
-                        <span class="small text-muted d-block">Wallet Balance</span>
+                        <span class="small text-muted d-block text-uppercase fw-bold" style="font-size:0.7rem;">Wallet Balance</span>
                         <strong class="text-success"><i class="fa-solid fa-wallet me-1"></i>₹{{ user.wallet_balance }}</strong>
                     </div>
                     {% endif %}
 
                     {% if user.role == 'worker' %}
                     <div class="col-6">
-                        <span class="small text-muted d-block">Experience</span>
+                        <span class="small text-muted d-block text-uppercase fw-bold" style="font-size:0.7rem;">Experience</span>
                         <strong class="text-dark"><i class="fa-solid fa-briefcase text-secondary me-1"></i>{{ user.experience or 'Not Provided' }}</strong>
                     </div>
                     <div class="col-6">
-                        <span class="small text-muted d-block">Expertise / Skills</span>
+                        <span class="small text-muted d-block text-uppercase fw-bold" style="font-size:0.7rem;">Expertise / Skills</span>
                         <strong class="text-dark"><i class="fa-solid fa-tools text-secondary me-1"></i>{{ user.expertise or 'Not Provided' }}</strong>
                     </div>
                     {% if user.per_day_amount %}
-                    <div class="col-6">
-                        <span class="small text-muted d-block">Per Day Charges</span>
-                        <strong class="text-success">₹{{ user.per_day_amount }}</strong>
+                    <div class="col-12 mt-2">
+                        <span class="small text-muted d-block text-uppercase fw-bold" style="font-size:0.7rem;">Expected Per Day Charges</span>
+                        <strong class="text-success badge bg-success bg-opacity-10 fs-6 border border-success">₹{{ user.per_day_amount }}</strong>
                     </div>
                     {% endif %}
                     {% endif %}
 
-                    <div class="col-12">
-                        <span class="small text-muted d-block">Signup Date & Time</span>
+                    <div class="col-12 mt-3 pt-3 border-top">
+                        <span class="small text-muted d-block text-uppercase fw-bold" style="font-size:0.7rem;">Signup Date & Time</span>
                         <strong class="text-dark">
                             {% if user.created_at %}
-                                {{ user.created_at.strftime('%d %b %Y, %I:%M %p') }}
+                                <i class="fa-regular fa-calendar-check text-success me-1"></i> {{ user.created_at.strftime('%d %b %Y, %I:%M %p') }}
                             {% else %}
-                                N/A (Old User)
+                                N/A (Legacy System User)
                             {% endif %}
                         </strong>
                     </div>
                 </div>
             </div>
             <div class="modal-footer border-0 bg-light rounded-bottom-4">
-                <button type="button" class="btn btn-secondary rounded-pill px-4" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-secondary rounded-pill px-4 fw-bold shadow-sm" data-bs-dismiss="modal">Close</button>
             </div>
         </div>
     </div>
@@ -372,30 +598,30 @@
 {% for shop in shop_owners %}
 <div class="modal fade" id="editModal{{ shop.id }}" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content border-0 shadow">
+        <div class="modal-content border-0 shadow-lg rounded-4">
             <div class="modal-header bg-light border-0">
-                <h5 class="modal-title fw-bold">Edit {{ shop.name }}</h5>
+                <h5 class="modal-title fw-bold text-dark"><i class="fa-solid fa-pen-to-square text-primary me-2"></i>Edit {{ shop.name }}</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
             <form action="{{ url_for('edit_user', user_id=shop.id) }}" method="POST">
                 <div class="modal-body">
-                    <label class="small fw-bold text-muted">Name</label>
-                    <input type="text" name="name" class="form-control mb-2" value="{{ shop.name }}" required>
+                    <label class="small fw-bold text-muted text-uppercase" style="font-size:0.7rem;">Name</label>
+                    <input type="text" name="name" class="form-control mb-3 shadow-sm border-0 bg-light" value="{{ shop.name }}" required>
                     
-                    <label class="small fw-bold text-muted">Mobile Number</label>
-                    <input type="text" name="mobile" class="form-control mb-2" value="{{ shop.mobile }}" required>
+                    <label class="small fw-bold text-muted text-uppercase" style="font-size:0.7rem;">Mobile Number</label>
+                    <input type="text" name="mobile" class="form-control mb-3 shadow-sm border-0 bg-light" value="{{ shop.mobile }}" required>
                     
-                    <label class="small fw-bold text-muted">Password (Update karein ya khali chhodein)</label>
-                    <input type="password" name="password" class="form-control mb-2" placeholder="New Password (optional)">
+                    <label class="small fw-bold text-muted text-uppercase" style="font-size:0.7rem;">Password (Optional Update)</label>
+                    <input type="password" name="password" class="form-control mb-3 shadow-sm border-0 bg-light" placeholder="New Password (leave empty to keep current)">
                     
-                    <label class="small fw-bold text-muted">Address</label>
-                    <input type="text" name="address" class="form-control mb-3" value="{{ shop.address or '' }}">
+                    <label class="small fw-bold text-muted text-uppercase" style="font-size:0.7rem;">Address</label>
+                    <input type="text" name="address" class="form-control mb-3 shadow-sm border-0 bg-light" value="{{ shop.address or '' }}">
                     
-                    <label class="small fw-bold text-muted">Wallet Balance (₹)</label>
-                    <input type="number" name="wallet_balance" class="form-control mb-2" value="{{ shop.wallet_balance }}">
+                    <label class="small fw-bold text-muted text-uppercase" style="font-size:0.7rem;">Wallet Balance (₹)</label>
+                    <input type="number" name="wallet_balance" class="form-control mb-2 shadow-sm border-0 bg-light fw-bold text-success" value="{{ shop.wallet_balance }}">
                 </div>
-                <div class="modal-footer border-0">
-                    <button type="submit" class="btn btn-dark w-100 rounded-pill">Save Updates</button>
+                <div class="modal-footer border-0 pt-0">
+                    <button type="submit" class="btn btn-primary w-100 rounded-pill fw-bold shadow">Save Updates</button>
                 </div>
             </form>
         </div>
@@ -407,24 +633,24 @@
 {% for worker in workers %}
 <div class="modal fade" id="editWorkerModal{{ worker.id }}" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content border-0 shadow">
+        <div class="modal-content border-0 shadow-lg rounded-4">
             <div class="modal-header bg-light border-0">
-                <h5 class="modal-title fw-bold">Edit Worker: {{ worker.name }}</h5>
+                <h5 class="modal-title fw-bold text-dark"><i class="fa-solid fa-pen-to-square text-info me-2"></i>Edit Worker: {{ worker.name }}</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
             <form action="{{ url_for('edit_user', user_id=worker.id) }}" method="POST">
                 <div class="modal-body">
-                    <label class="small fw-bold text-muted">Name</label>
-                    <input type="text" name="name" class="form-control mb-2" value="{{ worker.name }}" required>
+                    <label class="small fw-bold text-muted text-uppercase" style="font-size:0.7rem;">Name</label>
+                    <input type="text" name="name" class="form-control mb-3 shadow-sm border-0 bg-light" value="{{ worker.name }}" required>
                     
-                    <label class="small fw-bold text-muted">Mobile Number</label>
-                    <input type="text" name="mobile" class="form-control mb-2" value="{{ worker.mobile }}" required>
+                    <label class="small fw-bold text-muted text-uppercase" style="font-size:0.7rem;">Mobile Number</label>
+                    <input type="text" name="mobile" class="form-control mb-3 shadow-sm border-0 bg-light" value="{{ worker.mobile }}" required>
                     
-                    <label class="small fw-bold text-muted">Password (Update karein ya khali chhodein)</label>
-                    <input type="password" name="password" class="form-control mb-2" placeholder="New Password (optional)">
+                    <label class="small fw-bold text-muted text-uppercase" style="font-size:0.7rem;">Password (Optional Update)</label>
+                    <input type="password" name="password" class="form-control mb-2 shadow-sm border-0 bg-light" placeholder="New Password (leave empty to keep current)">
                 </div>
-                <div class="modal-footer border-0">
-                    <button type="submit" class="btn btn-dark w-100 rounded-pill">Save Updates</button>
+                <div class="modal-footer border-0 pt-0">
+                    <button type="submit" class="btn btn-info text-white w-100 rounded-pill fw-bold shadow">Save Updates</button>
                 </div>
             </form>
         </div>
@@ -436,54 +662,54 @@
 {% for customer in customers %}
 <div class="modal fade text-start" id="editCustomerModal{{ customer.id }}" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content rounded-4 border-0 shadow">
-            <div class="modal-header border-0 pb-0">
+        <div class="modal-content rounded-4 border-0 shadow-lg">
+            <div class="modal-header bg-light border-0">
                 <h5 class="modal-title fw-bold text-dark"><i class="fa-solid fa-user-pen text-primary me-2"></i>Edit Customer Details</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
             <form action="{{ url_for('edit_user', user_id=customer.id) }}" method="POST">
-                <div class="modal-body">
+                <div class="modal-body p-4">
                     <div class="mb-3">
-                        <label class="form-label small fw-bold text-muted">Full Name</label>
-                        <div class="input-group">
-                            <span class="input-group-text bg-light"><i class="fa-solid fa-user text-muted"></i></span>
-                            <input type="text" name="name" class="form-control" value="{{ customer.name }}" required>
+                        <label class="form-label small fw-bold text-muted text-uppercase" style="font-size:0.7rem;">Full Name</label>
+                        <div class="input-group shadow-sm rounded">
+                            <span class="input-group-text bg-white border-0"><i class="fa-solid fa-user text-muted"></i></span>
+                            <input type="text" name="name" class="form-control border-0 bg-light" value="{{ customer.name }}" required>
                         </div>
                     </div>
                     <div class="mb-3">
-                        <label class="form-label small fw-bold text-muted">Mobile Number</label>
-                        <div class="input-group">
-                            <span class="input-group-text bg-light"><i class="fa-solid fa-phone text-muted"></i></span>
-                            <input type="text" name="mobile" class="form-control" value="{{ customer.mobile }}" required>
+                        <label class="form-label small fw-bold text-muted text-uppercase" style="font-size:0.7rem;">Mobile Number</label>
+                        <div class="input-group shadow-sm rounded">
+                            <span class="input-group-text bg-white border-0"><i class="fa-solid fa-phone text-muted"></i></span>
+                            <input type="text" name="mobile" class="form-control border-0 bg-light" value="{{ customer.mobile }}" required>
                         </div>
                     </div>
                     
                     <div class="mb-3">
-                        <label class="form-label small fw-bold text-muted">Password (Update karein ya khali chhodein)</label>
-                        <div class="input-group">
-                            <span class="input-group-text bg-light"><i class="fa-solid fa-lock text-muted"></i></span>
-                            <input type="password" name="password" class="form-control" placeholder="New Password (optional)">
+                        <label class="form-label small fw-bold text-muted text-uppercase" style="font-size:0.7rem;">Password (Optional)</label>
+                        <div class="input-group shadow-sm rounded">
+                            <span class="input-group-text bg-white border-0"><i class="fa-solid fa-lock text-muted"></i></span>
+                            <input type="password" name="password" class="form-control border-0 bg-light" placeholder="New Password (optional)">
                         </div>
                     </div>
 
                     <div class="mb-3">
-                        <label class="form-label small fw-bold text-muted">Email Address</label>
-                        <div class="input-group">
-                            <span class="input-group-text bg-light"><i class="fa-solid fa-envelope text-muted"></i></span>
-                            <input type="email" name="email" class="form-control" value="{{ customer.email or '' }}" placeholder="customer@example.com">
+                        <label class="form-label small fw-bold text-muted text-uppercase" style="font-size:0.7rem;">Email Address</label>
+                        <div class="input-group shadow-sm rounded">
+                            <span class="input-group-text bg-white border-0"><i class="fa-solid fa-envelope text-muted"></i></span>
+                            <input type="email" name="email" class="form-control border-0 bg-light" value="{{ customer.email or '' }}" placeholder="customer@example.com">
                         </div>
                     </div>
                     <div class="mb-3">
-                        <label class="form-label small fw-bold text-muted">Address / Location</label>
-                        <div class="input-group">
-                            <span class="input-group-text bg-light"><i class="fa-solid fa-location-dot text-muted"></i></span>
-                            <input type="text" name="address" class="form-control" value="{{ customer.address or '' }}" placeholder="Enter customer city or full address">
+                        <label class="form-label small fw-bold text-muted text-uppercase" style="font-size:0.7rem;">Address / Location</label>
+                        <div class="input-group shadow-sm rounded">
+                            <span class="input-group-text bg-white border-0"><i class="fa-solid fa-location-dot text-muted"></i></span>
+                            <input type="text" name="address" class="form-control border-0 bg-light" value="{{ customer.address or '' }}" placeholder="Enter customer city or full address">
                         </div>
                     </div>
                 </div>
-                <div class="modal-footer border-0 pt-0">
-                    <button type="button" class="btn btn-light rounded-pill px-4 fw-bold" data-bs-dismiss="modal">Cancel</button>
-                    <button type="submit" class="btn btn-primary rounded-pill px-4 fw-bold">Save Changes</button>
+                <div class="modal-footer border-0 pt-0 px-4 pb-4">
+                    <button type="button" class="btn btn-light rounded-pill px-4 fw-bold shadow-sm" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary rounded-pill px-4 fw-bold shadow">Save Changes</button>
                 </div>
             </form>
         </div>
