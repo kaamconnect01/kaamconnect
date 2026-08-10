@@ -125,6 +125,52 @@
         color: white;
         background-color: #0f172a;
     }
+
+    /* =========================================
+       📱 MOBILE SPECIFIC OPTIMIZATIONS
+       (Ensures PC stays EXACTLY the same)
+    ========================================= */
+    @media (max-width: 768px) {
+        /* Make Admin Tabs scrollable horizontally instead of stacking vertically */
+        .admin-tabs {
+            flex-wrap: nowrap !important;
+            overflow-x: auto !important;
+            justify-content: flex-start !important;
+            border-radius: 15px; /* Adjust border radius for scroll */
+            padding-bottom: 5px;
+        }
+        .admin-tabs::-webkit-scrollbar {
+            height: 4px;
+        }
+        .admin-tabs::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+        .admin-tabs .nav-link {
+            white-space: nowrap;
+        }
+
+        /* Compact Analytics Panel */
+        .mobile-chart-divider {
+            border-right: none !important;
+            border-bottom: 1px solid #e2e8f0 !important;
+            padding-bottom: 1.5rem !important;
+            margin-bottom: 1.5rem !important;
+        }
+        
+        /* Compact Tables for Mobile */
+        .table-glass th, .table-glass td {
+            padding: 0.5rem !important;
+            font-size: 0.85rem !important;
+        }
+        
+        .stat-card h1 {
+            font-size: 2rem !important; /* Smaller numbers on mobile */
+        }
+        .stat-icon {
+            font-size: 1.8rem; /* Smaller icon on mobile */
+        }
+    }
 </style>
 
 <!-- Pre-calculate stats for Analytics -->
@@ -138,7 +184,7 @@
             <h4 class="fw-bold mb-1"><i class="fa-solid fa-shield-halved text-warning me-2"></i> Super Admin Portal</h4>
             <p class="mb-0 text-light opacity-75 small">Manage users, jobs, payments, and platform settings.</p>
         </div>
-        <span class="badge bg-danger bg-opacity-25 border border-danger text-danger px-3 py-2 rounded-pill shadow-sm">
+        <span class="badge bg-danger bg-opacity-25 border border-danger text-danger px-3 py-2 rounded-pill shadow-sm d-none d-md-inline-block">
             <i class="fa-solid fa-lock me-1"></i> Restricted Access
         </span>
     </div>
@@ -192,7 +238,7 @@
         </div>
     </div>
     <div class="col-md-6">
-        <div class="glass-panel h-100 p-0 overflow-hidden border-start border-4 border-warning">
+        <div class="glass-panel h-100 p-0 overflow-hidden border-md-start border-4 border-warning">
             <div class="bg-warning bg-opacity-10 text-dark fw-bold p-3 border-bottom border-warning border-opacity-25 d-flex justify-content-between align-items-center">
                 <span><i class="fa-solid fa-clock text-warning me-2"></i> Pending Payment Approvals</span>
                 <span class="badge bg-warning text-dark rounded-pill">{{ pending_requests|length }}</span>
@@ -205,7 +251,7 @@
                         <span class="fw-bold ms-2 text-success fs-5">₹{{ req.amount }}</span><br>
                         <small class="text-muted"><i class="fa-solid fa-hashtag me-1"></i>TRX: {{ req.trx_id }}</small>
                     </div>
-                    <div>
+                    <div class="text-nowrap">
                         <form action="{{ url_for('approve_payment', req_id=req.id, action='approve') }}" method="POST" class="d-inline">
                             <button class="btn btn-sm btn-success rounded-circle shadow-sm me-1" style="width:32px; height:32px;" title="Approve"><i class="fa-solid fa-check"></i></button>
                         </form>
@@ -231,19 +277,19 @@
       
       <!-- Analytics Mini Dashboard -->
       {% if total_users > 0 or total_jobs > 0 %}
-      <div class="glass-panel p-4 mb-4">
-          <div class="d-flex justify-content-between align-items-center mb-4 border-bottom pb-3">
+      <div class="glass-panel p-3 p-md-4 mb-4">
+          <div class="d-flex flex-column flex-md-row justify-content-between align-items-center mb-4 border-bottom pb-3 gap-3">
               <h6 class="fw-bold text-dark mb-0"><i class="fa-solid fa-chart-line text-primary me-2"></i>Platform Health Analytics</h6>
               
               <!-- Toggle Buttons -->
-              <ul class="nav nav-pills analytics-toggle bg-light p-1 rounded-pill shadow-sm" id="viewToggle" role="tablist">
+              <ul class="nav nav-pills analytics-toggle bg-light p-1 rounded-pill shadow-sm flex-nowrap" id="viewToggle" role="tablist">
                   <li class="nav-item" role="presentation">
-                      <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#chartView" type="button">
+                      <button class="nav-link active text-nowrap" data-bs-toggle="tab" data-bs-target="#chartView" type="button">
                           <i class="fa-solid fa-chart-pie me-1"></i> Charts
                       </button>
                   </li>
                   <li class="nav-item" role="presentation">
-                      <button class="nav-link" data-bs-toggle="tab" data-bs-target="#barView" type="button">
+                      <button class="nav-link text-nowrap" data-bs-toggle="tab" data-bs-target="#barView" type="button">
                           <i class="fa-solid fa-bars-progress me-1"></i> Bars
                       </button>
                   </li>
@@ -254,15 +300,15 @@
               <!-- Round Chart View (Doughnut) -->
               <div class="tab-pane fade show active" id="chartView">
                   <div class="row text-center align-items-center justify-content-center">
-                      <div class="col-md-6 mb-4 mb-md-0 d-flex flex-column align-items-center border-end">
+                      <div class="col-md-6 d-flex flex-column align-items-center border-end mobile-chart-divider">
                           <span class="small fw-bold text-dark mb-3 text-uppercase">User Demographics ({{ total_users }})</span>
                           <div style="position: relative; height: 160px; width: 160px; margin: 0 auto;">
                               <canvas id="userChart"></canvas>
                           </div>
-                          <div class="d-flex justify-content-center gap-3 small fw-bold mt-3" style="font-size: 0.75rem;">
-                              <span><i class="fa-solid fa-circle text-primary me-1"></i> Cust ({{customers|length}})</span>
-                              <span><i class="fa-solid fa-circle text-info me-1"></i> Shops ({{shop_owners|length}})</span>
-                              <span><i class="fa-solid fa-circle text-warning me-1"></i> Workers ({{workers|length}})</span>
+                          <div class="d-flex flex-wrap justify-content-center gap-2 gap-md-3 small fw-bold mt-3" style="font-size: 0.75rem;">
+                              <span class="text-nowrap"><i class="fa-solid fa-circle text-primary me-1"></i> Cust ({{customers|length}})</span>
+                              <span class="text-nowrap"><i class="fa-solid fa-circle text-info me-1"></i> Shops ({{shop_owners|length}})</span>
+                              <span class="text-nowrap"><i class="fa-solid fa-circle text-warning me-1"></i> Workers ({{workers|length}})</span>
                           </div>
                       </div>
                       <div class="col-md-6 d-flex flex-column align-items-center">
@@ -270,9 +316,9 @@
                           <div style="position: relative; height: 160px; width: 160px; margin: 0 auto;">
                               <canvas id="jobChart"></canvas>
                           </div>
-                          <div class="d-flex justify-content-center gap-3 small fw-bold mt-3" style="font-size: 0.75rem;">
-                              <span><i class="fa-solid fa-circle text-success me-1"></i> Customer Jobs ({{total_reqs}})</span>
-                              <span><i class="fa-solid fa-circle text-warning me-1"></i> Vacancies ({{total_vacancies}})</span>
+                          <div class="d-flex flex-wrap justify-content-center gap-2 gap-md-3 small fw-bold mt-3" style="font-size: 0.75rem;">
+                              <span class="text-nowrap"><i class="fa-solid fa-circle text-success me-1"></i> Customer Jobs ({{total_reqs}})</span>
+                              <span class="text-nowrap"><i class="fa-solid fa-circle text-warning me-1"></i> Vacancies ({{total_vacancies}})</span>
                           </div>
                       </div>
                   </div>
@@ -281,7 +327,7 @@
               <!-- Progress Bar View -->
               <div class="tab-pane fade" id="barView">
                   <div class="row align-items-center">
-                      <div class="col-md-6 mb-3 mb-md-0 border-end pe-4">
+                      <div class="col-md-6 border-end pe-md-4 mobile-chart-divider">
                           <div class="d-flex justify-content-between small fw-bold mb-2">
                               <span class="text-dark text-uppercase">User Demographics</span>
                               <span class="text-muted">Total: {{ total_users }}</span>
@@ -293,13 +339,13 @@
                               <div class="progress-bar bg-warning" role="progressbar" style="width: {{ (workers|length / total_users * 100)|round }}%" title="Workers"></div>
                               {% endif %}
                           </div>
-                          <div class="d-flex justify-content-between small text-muted mt-1" style="font-size: 0.7rem;">
-                              <span><i class="fa-solid fa-circle text-primary"></i> Cust ({{customers|length}})</span>
-                              <span><i class="fa-solid fa-circle text-info"></i> Shops ({{shop_owners|length}})</span>
-                              <span><i class="fa-solid fa-circle text-warning"></i> Workers ({{workers|length}})</span>
+                          <div class="d-flex flex-wrap justify-content-between small text-muted mt-1 gap-2" style="font-size: 0.7rem;">
+                              <span class="text-nowrap"><i class="fa-solid fa-circle text-primary"></i> Cust ({{customers|length}})</span>
+                              <span class="text-nowrap"><i class="fa-solid fa-circle text-info"></i> Shops ({{shop_owners|length}})</span>
+                              <span class="text-nowrap"><i class="fa-solid fa-circle text-warning"></i> Workers ({{workers|length}})</span>
                           </div>
                       </div>
-                      <div class="col-md-6 ps-4">
+                      <div class="col-md-6 ps-md-4">
                           <div class="d-flex justify-content-between small fw-bold mb-2">
                               <span class="text-dark text-uppercase">Jobs vs Vacancies</span>
                               <span class="text-muted">Total: {{ total_jobs }}</span>
@@ -310,9 +356,9 @@
                               <div class="progress-bar bg-warning" role="progressbar" style="width: {{ (total_vacancies / total_jobs * 100)|round }}%" title="Shop Vacancies"></div>
                               {% endif %}
                           </div>
-                          <div class="d-flex justify-content-between small text-muted mt-1" style="font-size: 0.7rem;">
-                              <span><i class="fa-solid fa-circle text-success"></i> Customer Jobs ({{total_reqs}})</span>
-                              <span><i class="fa-solid fa-circle text-warning"></i> Vacancies ({{total_vacancies}})</span>
+                          <div class="d-flex flex-wrap justify-content-between small text-muted mt-1 gap-2" style="font-size: 0.7rem;">
+                              <span class="text-nowrap"><i class="fa-solid fa-circle text-success"></i> Cust Jobs ({{total_reqs}})</span>
+                              <span class="text-nowrap"><i class="fa-solid fa-circle text-warning"></i> Vacancies ({{total_vacancies}})</span>
                           </div>
                       </div>
                   </div>
@@ -322,34 +368,33 @@
       {% endif %}
 
       <!-- Clickable Stat Cards -->
-      <div class="row text-center g-3">
+      <div class="row text-center g-2 g-md-3">
           <div class="col-6 col-md-3">
-              <div class="card stat-card bg-primary-soft py-4 h-100 rounded-4 shadow-sm border-0" onclick="document.querySelector('[data-bs-target=\'#shops\']').click()">
+              <div class="card stat-card bg-primary-soft py-3 py-md-4 h-100 rounded-4 shadow-sm border-0" onclick="document.querySelector('[data-bs-target=\'#shops\']').click()">
                   <i class="fa-solid fa-shop stat-icon"></i>
                   <h1 class="fw-bold mb-0 display-5">{{ shop_owners|length }}</h1>
-                  <small class="fw-bold text-uppercase" style="letter-spacing: 1px; font-size:0.75rem;">Shop Owners</small>
+                  <small class="fw-bold text-uppercase" style="letter-spacing: 1px; font-size:0.7rem;">Shop Owners</small>
               </div>
           </div>
           <div class="col-6 col-md-3">
-              <div class="card stat-card bg-info-soft py-4 h-100 rounded-4 shadow-sm border-0" onclick="document.querySelector('[data-bs-target=\'#workers\']').click()">
+              <div class="card stat-card bg-info-soft py-3 py-md-4 h-100 rounded-4 shadow-sm border-0" onclick="document.querySelector('[data-bs-target=\'#workers\']').click()">
                   <i class="fa-solid fa-helmet-safety stat-icon"></i>
                   <h1 class="fw-bold mb-0 display-5">{{ workers|length }}</h1>
-                  <small class="fw-bold text-uppercase" style="letter-spacing: 1px; font-size:0.75rem;">Registered Workers</small>
+                  <small class="fw-bold text-uppercase" style="letter-spacing: 1px; font-size:0.7rem;">Workers</small>
               </div>
           </div>
           <div class="col-6 col-md-3">
-              <div class="card stat-card bg-success-soft py-4 h-100 rounded-4 shadow-sm border-0" onclick="document.querySelector('[data-bs-target=\'#customers-panel\']').click()">
+              <div class="card stat-card bg-success-soft py-3 py-md-4 h-100 rounded-4 shadow-sm border-0" onclick="document.querySelector('[data-bs-target=\'#customers-panel\']').click()">
                   <i class="fa-solid fa-briefcase stat-icon"></i>
                   <h1 class="fw-bold mb-0 display-5">{{ total_reqs }}</h1>
-                  <small class="fw-bold text-uppercase" style="letter-spacing: 1px; font-size:0.75rem;">Customer Jobs</small>
+                  <small class="fw-bold text-uppercase" style="letter-spacing: 1px; font-size:0.7rem;">Cust Jobs</small>
               </div>
           </div>
           <div class="col-6 col-md-3">
-              <!-- Using button click for database since vacancies don't have a direct tab -->
-              <div class="card stat-card bg-warning-soft py-4 h-100 rounded-4 shadow-sm border-0" onclick="document.querySelector('[data-bs-target=\'#alldata\']').click()">
+              <div class="card stat-card bg-warning-soft py-3 py-md-4 h-100 rounded-4 shadow-sm border-0" onclick="document.querySelector('[data-bs-target=\'#alldata\']').click()">
                   <i class="fa-solid fa-clipboard-list stat-icon"></i>
                   <h1 class="fw-bold mb-0 display-5">{{ total_vacancies }}</h1>
-                  <small class="fw-bold text-uppercase" style="letter-spacing: 1px; font-size:0.75rem;">Shop Vacancies</small>
+                  <small class="fw-bold text-uppercase" style="letter-spacing: 1px; font-size:0.7rem;">Vacancies</small>
               </div>
           </div>
       </div>
@@ -357,20 +402,20 @@
 
   <!-- SHOPS TAB -->
   <div class="tab-pane fade" id="shops">
-      <div class="glass-panel p-4">
+      <div class="glass-panel p-3 p-md-4">
           <h5 class="fw-bold text-dark mb-4"><i class="fa-solid fa-shop text-primary me-2"></i> Shop Owners Directory</h5>
           <div class="table-responsive">
               <table class="table table-glass table-hover align-middle">
-                  <thead><tr><th>ID</th><th>Shop / Name</th><th>Contact</th><th>Joined Details</th><th>Wallet</th><th class="text-end">Actions</th></tr></thead>
+                  <thead><tr class="text-nowrap"><th>ID</th><th>Shop / Name</th><th>Contact</th><th>Joined Details</th><th>Wallet</th><th class="text-end">Actions</th></tr></thead>
                   <tbody>
                       {% for shop in shop_owners %}
                       <tr>
                           <td><span class="badge bg-secondary rounded-pill">#{{ shop.id }}</span></td>
-                          <td>
+                          <td class="text-nowrap">
                               <div class="fw-bold text-dark">{{ shop.name }}</div>
                           </td>
-                          <td><i class="fa-solid fa-phone text-muted small me-1"></i>{{ shop.mobile }}</td>
-                          <td>
+                          <td class="text-nowrap"><i class="fa-solid fa-phone text-muted small me-1"></i>{{ shop.mobile }}</td>
+                          <td class="text-nowrap">
                               {% if shop.created_at %}
                                   <div class="small fw-bold text-dark">{{ shop.created_at.strftime('%d %b %Y') }}</div>
                                   <div class="text-muted" style="font-size: 0.75rem;"><i class="fa-regular fa-clock me-1"></i>{{ shop.created_at.strftime('%I:%M %p') }}</div>
@@ -379,7 +424,7 @@
                               {% endif %}
                           </td>
                           <td class="text-success fw-bold fs-6">₹{{ shop.wallet_balance }}</td>
-                          <td class="text-end">
+                          <td class="text-end text-nowrap">
                               <button class="btn btn-sm btn-outline-info rounded-circle me-1" style="width:32px; height:32px; padding:0;" data-bs-toggle="modal" data-bs-target="#viewModal{{ shop.id }}" title="View"><i class="fa-solid fa-eye"></i></button>
                               <button class="btn btn-sm btn-outline-primary rounded-circle me-1" style="width:32px; height:32px; padding:0;" data-bs-toggle="modal" data-bs-target="#editModal{{ shop.id }}" title="Edit"><i class="fa-solid fa-pen"></i></button>
                               <form action="{{ url_for('delete_user', user_id=shop.id) }}" method="POST" class="d-inline" onsubmit="return confirm('WARNING: This will delete ALL data related to this shop. Continue?');">
@@ -396,18 +441,18 @@
 
   <!-- WORKERS TAB -->
   <div class="tab-pane fade" id="workers">
-       <div class="glass-panel p-4">
+       <div class="glass-panel p-3 p-md-4">
           <h5 class="fw-bold text-dark mb-4"><i class="fa-solid fa-helmet-safety text-info me-2"></i> Registered Workers</h5>
           <div class="table-responsive">
               <table class="table table-glass table-hover align-middle">
-                  <thead><tr><th>ID</th><th>Worker Name</th><th>Mobile</th><th>Joined Date</th><th class="text-end">Actions</th></tr></thead>
+                  <thead><tr class="text-nowrap"><th>ID</th><th>Worker Name</th><th>Mobile</th><th>Joined Date</th><th class="text-end">Actions</th></tr></thead>
                   <tbody>
                       {% for worker in workers %}
                       <tr>
                           <td><span class="badge bg-secondary rounded-pill">#{{ worker.id }}</span></td>
-                          <td><div class="fw-bold text-dark">{{ worker.name }}</div></td>
-                          <td><i class="fa-solid fa-phone text-muted small me-1"></i>{{ worker.mobile }}</td>
-                          <td>
+                          <td class="text-nowrap"><div class="fw-bold text-dark">{{ worker.name }}</div></td>
+                          <td class="text-nowrap"><i class="fa-solid fa-phone text-muted small me-1"></i>{{ worker.mobile }}</td>
+                          <td class="text-nowrap">
                               {% if worker.created_at %}
                                   <div class="small fw-bold text-dark">{{ worker.created_at.strftime('%d %b %Y') }}</div>
                                   <div class="text-muted" style="font-size: 0.75rem;"><i class="fa-regular fa-clock me-1"></i>{{ worker.created_at.strftime('%I:%M %p') }}</div>
@@ -415,7 +460,7 @@
                                   <span class="text-muted small border rounded px-2 bg-light">Legacy User</span>
                               {% endif %}
                           </td>
-                          <td class="text-end">
+                          <td class="text-end text-nowrap">
                               <button class="btn btn-sm btn-outline-info rounded-circle me-1" style="width:32px; height:32px; padding:0;" data-bs-toggle="modal" data-bs-target="#viewModal{{ worker.id }}" title="View"><i class="fa-solid fa-eye"></i></button>
                               <button class="btn btn-sm btn-outline-primary rounded-circle me-1" style="width:32px; height:32px; padding:0;" data-bs-toggle="modal" data-bs-target="#editWorkerModal{{ worker.id }}" title="Edit"><i class="fa-solid fa-pen"></i></button>
                               <form action="{{ url_for('delete_user', user_id=worker.id) }}" method="POST" class="d-inline" onsubmit="return confirm('Delete worker?');">
@@ -432,12 +477,12 @@
 
   <!-- CUSTOMERS TAB -->
   <div class="tab-pane fade" id="customers-panel" role="tabpanel">
-    <div class="glass-panel p-4 mt-3">
+    <div class="glass-panel p-3 p-md-4 mt-3">
         <h5 class="fw-bold mb-4 text-dark"><i class="fa-solid fa-users text-primary me-2"></i> Manage Customers</h5>
         <div class="table-responsive">
             <table class="table table-glass table-hover align-middle">
                 <thead>
-                    <tr>
+                    <tr class="text-nowrap">
                         <th>Name & Details</th>
                         <th>Mobile Number</th>
                         <th>Location</th>
@@ -449,13 +494,13 @@
                 <tbody>
                     {% for customer in customers %}
                     <tr>
-                        <td>
+                        <td class="text-nowrap">
                             <div class="fw-bold text-dark">{{ customer.name }}</div>
                             <div class="small text-muted"><i class="fa-regular fa-envelope me-1"></i>{{ customer.email or 'No Email' }}</div>
                         </td>
-                        <td class="fw-bold text-dark"><i class="fa-solid fa-phone text-secondary me-1 small"></i>{{ customer.mobile }}</td>
-                        <td class="text-muted small">{{ customer.address or 'N/A' }}</td>
-                        <td>
+                        <td class="fw-bold text-dark text-nowrap"><i class="fa-solid fa-phone text-secondary me-1 small"></i>{{ customer.mobile }}</td>
+                        <td class="text-muted small text-nowrap">{{ customer.address or 'N/A' }}</td>
+                        <td class="text-nowrap">
                             {% if customer.created_at %}
                                 <div class="small fw-bold text-dark">{{ customer.created_at.strftime('%d %b %Y') }}</div>
                                 <div class="text-muted" style="font-size: 0.75rem;"><i class="fa-regular fa-clock me-1"></i>{{ customer.created_at.strftime('%I:%M %p') }}</div>
@@ -463,21 +508,21 @@
                                 <span class="text-muted small border rounded px-2 bg-light">Legacy</span>
                             {% endif %}
                         </td>
-                        <td>
-                            <span class="badge bg-success bg-opacity-10 text-success border border-success rounded-pill px-3 py-2 shadow-sm">
-                                <i class="fa-solid fa-briefcase me-1"></i> {{ customer_req_counts.get(customer.id, 0) }} Posted
+                        <td class="text-nowrap">
+                            <span class="badge bg-success bg-opacity-10 text-success border border-success rounded-pill px-2 py-1 shadow-sm">
+                                <i class="fa-solid fa-briefcase me-1"></i> {{ customer_req_counts.get(customer.id, 0) }} Jobs
                             </span>
                         </td>
-                        <td class="text-end">
-                            <button class="btn btn-sm btn-outline-info rounded-pill me-1 shadow-sm" data-bs-toggle="modal" data-bs-target="#viewModal{{ customer.id }}">
+                        <td class="text-end text-nowrap">
+                            <button class="btn btn-sm btn-outline-info rounded-circle me-1" style="width:32px; height:32px; padding:0;" data-bs-toggle="modal" data-bs-target="#viewModal{{ customer.id }}">
                                 <i class="fa-solid fa-eye"></i>
                             </button>
-                            <button class="btn btn-sm btn-outline-primary rounded-pill me-1 shadow-sm" data-bs-toggle="modal" data-bs-target="#editCustomerModal{{ customer.id }}">
+                            <button class="btn btn-sm btn-outline-primary rounded-circle me-1" style="width:32px; height:32px; padding:0;" data-bs-toggle="modal" data-bs-target="#editCustomerModal{{ customer.id }}">
                                 <i class="fa-solid fa-pen-to-square"></i>
                             </button>
                             
                             <form action="{{ url_for('delete_user', user_id=customer.id) }}" method="POST" class="d-inline" onsubmit="return confirm('WARNING: Kya aap sach me is customer ko delete karna chahte hain? Iska saara data clear ho jayega.');">
-                                <button type="submit" class="btn btn-sm btn-outline-danger rounded-pill shadow-sm">
+                                <button type="submit" class="btn btn-sm btn-outline-danger rounded-circle" style="width:32px; height:32px; padding:0;">
                                     <i class="fa-solid fa-trash"></i>
                                 </button>
                             </form>
@@ -499,7 +544,7 @@
 
   <!-- BROADCAST MAIL TAB -->
   <div class="tab-pane fade" id="broadcast-panel">
-      <div class="glass-panel p-4 mt-3 border-start border-4 border-success">
+      <div class="glass-panel p-3 p-md-4 mt-3 border-start border-4 border-success">
           <h5 class="fw-bold mb-4 text-dark"><i class="fa-solid fa-bullhorn text-success me-2"></i> Send Broadcast Notice / Mail with Attachments</h5>
           <form action="{{ url_for('admin_send_broadcast') }}" method="POST" enctype="multipart/form-data">
               <div class="row">
@@ -530,7 +575,7 @@
                   <small class="text-muted"><i class="fa-solid fa-circle-info me-1 mt-2"></i>Aap koi bhi poster, banner ya PDF file attach kar sakte hain.</small>
               </div>
               
-              <button type="submit" class="btn btn-success rounded-pill px-5 py-2 fw-bold shadow">
+              <button type="submit" class="btn btn-success rounded-pill px-5 py-2 w-100 fw-bold shadow">
                   <i class="fa-solid fa-paper-plane me-2"></i> Send Broadcast Mail Now
               </button>
           </form>
@@ -539,16 +584,16 @@
 
   <!-- DATABASE TAB -->
   <div class="tab-pane fade" id="alldata">
-      <div class="glass-panel p-4">
+      <div class="glass-panel p-3 p-md-4">
           <h5 class="fw-bold text-dark mb-4"><i class="fa-solid fa-database text-danger me-2"></i> Full Database View</h5>
           <div class="table-responsive">
               <table class="table table-sm table-glass table-hover text-center align-middle" style="font-size: 14px;">
-                  <thead><tr><th>DB ID</th><th>Role</th><th>Name</th><th>Mobile</th><th>Joined Date</th><th>Action</th></tr></thead>
+                  <thead><tr class="text-nowrap"><th>DB ID</th><th>Role</th><th>Name</th><th>Mobile</th><th>Joined Date</th><th>Action</th></tr></thead>
                   <tbody>
                       {% for user in all_users %}
                       <tr>
                           <td class="fw-bold text-muted">#{{ user.id }}</td>
-                          <td>
+                          <td class="text-nowrap">
                               {% if user.role == 'admin' %}
                               <span class="badge bg-danger shadow-sm">{{ user.role.upper() }}</span>
                               {% elif user.role == 'shop_owner' %}
@@ -559,9 +604,9 @@
                               <span class="badge bg-success shadow-sm">{{ user.role.upper() }}</span>
                               {% endif %}
                           </td>
-                          <td class="fw-bold text-dark">{{ user.name }}</td>
-                          <td>{{ user.mobile }}</td>
-                          <td class="small">
+                          <td class="fw-bold text-dark text-nowrap">{{ user.name }}</td>
+                          <td class="text-nowrap">{{ user.mobile }}</td>
+                          <td class="small text-nowrap">
                               {% if user.created_at %}
                                   {{ user.created_at.strftime('%d %b %Y, %I:%M %p') }}
                               {% else %}
@@ -587,7 +632,7 @@
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content border-0 shadow-lg rounded-4">
             <div class="modal-header bg-light border-0">
-                <h5 class="modal-title fw-bold text-dark"><i class="fa-solid fa-user-shield text-primary me-2"></i> User Profile Profile</h5>
+                <h5 class="modal-title fw-bold text-dark"><i class="fa-solid fa-user-shield text-primary me-2"></i> User Profile</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
             <div class="modal-body p-4">
@@ -655,7 +700,7 @@
                 </div>
             </div>
             <div class="modal-footer border-0 bg-light rounded-bottom-4">
-                <button type="button" class="btn btn-secondary rounded-pill px-4 fw-bold shadow-sm" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-secondary w-100 rounded-pill px-4 fw-bold shadow-sm" data-bs-dismiss="modal">Close</button>
             </div>
         </div>
     </div>
@@ -775,9 +820,9 @@
                         </div>
                     </div>
                 </div>
-                <div class="modal-footer border-0 pt-0 px-4 pb-4">
-                    <button type="button" class="btn btn-light rounded-pill px-4 fw-bold shadow-sm" data-bs-dismiss="modal">Cancel</button>
-                    <button type="submit" class="btn btn-primary rounded-pill px-4 fw-bold shadow">Save Changes</button>
+                <div class="modal-footer flex-column flex-md-row border-0 pt-0 px-4 pb-4">
+                    <button type="button" class="btn btn-light rounded-pill px-4 fw-bold shadow-sm mb-2 mb-md-0 w-100" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary rounded-pill px-4 fw-bold shadow w-100">Save Changes</button>
                 </div>
             </form>
         </div>
