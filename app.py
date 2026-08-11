@@ -344,7 +344,7 @@ def login():
             if user.role == 'admin':
                 # Auto-fix admin email if missing in DB
                 if not user.email:
-                    user.email = os.environ.get('ADMIN_EMAIL') or os.environ.get('MAIL_USERNAME') or 'admin@kaamconnect.com'
+                    user.email = os.environ.get('ADMIN_EMAIL') or os.environ.get('MAIL_USERNAME') or 'kaamconnect7@gmail.com'
                     db.session.commit()
                 
                 otp = str(random.randint(100000, 999999))
