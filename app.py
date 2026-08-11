@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, url_for, flash, session
+from flask import Flask, render_template, request, redirect, url_for, flash, session, render_template_string
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -6,6 +6,7 @@ from datetime import timedelta, datetime
 from zoneinfo import ZoneInfo
 import os
 import re
+import random
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'super_secret_key_for_local_kaamconnect')
@@ -115,7 +116,7 @@ class Quotation(db.Model):
 def load_user(user_id):
     return User.query.get(int(user_id))
 
-# --- HELPER FUNCTION ---
+# --- HELPER FUNCTIONS ---
 def get_unlock_cost(budget_str):
     try:
         if not budget_str: return 50 
@@ -130,6 +131,39 @@ def get_unlock_cost(budget_str):
     except Exception:
         return 50
 
+def send_otp_email(target_email, otp, context="Security Verification"):
+    try:
+        api_key = os.environ.get('BREVO_API_KEY')
+        sender_email = os.environ.get('MAIL_USERNAME', 'no-reply@kaamconnect.com')
+        if api_key and sender_email:
+            import urllib.request
+            import json
+            url = "https://api.brevo.com/v3/smtp/email"
+            payload = {
+                "sender": {"name": "Kaamconnect System", "email": sender_email},
+                "to": [{"email": target_email}],
+                "subject": f"Your OTP for Kaamconnect {context}",
+                "htmlContent": f"""
+                <div style="font-family: Arial, sans-serif; padding: 20px; border: 1px solid #ddd; border-radius: 8px; text-align: center;">
+                    <h2 style="color: #667eea;">Kaamconnect {context}</h2>
+                    <p style="font-size: 16px;">Apna account verify karne ke liye niche diya gaya OTP enter karein:</p>
+                    <h1 style="color: #333; letter-spacing: 5px; padding: 10px; background: #f4f4f4; border-radius: 5px; display: inline-block;">{otp}</h1>
+                    <p style="color: #e74c3c; font-size: 12px; margin-top: 20px;">Kripya yeh OTP kisi ke sath share na karein.</p>
+                </div>
+                """
+            }
+            headers = {
+                "accept": "application/json",
+                "api-key": api_key,
+                "content-type": "application/json"
+            }
+            req_data = json.dumps(payload).encode('utf-8')
+            req_obj = urllib.request.Request(url, data=req_data, headers=headers, method='POST')
+            with urllib.request.urlopen(req_obj, timeout=5) as response:
+                pass
+    except Exception as e:
+        print(f"OTP Email Error: {e}")
+
 # ================= ADMIN NOTIFICATION FUNCTION =================
 def notify_admin_new_user(user):
     try:
@@ -140,15 +174,12 @@ def notify_admin_new_user(user):
         if api_key and admin_email:
             import urllib.request
             import json
-
             url = "https://api.brevo.com/v3/smtp/email"
-            
             extra_info = ""
             if user.role == 'shop_owner':
                 extra_info = f"<li><b>Shop Name:</b> {getattr(user, 'shop_name', 'N/A')}</li>"
             elif user.role == 'worker':
                 extra_info = f"<li><b>Expertise/Skills:</b> {getattr(user, 'expertise', 'N/A')}</li>"
-
             payload = {
                 "sender": {"name": "Kaamconnect System", "email": sender_email},
                 "to": [{"email": admin_email}],
@@ -178,7 +209,6 @@ def notify_admin_new_user(user):
                 "api-key": api_key,
                 "content-type": "application/json"
             }
-            
             req_data = json.dumps(payload).encode('utf-8')
             req_obj = urllib.request.Request(url, data=req_data, headers=headers, method='POST')
             with urllib.request.urlopen(req_obj, timeout=5) as response:
@@ -218,6 +248,18 @@ def signup():
             flash('Kripya ek valid Email address dalein (jaise name@example.com).', 'danger')
             return redirect(url_for('signup', role=role))
 
+        # FEATURE 2: ADMIN NUMBER BLOCKING SYSTEM
+        restricted_numbers = ["9999999999", "+91 9999999999"]
+        admin_users = User.query.filter_by(role='admin').all()
+        for admin in admin_users:
+            restricted_numbers.append(admin.mobile)
+            if ' ' in admin.mobile:
+                restricted_numbers.append(admin.mobile.split(' ', 1)[1])
+                
+        if raw_mobile in restricted_numbers or f"{country_code} {raw_mobile}" in restricted_numbers:
+            flash('Kripya apna valid mobile number use karein. System admin ka number allowed nahi hai.', 'danger')
+            return redirect(url_for('signup', role=role))
+
         # Combine Country Code and Mobile Number
         mobile = f"{country_code} {raw_mobile}"
 
@@ -226,13 +268,39 @@ def signup():
             flash('Mobile number pehle se registered hai!', 'danger')
             return redirect(url_for('signup', role=role))
 
+        # FEATURE 1: SEND OTP INSTEAD OF SAVING DIRECTLY
         hashed_password = generate_password_hash(password, method='scrypt')
+        
+        otp = str(random.randint(100000, 999999))
+        session['signup_data'] = {
+            'role': role, 'mobile': mobile, 'password': hashed_password,
+            'name': name, 'email': email, 'address': address,
+            'experience': experience, 'expertise': expertise,
+            'shop_name': shop_name, 'per_day_amount': per_day_amount
+        }
+        session['signup_otp'] = otp
+        
+        send_otp_email(email, otp, context="Signup")
+        flash(f'Verification OTP aapke email ({email}) par bhej diya gaya hai.', 'info')
+        
+        return render_template('signup.html', role=role, show_otp=True, email=email)
+        
+    role = request.args.get('role', 'customer')
+    return render_template('signup.html', role=role, show_otp=False)
+
+@app.route('/verify_signup_otp', methods=['POST'])
+def verify_signup_otp():
+    entered_otp = request.form.get('otp', '').strip()
+    
+    if 'signup_otp' in session and entered_otp == session['signup_otp']:
+        # OTP is correct, Create the user
+        data = session.get('signup_data')
         ist_time = datetime.now(ZoneInfo("Asia/Kolkata")).replace(tzinfo=None)
         
         new_user = User(
-            role=role, mobile=mobile, password=hashed_password, name=name,
-            email=email, address=address, experience=experience, expertise=expertise,
-            shop_name=shop_name, per_day_amount=per_day_amount,
+            role=data['role'], mobile=data['mobile'], password=data['password'], name=data['name'],
+            email=data['email'], address=data['address'], experience=data['experience'], expertise=data['expertise'],
+            shop_name=data['shop_name'], per_day_amount=data['per_day_amount'],
             wallet_balance=50, is_available=True, created_at=ist_time
         )
         
@@ -241,19 +309,23 @@ def signup():
         
         notify_admin_new_user(new_user)
         login_user(new_user)
+        
+        # Clear sensitive session data
+        session.pop('signup_otp', None)
+        session.pop('signup_data', None)
 
         if new_user.role == 'shop_owner':
             session['show_welcome_popup'] = True
         
-        flash('Account successfully ban gaya hai aur aap login ho chuke hain!', 'success')
+        flash('Email verified! Account successfully ban gaya hai aur aap login ho chuke hain!', 'success')
         
         if new_user.role == 'customer': return redirect(url_for('customer_dash'))
         elif new_user.role == 'shop_owner': return redirect(url_for('shop_dash'))
         elif new_user.role == 'worker': return redirect(url_for('worker_dash'))
         return redirect(url_for('index'))
-        
-    role = request.args.get('role', 'customer')
-    return render_template('signup.html', role=role)
+    else:
+        flash('Invalid OTP. Kripya sahi OTP dalein.', 'danger')
+        return render_template('signup.html', show_otp=True, email=session.get('signup_data', {}).get('email', ''))
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -262,20 +334,72 @@ def login():
         raw_mobile = request.form.get('mobile', '').strip()
         password = request.form.get('password', '').strip()
         
-        # Check direct mobile or prefixed mobile for login safety
         user = User.query.filter_by(mobile=f"{country_code} {raw_mobile}").first()
         if not user:
             user = User.query.filter_by(mobile=raw_mobile).first()
         
         if user and check_password_hash(user.password, password):
+            # FEATURE 3: ADMIN LOGIN OTP
+            if user.role == 'admin':
+                otp = str(random.randint(100000, 999999))
+                session['admin_login_id'] = user.id
+                session['admin_login_otp'] = otp
+                send_otp_email(user.email, otp, context="Admin Login")
+                flash(f'Admin Security Alert: Ek OTP aapke registered email ({user.email}) par bheja gaya hai.', 'info')
+                return redirect(url_for('verify_admin_otp'))
+            
+            # Normal users login directly
             session.permanent = True
             login_user(user)
             if user.role == 'customer': return redirect(url_for('customer_dash'))
             elif user.role == 'shop_owner': return redirect(url_for('shop_dash'))
             elif user.role == 'worker': return redirect(url_for('worker_dash'))
-            elif user.role == 'admin': return redirect(url_for('admin_dash'))
         flash('Invalid Mobile Number or Password', 'danger')
     return render_template('login.html')
+
+@app.route('/verify_admin_otp', methods=['GET', 'POST'])
+def verify_admin_otp():
+    if 'admin_login_id' not in session:
+        return redirect(url_for('login'))
+        
+    if request.method == 'POST':
+        entered_otp = request.form.get('otp', '').strip()
+        if entered_otp == session.get('admin_login_otp'):
+            user = User.query.get(session['admin_login_id'])
+            session.permanent = True
+            login_user(user)
+            session.pop('admin_login_otp', None)
+            session.pop('admin_login_id', None)
+            flash('Admin authentication successful.', 'success')
+            return redirect(url_for('admin_dash'))
+        else:
+            flash('Invalid OTP entered. Please try again.', 'danger')
+            
+    # Premium Inline UI for Admin OTP
+    html = """
+    {% extends 'base.html' %}
+    {% block content %}
+    <div class="container py-5 mt-5">
+        <div class="row justify-content-center">
+            <div class="col-md-5">
+                <div class="card shadow-lg border-0 p-5 text-center" style="border-radius: 20px; background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(10px);">
+                    <i class="fa-solid fa-shield-halved fa-3x text-primary mb-3"></i>
+                    <h3 class="fw-bold mb-2 text-dark">Admin Verification</h3>
+                    <p class="text-muted small mb-4">Please enter the 6-digit OTP sent to your registered admin email.</p>
+                    <form method="POST">
+                        <input type="text" name="otp" class="form-control text-center fw-bold fs-4 mb-4 shadow-sm" placeholder="• • • • • •" required maxlength="6" style="letter-spacing: 5px; border-radius: 12px; height: 60px;">
+                        <button type="submit" class="btn btn-primary w-100 py-3 fw-bold shadow" style="border-radius: 12px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border: none;">
+                            Verify & Login Securely
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endblock %}
+    """
+    return render_template_string(html)
+
 
 @app.route('/logout')
 @login_required
@@ -331,7 +455,7 @@ def customer_dash():
                                     <li><b>Category:</b> {new_req.category}</li>
                                     <li><b>Budget:</b> ₹{new_req.budget}</li>
                                 </ul>
-                                <p><b>Note:</b> Sirf pehle 3-4 log hi ise unlock kar sakte hain. Jaldi से apna dashboard check karein!</p>
+                                <p><b>Note:</b> Sirf pehle 3-4 log hi ise unlock kar sakte hain. Jaldi se apna dashboard check karein!</p>
                             </body>
                         </html>
                         """
@@ -444,7 +568,7 @@ def unlock_lead(req_id):
         
     already_unlocked = UnlockedLead.query.filter_by(shop_owner_id=current_user.id, requirement_id=req.id).first()
     if already_unlocked:
-        flash('Yeh lead aapne pehle से hi unlock ki hui hai!', 'info')
+        flash('Yeh lead aapne pehle se hi unlock ki hui hai!', 'info')
         return redirect(url_for('shop_dash'))
 
     if current_user.wallet_balance >= credit_cost:
@@ -567,7 +691,6 @@ def delete_user(user_id):
     
     if user:
         try:
-            # Clean up connected Quotations safely
             Quotation.query.filter(Quotation.shop_owner_id == user.id).delete(synchronize_session=False)
 
             if user.role == 'customer':
@@ -644,7 +767,6 @@ def approve_payment(req_id, action):
     if current_user.role != 'admin': return "Unauthorized", 403
     req = PaymentRequest.query.get_or_404(req_id)
     
-    # Anti-Double Processing Safeguard
     if req.status != 'Pending':
         flash('Yeh payment request pehle hi process ho chuki hai.', 'warning')
         return redirect(url_for('admin_dash'))
