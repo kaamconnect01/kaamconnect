@@ -2,309 +2,348 @@
 {% block content %}
 <style>
     /* =========================================
-       PREMIUM SAAS INPUT REDESIGN (NON-SCROLL)
+       PREMIUM GLASSMORPHISM SAAS REDESIGN
        ========================================= */
     :root {
-        --indigo-primary: #4f46e5;
-        --indigo-hover: #4338ca;
-        --indigo-light: #eef2ff;
-        --input-border: #cbd5e1;
-        --input-focus: #4f46e5;
+        --glass-bg: rgba(255, 255, 255, 0.85);
+        --glass-border: rgba(255, 255, 255, 0.5);
+        --glass-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.15);
+        
+        --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        --hover-gradient: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
+        
+        --input-bg: rgba(255, 255, 255, 0.9);
+        --input-border: rgba(102, 126, 234, 0.3);
+        --input-focus: #667eea;
     }
 
-    body {
-        background-color: #f4f6fb;
-        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-    }
-
-    .auth-card {
-        background: #ffffff;
+    /* Animated Colorful Background for the page wrapper */
+    .animated-bg-wrapper {
+        background: linear-gradient(-45deg, #ee7752, #e73c7e, #23a6d5, #23d5ab);
+        background-size: 400% 400%;
+        animation: gradientBG 12s ease infinite;
+        min-height: 90vh;
         border-radius: 20px;
-        box-shadow: 0 15px 35px rgba(79, 70, 229, 0.08);
-        border: 1px solid rgba(79, 70, 229, 0.06);
+        display: flex;
+        align-items: center;
+        padding: 2rem 0;
+        margin: 1rem 0;
     }
 
-    /* Compact Role Grid Cards */
+    @keyframes gradientBG {
+        0% { background-position: 0% 50%; }
+        50% { background-position: 100% 50%; }
+        100% { background-position: 0% 50%; }
+    }
+
+    /* Glassmorphism Card */
+    .auth-glass-card {
+        background: var(--glass-bg);
+        backdrop-filter: blur(16px);
+        -webkit-backdrop-filter: blur(16px);
+        border: 1px solid var(--glass-border);
+        border-radius: 24px;
+        box-shadow: var(--glass-shadow);
+        overflow: hidden;
+    }
+
+    /* Compact Role Grid Cards (Glass Theme) */
     .role-card {
-        border: 2px solid #e2e8f0;
-        border-radius: 12px;
+        border: 2px solid transparent;
+        border-radius: 16px;
         cursor: pointer;
-        transition: all 0.2s ease;
-        background-color: #ffffff;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        background: rgba(255, 255, 255, 0.6);
+        box-shadow: 0 4px 15px rgba(0,0,0,0.04);
+        position: relative;
+        overflow: hidden;
     }
     
     .role-card:hover {
-        border-color: #cbd5e1;
-        background-color: #fafbfc;
+        background: rgba(255, 255, 255, 0.9);
+        transform: translateY(-3px);
+        box-shadow: 0 8px 20px rgba(0,0,0,0.08);
     }
     
     .role-card.active {
-        border-color: var(--indigo-primary);
-        background-color: var(--indigo-light);
-        box-shadow: 0 4px 12px rgba(79, 70, 229, 0.1);
+        border-color: #667eea;
+        background: #ffffff;
+        box-shadow: 0 8px 25px rgba(102, 126, 234, 0.25);
     }
     
+    .role-card.active::before {
+        content: '';
+        position: absolute;
+        top: 0; left: 0; right: 0;
+        height: 4px;
+        background: var(--primary-gradient);
+    }
+
     .role-icon-box {
-        width: 38px;
-        height: 38px;
-        border-radius: 10px;
-        background-color: #f1f5f9;
+        width: 45px;
+        height: 45px;
+        border-radius: 12px;
+        background: rgba(102, 126, 234, 0.1);
         display: flex;
         align-items: center;
         justify-content: center;
-        transition: all 0.2s ease;
+        transition: all 0.3s ease;
+        font-size: 1.2rem;
     }
     
     .role-card.active .role-icon-box {
-        background-color: var(--indigo-primary);
+        background: var(--primary-gradient);
         color: white !important;
+        transform: scale(1.1);
     }
 
-    /* Premium Modern Input Styling */
-    .input-group-text {
-        background-color: #f8fafc;
+    /* Premium Modern Glass Inputs */
+    .glass-input-group {
+        background: var(--input-bg);
+        border-radius: 12px;
         border: 1.5px solid var(--input-border);
-        border-right: none;
-        border-radius: 10px 0 0 10px;
-        color: #64748b;
-        font-size: 0.85rem;
-        transition: all 0.2s ease;
+        overflow: hidden;
+        transition: all 0.3s ease;
     }
 
-    .custom-input {
-        border-radius: 0 10px 10px 0;
-        padding: 8px 12px;
-        border: 1.5px solid var(--input-border);
-        border-left: none;
-        font-size: 0.86rem;
-        background-color: #ffffff;
-        color: #1e293b;
-        transition: all 0.2s ease;
-    }
-
-    /* Single inputs without addon groups */
-    .custom-input-standalone {
-        border-radius: 10px;
-        padding: 8px 12px;
-        border: 1.5px solid var(--input-border);
-        font-size: 0.86rem;
-        background-color: #ffffff;
-        color: #1e293b;
-        transition: all 0.2s ease;
-    }
-
-    .custom-input:focus, .custom-input-standalone:focus {
+    .glass-input-group:focus-within {
         border-color: var(--input-focus);
-        box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.12);
-        background-color: #ffffff;
-        outline: none;
+        box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.15);
+        background: #ffffff;
     }
 
-    /* When input is focused, style its addon box too */
-    .input-group:focus-within .input-group-text {
-        border-color: var(--input-focus);
-        color: var(--indigo-primary);
-        background-color: #eef2ff;
-    }
-
-    .btn-indigo {
-        background: linear-gradient(135deg, #4f46e5 0%, #4338ca 100%);
-        color: white;
+    .glass-input-group .input-group-text {
+        background: transparent;
         border: none;
-        transition: all 0.2s ease;
+        color: #64748b;
     }
     
-    .btn-indigo:hover {
-        background: linear-gradient(135deg, #4338ca 0%, #3730a3 100%);
-        color: white;
-        box-shadow: 0 6px 16px rgba(79, 70, 229, 0.25);
+    .glass-input-group:focus-within .input-group-text {
+        color: var(--input-focus);
     }
 
-    .badge-pill {
-        display: inline-block;
-        padding: 4px 12px;
-        background-color: var(--indigo-light);
-        color: var(--indigo-primary);
+    .glass-input-group .form-control, 
+    .glass-input-group .form-select {
+        border: none;
+        background: transparent;
+        color: #1e293b;
+        font-size: 0.9rem;
+    }
+
+    .glass-input-group .form-control:focus, 
+    .glass-input-group .form-select:focus {
+        box-shadow: none;
+        background: transparent;
+    }
+
+    /* Primary Gradient Button */
+    .btn-gradient {
+        background: var(--primary-gradient);
+        color: white;
+        border: none;
+        border-radius: 12px;
+        transition: all 0.3s ease;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+    
+    .btn-gradient:hover {
+        background: var(--hover-gradient);
+        color: white;
+        transform: translateY(-2px);
+        box-shadow: 0 10px 20px rgba(102, 126, 234, 0.4);
+    }
+
+    .glass-badge {
+        background: rgba(255, 255, 255, 0.7);
+        color: #764ba2;
+        border: 1px solid rgba(118, 75, 162, 0.2);
+        padding: 5px 15px;
         border-radius: 50px;
         font-weight: 700;
-        font-size: 0.7rem;
+        font-size: 0.75rem;
+        letter-spacing: 1px;
         text-transform: uppercase;
-        letter-spacing: 0.5px;
     }
 
-    @keyframes fadeIn {
-        0% { opacity: 0; transform: translateY(6px); }
+    @keyframes slideUpFade {
+        0% { opacity: 0; transform: translateY(15px); }
         100% { opacity: 1; transform: translateY(0); }
     }
     .dynamic-field-anim {
-        animation: fadeIn 0.25s ease forwards;
+        animation: slideUpFade 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
     }
 </style>
 
-<div class="container py-3">
-    <div class="row justify-content-center">
-        <div class="col-lg-9 col-xl-8">
-            
-            <div class="auth-card p-3 p-md-4">
-                
-                <!-- Header -->
-                <div class="text-center mb-3">
-                    <span class="badge-pill mb-1">Kaamconnect</span>
-                    <h4 class="fw-bold text-dark mb-1" style="font-size: 1.35rem;">Create Your Account</h4>
-                    <p class="text-muted small mb-0" style="font-size: 0.8rem;">Select your profile type to proceed instantly.</p>
+<div class="container py-2">
+    <!-- Animated Gradient Background Wrapper -->
+    <div class="animated-bg-wrapper shadow-lg">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-lg-10 col-xl-9">
+                    
+                    <div class="auth-glass-card p-4 p-md-5">
+                        
+                        <!-- Header -->
+                        <div class="text-center mb-4">
+                            <span class="glass-badge mb-2 d-inline-block">Kaamconnect</span>
+                            <h3 class="fw-bold text-dark mb-1" style="letter-spacing: -0.5px;">Join the Network</h3>
+                            <p class="text-muted small mb-0" style="font-size: 0.9rem;">Select your profile type to proceed instantly.</p>
+                        </div>
+
+                        <!-- Fixed: Added action method -->
+                        <form method="POST" action="">
+                            
+                            <!-- Role Selection (Horizontal Compact Grid) -->
+                            <div class="mb-4">
+                                <label class="form-label fw-bold text-uppercase text-secondary mb-3 d-block text-center" style="font-size: 0.75rem; letter-spacing: 1px;">Choose Profile Category</label>
+                                <div class="row g-3">
+                                    
+                                    <div class="col-4">
+                                        <div class="role-card text-center p-3 h-100 d-flex flex-column align-items-center justify-content-center" id="card_customer" onclick="selectRole('customer')">
+                                            <div class="role-icon-box mb-2 text-primary">
+                                                <i class="fa-solid fa-user-tie"></i>
+                                            </div>
+                                            <h6 class="fw-bold text-dark mb-1" style="font-size: 0.85rem;">Customer</h6>
+                                            <span class="text-muted d-none d-md-block" style="font-size: 0.7rem;">Kaam karwana hai</span>
+                                            <input type="radio" name="role" id="role_customer" value="customer" required class="d-none">
+                                        </div>
+                                    </div>
+
+                                    <div class="col-4">
+                                        <div class="role-card text-center p-3 h-100 d-flex flex-column align-items-center justify-content-center" id="card_shop_owner" onclick="selectRole('shop_owner')">
+                                            <div class="role-icon-box mb-2 text-success">
+                                                <i class="fa-solid fa-shop"></i>
+                                            </div>
+                                            <h6 class="fw-bold text-dark mb-1" style="font-size: 0.85rem;">Shop Owner</h6>
+                                            <span class="text-muted d-none d-md-block" style="font-size: 0.7rem;">Business & Leads</span>
+                                            <input type="radio" name="role" id="role_shop_owner" value="shop_owner" class="d-none">
+                                        </div>
+                                    </div>
+
+                                    <div class="col-4">
+                                        <div class="role-card text-center p-3 h-100 d-flex flex-column align-items-center justify-content-center" id="card_worker" onclick="selectRole('worker')">
+                                            <div class="role-icon-box mb-2 text-warning">
+                                                <i class="fa-solid fa-helmet-safety"></i>
+                                            </div>
+                                            <h6 class="fw-bold text-dark mb-1" style="font-size: 0.85rem;">Skilled Worker</h6>
+                                            <span class="text-muted d-none d-md-block" style="font-size: 0.7rem;">Daily/Monthly Job</span>
+                                            <input type="radio" name="role" id="role_worker" value="worker" class="d-none">
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </div>
+
+                            <!-- Common Credentials Section -->
+                            <div id="commonCredentials" style="display: none;" class="dynamic-field-anim mb-3">
+                                <div class="p-3 rounded-4" style="background: rgba(255,255,255,0.4);">
+                                    <div class="row g-3">
+                                        <div class="col-md-4">
+                                            <label class="form-label text-secondary mb-1" style="font-size: 0.75rem; font-weight: 600;">Full Name</label>
+                                            <div class="input-group glass-input-group">
+                                                <span class="input-group-text"><i class="fa-solid fa-user"></i></span>
+                                                <input type="text" name="name" class="form-control" required placeholder="Full name">
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <label class="form-label text-secondary mb-1" style="font-size: 0.75rem; font-weight: 600;">Mobile Number</label>
+                                            <div class="input-group glass-input-group">
+                                                <select name="country_code" id="country_code" class="form-select px-2" style="max-width: 95px; border-right: 1px solid var(--input-border); border-radius: 0;">
+                                                    <option value="+91" selected>+91 (IN)</option>
+                                                    <option value="+1">+1 (US)</option>
+                                                    <option value="+44">+44 (UK)</option>
+                                                    <option value="+971">+971 (UAE)</option>
+                                                    <option value="+61">+61 (AU)</option>
+                                                </select>
+                                                <input type="tel" name="mobile" class="form-control" required placeholder="Mobile number" pattern="[0-9]{7,15}" title="Enter a valid mobile number (7 to 15 digits)">
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <label class="form-label text-secondary mb-1" style="font-size: 0.75rem; font-weight: 600;">Password</label>
+                                            <div class="input-group glass-input-group">
+                                                <span class="input-group-text"><i class="fa-solid fa-lock"></i></span>
+                                                <input type="password" name="password" class="form-control" required placeholder="Create password">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Professional / Details Section -->
+                            <div id="proFields" style="display: none;" class="dynamic-field-anim mb-3">
+                                <div class="p-3 rounded-4" style="background: rgba(255,255,255,0.4);">
+                                    
+                                    <!-- Shop Name Input Field -->
+                                    <div class="mb-3" id="shopNameContainer" style="display: none;">
+                                        <label class="form-label text-secondary mb-1" style="font-size: 0.75rem; font-weight: 600;">Shop / Business Name</label>
+                                        <div class="input-group glass-input-group">
+                                            <span class="input-group-text"><i class="fa-solid fa-shop"></i></span>
+                                            <input type="text" name="shop_name" id="shopNameInput" class="form-control" placeholder="Enter shop/business name">
+                                        </div>
+                                    </div>
+
+                                    <div class="row g-3">
+                                        <div class="col-md-6">
+                                            <label class="form-label text-secondary mb-1" style="font-size: 0.75rem; font-weight: 600;">Expertise / Skill</label>
+                                            <div class="input-group glass-input-group">
+                                                <span class="input-group-text"><i class="fa-solid fa-screwdriver-wrench"></i></span>
+                                                <input type="text" name="expertise" id="expertInput" class="form-control" placeholder="e.g. Electrician, Painter">
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="form-label text-secondary mb-1" style="font-size: 0.75rem; font-weight: 600;">Experience (Years)</label>
+                                            <div class="input-group glass-input-group">
+                                                <span class="input-group-text"><i class="fa-solid fa-star"></i></span>
+                                                <input type="text" name="experience" id="expInput" class="form-control" placeholder="e.g. 4">
+                                            </div>
+                                        </div>
+                                        
+                                        <!-- BUG FIXED HERE: Removed hardcoded 'required' from HTML. It is now handled by JavaScript -->
+                                        <div class="col-md-6">
+                                            <label class="form-label text-secondary mb-1" style="font-size: 0.75rem; font-weight: 600;">Email Address <span class="text-danger">*</span></label>
+                                            <div class="input-group glass-input-group">
+                                                <span class="input-group-text"><i class="fa-solid fa-envelope"></i></span>
+                                                <input type="email" name="email" id="emailInput" class="form-control" placeholder="name@example.com" pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$">
+                                            </div>
+                                        </div>
+
+                                        <div class="col-md-6" id="workerFields" style="display: none;">
+                                            <label class="form-label text-secondary mb-1" style="font-size: 0.75rem; font-weight: 600;">Expected Daily Wage (₹)</label>
+                                            <div class="input-group glass-input-group">
+                                                <span class="input-group-text"><i class="fa-solid fa-indian-rupee-sign"></i></span>
+                                                <input type="number" name="per_day_amount" id="wageInput" class="form-control" placeholder="e.g. 700">
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="col-12">
+                                            <label class="form-label text-secondary mb-1" style="font-size: 0.75rem; font-weight: 600;">Address / Location</label>
+                                            <div class="input-group glass-input-group">
+                                                <span class="input-group-text"><i class="fa-solid fa-location-dot"></i></span>
+                                                <input type="text" name="address" id="addressInput" class="form-control" placeholder="Gali, Shop No, City, State...">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Submit Button -->
+                            <div id="actionContainer" style="display: none;" class="dynamic-field-anim mt-4">
+                                <button type="submit" class="btn btn-gradient w-100 py-3 fw-bold shadow-sm" style="font-size: 1rem;">
+                                    Create My Account <i class="fa-solid fa-arrow-right ms-2"></i>
+                                </button>
+                            </div>
+                            
+                            <div class="text-center mt-4">
+                                <p class="text-dark small mb-0" style="font-size: 0.85rem; font-weight: 500;">
+                                    Already have an account? <a href="{{ url_for('login') }}" class="fw-bold text-decoration-none" style="color: #4338ca;">Sign in here</a>
+                                </p>
+                            </div>
+                        </form>
+                    </div>
+
                 </div>
-
-                <form method="POST">
-                    
-                    <!-- Role Selection (Horizontal Compact Grid) -->
-                    <div class="mb-3">
-                        <label class="form-label fw-bold text-uppercase text-secondary mb-2 d-block text-center" style="font-size: 0.72rem; letter-spacing: 0.5px;">Choose Profile Category</label>
-                        <div class="row g-2">
-                            
-                            <div class="col-4">
-                                <div class="role-card text-center p-2" id="card_customer" onclick="selectRole('customer')">
-                                    <div class="role-icon-box mx-auto mb-1 text-primary">
-                                        <i class="fa-solid fa-user-tie"></i>
-                                    </div>
-                                    <h6 class="fw-bold text-dark mb-0" style="font-size: 0.82rem;">Customer</h6>
-                                    <span class="text-muted d-none d-md-block" style="font-size: 0.68rem;">Kaam karwana hai</span>
-                                    <input type="radio" name="role" id="role_customer" value="customer" required class="d-none">
-                                </div>
-                            </div>
-
-                            <div class="col-4">
-                                <div class="role-card text-center p-2" id="card_shop_owner" onclick="selectRole('shop_owner')">
-                                    <div class="role-icon-box mx-auto mb-1 text-success">
-                                        <i class="fa-solid fa-shop"></i>
-                                    </div>
-                                    <h6 class="fw-bold text-dark mb-0" style="font-size: 0.82rem;">Shop Owner</h6>
-                                    <span class="text-muted d-none d-md-block" style="font-size: 0.68rem;">Business & Leads</span>
-                                    <input type="radio" name="role" id="role_shop_owner" value="shop_owner" class="d-none">
-                                </div>
-                            </div>
-
-                            <div class="col-4">
-                                <div class="role-card text-center p-2" id="card_worker" onclick="selectRole('worker')">
-                                    <div class="role-icon-box mx-auto mb-1 text-warning">
-                                        <i class="fa-solid fa-helmet-safety"></i>
-                                    </div>
-                                    <h6 class="fw-bold text-dark mb-0" style="font-size: 0.82rem;">Skilled Worker</h6>
-                                    <span class="text-muted d-none d-md-block" style="font-size: 0.68rem;">Daily/Monthly Job</span>
-                                    <input type="radio" name="role" id="role_worker" value="worker" class="d-none">
-                                </div>
-                            </div>
-
-                        </div>
-                    </div>
-
-                    <!-- Common Credentials Section (Premium Icon Inputs) -->
-                    <div id="commonCredentials" style="display: none;" class="dynamic-field-anim mb-2">
-                        <div class="p-2 p-md-3 rounded-3 border bg-white shadow-sm">
-                            <div class="row g-2">
-                                <div class="col-md-4">
-                                    <label class="form-label text-secondary mb-1" style="font-size: 0.73rem; font-weight: 600;">Full Name</label>
-                                    <div class="input-group">
-                                        <span class="input-group-text"><i class="fa-solid fa-user"></i></span>
-                                        <input type="text" name="name" class="form-control custom-input" required placeholder="Full name">
-                                    </div>
-                                </div>
-                                <div class="col-md-4">
-                                    <label class="form-label text-secondary mb-1" style="font-size: 0.73rem; font-weight: 600;">Mobile Number</label>
-                                    <div class="input-group">
-                                        <label class="input-group-text px-2" for="country_code" style="background:#f8fafc; font-size:0.8rem;">
-                                            <i class="fa-solid fa-globe me-1"></i>
-                                        </label>
-                                        <select name="country_code" id="country_code" class="form-select px-1" style="max-width: 95px; font-size: 0.8rem; border-radius: 0; border: 1.5px solid var(--input-border); border-left: none; border-right: none;">
-                                            <option value="+91" selected>+91 (IN)</option>
-                                            <option value="+1">+1 (US)</option>
-                                            <option value="+44">+44 (UK)</option>
-                                            <option value="+971">+971 (UAE)</option>
-                                            <option value="+61">+61 (AU)</option>
-                                            <option value="+1">+1 (CA)</option>
-                                            <option value="+49">+49 (DE)</option>
-                                            <option value="+33">+33 (FR)</option>
-                                            <option value="+81">+81 (JP)</option>
-                                            <option value="+65">+65 (SG)</option>
-                                            <option value="+966">+966 (SA)</option>
-                                        </select>
-                                        <input type="tel" name="mobile" class="form-control custom-input" required placeholder="Mobile number" pattern="[0-9]{7,15}" title="Enter a valid mobile number (7 to 15 digits)">
-                                    </div>
-                                </div>
-                                <div class="col-md-4">
-                                    <label class="form-label text-secondary mb-1" style="font-size: 0.73rem; font-weight: 600;">Password</label>
-                                    <div class="input-group">
-                                        <span class="input-group-text"><i class="fa-solid fa-lock"></i></span>
-                                        <input type="password" name="password" class="form-control custom-input" required placeholder="Password">
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Professional / Details Section (Premium Inputs with Icons) -->
-                    <div id="proFields" style="display: none;" class="dynamic-field-anim mb-2">
-                        <div class="p-2 p-md-3 rounded-3 border bg-white shadow-sm">
-                            
-                            <!-- Shop Name Input Field (Shown ONLY for Shop Owners) -->
-                            <div class="mb-2" id="shopNameContainer" style="display: none;">
-                                <label class="form-label text-secondary mb-1" style="font-size: 0.73rem; font-weight: 600;">Shop / Business Name</label>
-                                <div class="input-group">
-                                    <span class="input-group-text"><i class="fa-solid fa-shop"></i></span>
-                                    <input type="text" name="shop_name" id="shopNameInput" class="form-control custom-input" placeholder="Enter shop/business name">
-                                </div>
-                            </div>
-
-                            <div class="row g-2">
-                                <div class="col-md-6">
-                                    <label class="form-label text-secondary mb-1" style="font-size: 0.73rem; font-weight: 600;">Expertise / Skill</label>
-                                    <div class="input-group">
-                                        <span class="input-group-text"><i class="fa-solid fa-screwdriver-wrench"></i></span>
-                                        <input type="text" name="expertise" id="expertInput" class="form-control custom-input" placeholder="e.g. Electrician, Painter">
-                                    </div>
-                                </div>
-                                <div class="col-md-6">
-                                    <label class="form-label text-secondary mb-1" style="font-size: 0.73rem; font-weight: 600;">Experience (Years)</label>
-                                    <div class="input-group">
-                                        <span class="input-group-text"><i class="fa-solid fa-star"></i></span>
-                                        <input type="text" name="experience" id="expInput" class="form-control custom-input" placeholder="e.g. 4">
-                                    </div>
-                                </div>
-                                <div class="col-md-6">
-                                    <label class="form-label text-secondary mb-1" style="font-size: 0.73rem; font-weight: 600;">Email Address <span class="text-danger">*</span></label>
-                                    <div class="input-group">
-                                        <span class="input-group-text"><i class="fa-solid fa-envelope"></i></span>
-                                        <input type="email" name="email" class="form-control custom-input" required placeholder="name@example.com" pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$" title="Please enter a valid email address (e.g., name@example.com)">
-                                    </div>
-                                </div>
-                                <div class="col-md-6" id="workerFields" style="display: none;">
-                                    <label class="form-label text-secondary mb-1" style="font-size: 0.73rem; font-weight: 600;">Expected Daily Wage (₹)</label>
-                                    <div class="input-group">
-                                        <span class="input-group-text"><i class="fa-solid fa-indian-rupee-sign"></i></span>
-                                        <input type="number" name="per_day_amount" id="wageInput" class="form-control custom-input" placeholder="e.g. 700">
-                                    </div>
-                                </div>
-                                <div class="col-12">
-                                    <label class="form-label text-secondary mb-1" style="font-size: 0.73rem; font-weight: 600;">Address / Location</label>
-                                    <div class="input-group">
-                                        <span class="input-group-text"><i class="fa-solid fa-location-dot"></i></span>
-                                        <input type="text" name="address" id="addressInput" class="form-control custom-input" placeholder="Gali, Shop No, City, State...">
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Submit Button -->
-                    <div id="actionContainer" style="display: none;" class="dynamic-field-anim mt-3">
-                        <button type="submit" class="btn btn-indigo w-100 py-2 fw-bold rounded-3 shadow-sm" style="font-size: 0.95rem;">Create Account</button>
-                    </div>
-                    
-                    <div class="text-center mt-3">
-                        <p class="text-muted small mb-0" style="font-size: 0.8rem;">Already have an account? <a href="{{ url_for('login') }}" class="text-indigo fw-bold text-decoration-none">Sign in here</a></p>
-                    </div>
-                </form>
             </div>
-
         </div>
     </div>
 </div>
@@ -322,41 +361,56 @@
         const commonCredentials = document.getElementById('commonCredentials');
         const proFields = document.getElementById('proFields');
         const shopNameContainer = document.getElementById('shopNameContainer');
-        const shopNameInput = document.getElementById('shopNameInput');
         const workerFields = document.getElementById('workerFields');
         const actionContainer = document.getElementById('actionContainer');
         
-        const reqInputs = [document.getElementById('addressInput'), document.getElementById('expInput'), document.getElementById('expertInput')];
+        // Input Fields (Bug fixed here: added emailInput and properly handling required attributes)
+        const shopNameInput = document.getElementById('shopNameInput');
         const wageInput = document.getElementById('wageInput');
+        const emailInput = document.getElementById('emailInput');
+        const reqInputs = [document.getElementById('addressInput'), document.getElementById('expInput'), document.getElementById('expertInput')];
 
         // Show sections
         commonCredentials.style.display = 'block';
         actionContainer.style.display = 'block';
 
-        // 4. Role logic adaptation
+        // 4. Role logic adaptation (Very Important: Adding/Removing 'required' dynamically prevents form blocking)
         if (role === 'customer') {
             proFields.style.display = 'none';
             shopNameContainer.style.display = 'none';
             workerFields.style.display = 'none';
+            
+            // Remove required from all hidden fields so form submits properly
             shopNameInput.removeAttribute('required');
-            reqInputs.forEach(input => input.removeAttribute('required'));
+            emailInput.removeAttribute('required');
             wageInput.removeAttribute('required');
+            reqInputs.forEach(input => input.removeAttribute('required'));
         } 
         else if (role === 'shop_owner') {
             proFields.style.display = 'block';
             shopNameContainer.style.display = 'block'; // Shop name shown for shop owner
             workerFields.style.display = 'none';       // Wage hidden for shop owner
+            
+            // Set required for shown fields
             shopNameInput.setAttribute('required', 'true');
+            emailInput.setAttribute('required', 'true');
             reqInputs.forEach(input => input.setAttribute('required', 'true'));
+            
+            // Remove required for hidden fields
             wageInput.removeAttribute('required');
         } 
         else if (role === 'worker') {
             proFields.style.display = 'block';
-            shopNameContainer.style.display = 'none';  // Shop name removed for worker
+            shopNameContainer.style.display = 'none';  // Shop name hidden for worker
             workerFields.style.display = 'block';      // Wage shown for worker
-            shopNameInput.removeAttribute('required');
-            reqInputs.forEach(input => input.setAttribute('required', 'true'));
+            
+            // Set required for shown fields
+            emailInput.setAttribute('required', 'true');
             wageInput.setAttribute('required', 'true');
+            reqInputs.forEach(input => input.setAttribute('required', 'true'));
+            
+            // Remove required for hidden fields
+            shopNameInput.removeAttribute('required');
         }
     }
 </script>
