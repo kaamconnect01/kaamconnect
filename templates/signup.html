@@ -191,10 +191,11 @@
                             <p class="text-muted small mb-0" style="font-size: 0.9rem;">Select your profile type to proceed instantly.</p>
                         </div>
 
-                        <!-- Fixed: Added action method -->
+                        <!-- Error Message / Flash messages will appear above the form beautifully if any -->
+                        
                         <form method="POST" action="">
                             
-                            <!-- Role Selection (Horizontal Compact Grid) -->
+                            <!-- Role Selection -->
                             <div class="mb-4">
                                 <label class="form-label fw-bold text-uppercase text-secondary mb-3 d-block text-center" style="font-size: 0.75rem; letter-spacing: 1px;">Choose Profile Category</label>
                                 <div class="row g-3">
@@ -235,37 +236,53 @@
                                 </div>
                             </div>
 
-                            <!-- Common Credentials Section -->
+                            <!-- Common Credentials Section (Email added here for ALL roles) -->
                             <div id="commonCredentials" style="display: none;" class="dynamic-field-anim mb-3">
                                 <div class="p-3 rounded-4" style="background: rgba(255,255,255,0.4);">
                                     <div class="row g-3">
-                                        <div class="col-md-4">
-                                            <label class="form-label text-secondary mb-1" style="font-size: 0.75rem; font-weight: 600;">Full Name</label>
+                                        
+                                        <!-- Name -->
+                                        <div class="col-md-6">
+                                            <label class="form-label text-secondary mb-1" style="font-size: 0.75rem; font-weight: 600;">Full Name <span class="text-danger">*</span></label>
                                             <div class="input-group glass-input-group">
                                                 <span class="input-group-text"><i class="fa-solid fa-user"></i></span>
                                                 <input type="text" name="name" class="form-control" required placeholder="Full name">
                                             </div>
                                         </div>
-                                        <div class="col-md-4">
-                                            <label class="form-label text-secondary mb-1" style="font-size: 0.75rem; font-weight: 600;">Mobile Number</label>
+                                        
+                                        <!-- Email (Now visible to everyone to fix backend error) -->
+                                        <div class="col-md-6">
+                                            <label class="form-label text-secondary mb-1" style="font-size: 0.75rem; font-weight: 600;">Email Address <span class="text-danger">*</span></label>
                                             <div class="input-group glass-input-group">
-                                                <select name="country_code" id="country_code" class="form-select px-2" style="max-width: 95px; border-right: 1px solid var(--input-border); border-radius: 0;">
-                                                    <option value="+91" selected>+91 (IN)</option>
-                                                    <option value="+1">+1 (US)</option>
-                                                    <option value="+44">+44 (UK)</option>
-                                                    <option value="+971">+971 (UAE)</option>
-                                                    <option value="+61">+61 (AU)</option>
-                                                </select>
-                                                <input type="tel" name="mobile" class="form-control" required placeholder="Mobile number" pattern="[0-9]{7,15}" title="Enter a valid mobile number (7 to 15 digits)">
+                                                <span class="input-group-text"><i class="fa-solid fa-envelope"></i></span>
+                                                <input type="email" name="email" class="form-control" required placeholder="name@example.com" pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$">
                                             </div>
                                         </div>
-                                        <div class="col-md-4">
-                                            <label class="form-label text-secondary mb-1" style="font-size: 0.75rem; font-weight: 600;">Password</label>
+
+                                        <!-- Mobile Number -->
+                                        <div class="col-md-6">
+                                            <label class="form-label text-secondary mb-1" style="font-size: 0.75rem; font-weight: 600;">Mobile Number <span class="text-danger">*</span></label>
+                                            <div class="input-group glass-input-group">
+                                                <select name="country_code" id="country_code" class="form-select px-2" style="max-width: 95px; border-right: 1px solid var(--input-border); border-radius: 0;">
+                                                    <option value="+91" selected>+91</option>
+                                                    <option value="+1">+1</option>
+                                                    <option value="+44">+44</option>
+                                                    <option value="+971">+971</option>
+                                                    <option value="+61">+61</option>
+                                                </select>
+                                                <input type="tel" name="mobile" class="form-control" required placeholder="Mobile number" pattern="[0-9]{7,15}" title="Enter a valid mobile number">
+                                            </div>
+                                        </div>
+                                        
+                                        <!-- Password -->
+                                        <div class="col-md-6">
+                                            <label class="form-label text-secondary mb-1" style="font-size: 0.75rem; font-weight: 600;">Password <span class="text-danger">*</span></label>
                                             <div class="input-group glass-input-group">
                                                 <span class="input-group-text"><i class="fa-solid fa-lock"></i></span>
                                                 <input type="password" name="password" class="form-control" required placeholder="Create password">
                                             </div>
                                         </div>
+
                                     </div>
                                 </div>
                             </div>
@@ -276,7 +293,7 @@
                                     
                                     <!-- Shop Name Input Field -->
                                     <div class="mb-3" id="shopNameContainer" style="display: none;">
-                                        <label class="form-label text-secondary mb-1" style="font-size: 0.75rem; font-weight: 600;">Shop / Business Name</label>
+                                        <label class="form-label text-secondary mb-1" style="font-size: 0.75rem; font-weight: 600;">Shop / Business Name <span class="text-danger">*</span></label>
                                         <div class="input-group glass-input-group">
                                             <span class="input-group-text"><i class="fa-solid fa-shop"></i></span>
                                             <input type="text" name="shop_name" id="shopNameInput" class="form-control" placeholder="Enter shop/business name">
@@ -285,39 +302,31 @@
 
                                     <div class="row g-3">
                                         <div class="col-md-6">
-                                            <label class="form-label text-secondary mb-1" style="font-size: 0.75rem; font-weight: 600;">Expertise / Skill</label>
+                                            <label class="form-label text-secondary mb-1" style="font-size: 0.75rem; font-weight: 600;">Expertise / Skill <span class="text-danger">*</span></label>
                                             <div class="input-group glass-input-group">
                                                 <span class="input-group-text"><i class="fa-solid fa-screwdriver-wrench"></i></span>
                                                 <input type="text" name="expertise" id="expertInput" class="form-control" placeholder="e.g. Electrician, Painter">
                                             </div>
                                         </div>
+                                        
                                         <div class="col-md-6">
-                                            <label class="form-label text-secondary mb-1" style="font-size: 0.75rem; font-weight: 600;">Experience (Years)</label>
+                                            <label class="form-label text-secondary mb-1" style="font-size: 0.75rem; font-weight: 600;">Experience (Years) <span class="text-danger">*</span></label>
                                             <div class="input-group glass-input-group">
                                                 <span class="input-group-text"><i class="fa-solid fa-star"></i></span>
                                                 <input type="text" name="experience" id="expInput" class="form-control" placeholder="e.g. 4">
                                             </div>
                                         </div>
                                         
-                                        <!-- BUG FIXED HERE: Removed hardcoded 'required' from HTML. It is now handled by JavaScript -->
-                                        <div class="col-md-6">
-                                            <label class="form-label text-secondary mb-1" style="font-size: 0.75rem; font-weight: 600;">Email Address <span class="text-danger">*</span></label>
-                                            <div class="input-group glass-input-group">
-                                                <span class="input-group-text"><i class="fa-solid fa-envelope"></i></span>
-                                                <input type="email" name="email" id="emailInput" class="form-control" placeholder="name@example.com" pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$">
-                                            </div>
-                                        </div>
-
                                         <div class="col-md-6" id="workerFields" style="display: none;">
-                                            <label class="form-label text-secondary mb-1" style="font-size: 0.75rem; font-weight: 600;">Expected Daily Wage (₹)</label>
+                                            <label class="form-label text-secondary mb-1" style="font-size: 0.75rem; font-weight: 600;">Expected Daily Wage (₹) <span class="text-danger">*</span></label>
                                             <div class="input-group glass-input-group">
                                                 <span class="input-group-text"><i class="fa-solid fa-indian-rupee-sign"></i></span>
                                                 <input type="number" name="per_day_amount" id="wageInput" class="form-control" placeholder="e.g. 700">
                                             </div>
                                         </div>
                                         
-                                        <div class="col-12">
-                                            <label class="form-label text-secondary mb-1" style="font-size: 0.75rem; font-weight: 600;">Address / Location</label>
+                                        <div class="col-12" id="addressContainer">
+                                            <label class="form-label text-secondary mb-1" style="font-size: 0.75rem; font-weight: 600;">Address / Location <span class="text-danger">*</span></label>
                                             <div class="input-group glass-input-group">
                                                 <span class="input-group-text"><i class="fa-solid fa-location-dot"></i></span>
                                                 <input type="text" name="address" id="addressInput" class="form-control" placeholder="Gali, Shop No, City, State...">
@@ -362,55 +371,58 @@
         const proFields = document.getElementById('proFields');
         const shopNameContainer = document.getElementById('shopNameContainer');
         const workerFields = document.getElementById('workerFields');
+        const addressContainer = document.getElementById('addressContainer');
         const actionContainer = document.getElementById('actionContainer');
         
-        // Input Fields (Bug fixed here: added emailInput and properly handling required attributes)
+        // Input Fields (No email here since it's universally required now)
         const shopNameInput = document.getElementById('shopNameInput');
         const wageInput = document.getElementById('wageInput');
-        const emailInput = document.getElementById('emailInput');
         const reqInputs = [document.getElementById('addressInput'), document.getElementById('expInput'), document.getElementById('expertInput')];
 
-        // Show sections
+        // Always show the common credentials (Name, Email, Mobile, Password)
         commonCredentials.style.display = 'block';
         actionContainer.style.display = 'block';
 
-        // 4. Role logic adaptation (Very Important: Adding/Removing 'required' dynamically prevents form blocking)
+        // 4. Role logic adaptation 
         if (role === 'customer') {
             proFields.style.display = 'none';
             shopNameContainer.style.display = 'none';
             workerFields.style.display = 'none';
             
-            // Remove required from all hidden fields so form submits properly
+            // Remove required from ALL hidden pro fields for Customer
             shopNameInput.removeAttribute('required');
-            emailInput.removeAttribute('required');
             wageInput.removeAttribute('required');
             reqInputs.forEach(input => input.removeAttribute('required'));
         } 
         else if (role === 'shop_owner') {
             proFields.style.display = 'block';
-            shopNameContainer.style.display = 'block'; // Shop name shown for shop owner
-            workerFields.style.display = 'none';       // Wage hidden for shop owner
+            shopNameContainer.style.display = 'block'; 
+            workerFields.style.display = 'none';       
             
             // Set required for shown fields
             shopNameInput.setAttribute('required', 'true');
-            emailInput.setAttribute('required', 'true');
             reqInputs.forEach(input => input.setAttribute('required', 'true'));
             
             // Remove required for hidden fields
             wageInput.removeAttribute('required');
+            
+            // Full width for address to make it look balanced
+            addressContainer.className = "col-12";
         } 
         else if (role === 'worker') {
             proFields.style.display = 'block';
-            shopNameContainer.style.display = 'none';  // Shop name hidden for worker
-            workerFields.style.display = 'block';      // Wage shown for worker
+            shopNameContainer.style.display = 'none';  
+            workerFields.style.display = 'block';      
             
             // Set required for shown fields
-            emailInput.setAttribute('required', 'true');
             wageInput.setAttribute('required', 'true');
             reqInputs.forEach(input => input.setAttribute('required', 'true'));
             
             // Remove required for hidden fields
             shopNameInput.removeAttribute('required');
+            
+            // Adjust grid for Worker to fit Daily Wage nicely
+            addressContainer.className = "col-md-6"; 
         }
     }
 </script>
