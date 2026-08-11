@@ -132,6 +132,9 @@ def get_unlock_cost(budget_str):
         return 50
 
 def send_otp_email(target_email, otp, context="Security Verification"):
+    if not target_email:
+        print("OTP Email Error: Target email is empty or None.")
+        return
     try:
         api_key = os.environ.get('BREVO_API_KEY')
         sender_email = os.environ.get('MAIL_USERNAME', 'no-reply@kaamconnect.com')
@@ -293,7 +296,6 @@ def verify_signup_otp():
     entered_otp = request.form.get('otp', '').strip()
     
     if 'signup_otp' in session and entered_otp == session['signup_otp']:
-        # OTP is correct, Create the user
         data = session.get('signup_data')
         ist_time = datetime.now(ZoneInfo("Asia/Kolkata")).replace(tzinfo=None)
         
@@ -310,7 +312,6 @@ def verify_signup_otp():
         notify_admin_new_user(new_user)
         login_user(new_user)
         
-        # Clear sensitive session data
         session.pop('signup_otp', None)
         session.pop('signup_data', None)
 
@@ -341,6 +342,11 @@ def login():
         if user and check_password_hash(user.password, password):
             # FEATURE 3: ADMIN LOGIN OTP
             if user.role == 'admin':
+                # Auto-fix admin email if missing in DB
+                if not user.email:
+                    user.email = os.environ.get('ADMIN_EMAIL') or os.environ.get('MAIL_USERNAME') or 'admin@kaamconnect.com'
+                    db.session.commit()
+                
                 otp = str(random.randint(100000, 999999))
                 session['admin_login_id'] = user.id
                 session['admin_login_otp'] = otp
@@ -375,7 +381,6 @@ def verify_admin_otp():
         else:
             flash('Invalid OTP entered. Please try again.', 'danger')
             
-    # Premium Inline UI for Admin OTP
     html = """
     {% extends 'base.html' %}
     {% block content %}
@@ -399,7 +404,6 @@ def verify_admin_otp():
     {% endblock %}
     """
     return render_template_string(html)
-
 
 @app.route('/logout')
 @login_required
@@ -428,7 +432,6 @@ def customer_dash():
         db.session.add(new_req)
         db.session.commit()
 
-        # Brevo HTTP Email Notification
         try:
             shop_owners = User.query.filter_by(role='shop_owner', is_available=True).all()
             recipient_emails = [shop.email for shop in shop_owners if shop.email]
@@ -568,7 +571,7 @@ def unlock_lead(req_id):
         
     already_unlocked = UnlockedLead.query.filter_by(shop_owner_id=current_user.id, requirement_id=req.id).first()
     if already_unlocked:
-        flash('Yeh lead aapne pehle se hi unlock ki hui hai!', 'info')
+        flash('Yeh lead aapne pehle से hi unlock ki hui hai!', 'info')
         return redirect(url_for('shop_dash'))
 
     if current_user.wallet_balance >= credit_cost:
@@ -591,7 +594,7 @@ def unlock_lead(req_id):
         db.session.commit()
         flash(f'Lead successfully unlock ho gayi hai aur Quotation bhej diya gaya hai! {credit_cost} Credits deduct hue hain.', 'success')
     else:
-        flash('Aapke wallet me sufficiant credits nahi hain. Please recharge karein.', 'danger')
+        flash('Aapke wallet me sufficient credits nahi hain. Please recharge karein.', 'danger')
         
     return redirect(url_for('shop_dash'))
 
@@ -788,12 +791,17 @@ def approve_payment(req_id, action):
 # --- HELPER & SYSTEM ROUTES ---
 @app.route('/create_admin')
 def create_admin():
-    if not User.query.filter_by(role='admin').first():
+    admin = User.query.filter_by(role='admin').first()
+    if not admin:
         hashed_pw = generate_password_hash('admin123', method='scrypt')
         admin = User(role='admin', name='Super Admin', mobile='9999999999', email='admin@kaamconnect.com', password=hashed_pw, address='Head Office')
         db.session.add(admin)
         db.session.commit()
         return "Admin account created successfully! Mobile: 9999999999, Pass: admin123"
+    elif not admin.email:
+        admin.email = 'admin@kaamconnect.com'
+        db.session.commit()
+        return "Admin email updated successfully to admin@kaamconnect.com!"
     return "Admin already exists! Disabled for security.", 403
 
 @app.route('/reset_db_danger_123')
