@@ -145,22 +145,33 @@
 <script type="text/javascript">
 var Tawk_API = Tawk_API || {}, Tawk_LoadStart = new Date();
 
-<!-- Agar user login hai, toh uska naam aur mobile automatic Tawk.to par chala jayega -->
 {% if current_user.is_authenticated %}
-Tawk_API.visitor = {
-    name: '{{ current_user.name }}',
-    email: '{{ current_user.email or "" }}',
-    phone: '{{ current_user.mobile }}'
-};
+    // 1. Initial Visitor Setup
+    Tawk_API.visitor = {
+        name: '{{ current_user.name }} {% if current_user.role %}({{ current_user.role|title }}){% endif %}',
+        email: '{{ current_user.email | default(current_user.mobile ~ "@kaamconnect.com", true) }}'
+    };
+
+    // 2. Forcefully update data in Tawk.to dashboard once the chat loads
+    Tawk_API.onLoad = function(){
+        Tawk_API.setAttributes({
+            'name': '{{ current_user.name }} {% if current_user.role %}- {{ current_user.role|title }}{% endif %}',
+            'phone': '{{ current_user.mobile }}',
+            'email': '{{ current_user.email | default("", true) }}'
+        }, function (error) {
+            // Error handling if any (usually silent)
+        });
+    };
 {% endif %}
 
+// Main Tawk.to Script Loader
 (function(){
-var s1=document.createElement("script"),s0=document.getElementsByTagName("script")[0];
-s1.async=true;
-s1.src='https://embed.tawk.to/6a5492355f6a5d1d45915ac3/1jtd5m8l3';
-s1.charset='UTF-8';
-s1.setAttribute('crossorigin','*');
-s0.parentNode.insertBefore(s1,s0);
+    var s1=document.createElement("script"),s0=document.getElementsByTagName("script")[0];
+    s1.async=true;
+    s1.src='https://embed.tawk.to/6a5492355f6a5d1d45915ac3/1jtd5m8l3';
+    s1.charset='UTF-8';
+    s1.setAttribute('crossorigin','*');
+    s0.parentNode.insertBefore(s1,s0);
 })();
 </script>
     
