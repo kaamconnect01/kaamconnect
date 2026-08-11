@@ -219,6 +219,22 @@ def notify_admin_new_user(user):
     except Exception as e:
         print(f"Admin notification mail error: {e}")
 
+# ================= ADMIN STRICT SESSION SECURITY =================
+@app.before_request
+def restrict_admin_session():
+    if current_user.is_authenticated and current_user.role == 'admin':
+        login_time = session.get('admin_login_time')
+        # Agar admin login kiye hue 2 ghante (7200 seconds) se zyada ho gaye hain ya background se wapas khola hai, toh session expire kar do
+        if not login_time or (datetime.utcnow().timestamp() - login_time > 7200):
+            logout_user()
+            session.pop('admin_login_time', None)
+            flash('Admin session expired for security. Please login again.', 'warning')
+            return redirect(url_for('login'))
+
+@app.before_request
+def make_session_permanent():
+    session.permanent = True
+
 # ================= ROUTES =================
 @app.route('/')
 def index():
@@ -372,8 +388,9 @@ def verify_admin_otp():
         entered_otp = request.form.get('otp', '').strip()
         if entered_otp == session.get('admin_login_otp'):
             user = User.query.get(session['admin_login_id'])
-            session.permanent = True
+            session.permanent = False  # Admin session permanent nahi rahega
             login_user(user)
+            session['admin_login_time'] = datetime.utcnow().timestamp()  # Login timestamp store karenge
             session.pop('admin_login_otp', None)
             session.pop('admin_login_id', None)
             flash('Admin authentication successful.', 'success')
@@ -391,8 +408,8 @@ def verify_admin_otp():
                     <i class="fa-solid fa-shield-halved fa-3x text-primary mb-3"></i>
                     <h3 class="fw-bold mb-2 text-dark">Admin Verification</h3>
                     <p class="text-muted small mb-4">Please enter the 6-digit OTP sent to your registered admin email.</p>
-                    <form method="POST">
-                        <input type="text" name="otp" class="form-control text-center fw-bold fs-4 mb-4 shadow-sm" placeholder="• • • • • •" required maxlength="6" style="letter-spacing: 5px; border-radius: 12px; height: 60px;">
+                    <form method="POST" id="adminOtpForm">
+                        <input type="text" name="otp" id="otpInput" class="form-control text-center fw-bold fs-4 mb-4 shadow-sm" placeholder="• • • • • •" required maxlength="6" style="letter-spacing: 5px; border-radius: 12px; height: 60px;">
                         <button type="submit" class="btn btn-primary w-100 py-3 fw-bold shadow" style="border-radius: 12px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border: none;">
                             Verify & Login Securely
                         </button>
@@ -401,6 +418,14 @@ def verify_admin_otp():
             </div>
         </div>
     </div>
+    <script>
+        // Jaise hi 6 digits pure honge, OTP automatically submit ho jayega
+        document.getElementById('otpInput').addEventListener('input', function(e) {
+            if (this.value.trim().length === 6) {
+                document.getElementById('adminOtpForm').submit();
+            }
+        });
+    </script>
     {% endblock %}
     """
     return render_template_string(html)
@@ -408,6 +433,7 @@ def verify_admin_otp():
 @app.route('/logout')
 @login_required
 def logout():
+    session.pop('admin_login_time', None)
     logout_user()
     flash('Logged out successfully.', 'info')
     return redirect(url_for('index'))
@@ -571,7 +597,7 @@ def unlock_lead(req_id):
         
     already_unlocked = UnlockedLead.query.filter_by(shop_owner_id=current_user.id, requirement_id=req.id).first()
     if already_unlocked:
-        flash('Yeh lead aapne pehle से hi unlock ki hui hai!', 'info')
+        flash('Yeh lead aapne pehle se hi unlock ki hui hai!', 'info')
         return redirect(url_for('shop_dash'))
 
     if current_user.wallet_balance >= credit_cost:
@@ -1006,10 +1032,6 @@ def registered_shops():
 def shop_detail(shop_id):
     shop = User.query.get_or_404(shop_id)
     return render_template('shop_detail.html', shop=shop)
-
-@app.before_request
-def make_session_permanent():
-    session.permanent = True
 
 with app.app_context():
     db.create_all()
