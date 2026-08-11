@@ -184,14 +184,46 @@
                     
                     <div class="auth-glass-card p-4 p-md-5">
                         
+                        <!-- OTP VERIFICATION BLOCK -->
+                        {% if show_otp %}
+                        <div class="text-center mb-4">
+                            <span class="glass-badge mb-2 d-inline-block bg-white text-primary border-primary">Security Check</span>
+                            <h3 class="fw-bold text-dark mb-1" style="letter-spacing: -0.5px;">Verify Your Email</h3>
+                            <p class="text-muted small mb-0" style="font-size: 0.95rem;">Humne aapke email <b>{{ email }}</b> par ek 6-digit OTP bheja hai.</p>
+                        </div>
+
+                        <form method="POST" action="{{ url_for('verify_signup_otp') }}">
+                            <div class="mb-4 d-flex justify-content-center">
+                                <div class="col-md-8">
+                                    <div class="input-group glass-input-group p-1">
+                                        <span class="input-group-text"><i class="fa-solid fa-key"></i></span>
+                                        <input type="text" name="otp" class="form-control text-center fw-bold fs-4" required placeholder="• • • • • •" maxlength="6" style="letter-spacing: 4px;">
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="d-flex justify-content-center">
+                                <div class="col-md-8">
+                                    <button type="submit" class="btn btn-gradient w-100 py-3 fw-bold shadow-sm" style="font-size: 1rem;">
+                                        Verify OTP & Create Account <i class="fa-solid fa-check-circle ms-2"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            
+                            <div class="text-center mt-4">
+                                <a href="{{ url_for('signup', role=role) }}" class="text-decoration-none text-secondary small"><i class="fa-solid fa-arrow-left me-1"></i> Back to Form</a>
+                            </div>
+                        </form>
+
+                        <!-- ORIGINAL REGISTRATION FORM BLOCK -->
+                        {% else %}
+                        
                         <!-- Header -->
                         <div class="text-center mb-4">
                             <span class="glass-badge mb-2 d-inline-block">Kaamconnect</span>
                             <h3 class="fw-bold text-dark mb-1" style="letter-spacing: -0.5px;">Join the Network</h3>
                             <p class="text-muted small mb-0" style="font-size: 0.9rem;">Select your profile type to proceed instantly.</p>
                         </div>
-
-                        <!-- Error Message / Flash messages will appear above the form beautifully if any -->
                         
                         <form method="POST" action="">
                             
@@ -339,7 +371,7 @@
                             <!-- Submit Button -->
                             <div id="actionContainer" style="display: none;" class="dynamic-field-anim mt-4">
                                 <button type="submit" class="btn btn-gradient w-100 py-3 fw-bold shadow-sm" style="font-size: 1rem;">
-                                    Create My Account <i class="fa-solid fa-arrow-right ms-2"></i>
+                                    Proceed for Verification <i class="fa-solid fa-arrow-right ms-2"></i>
                                 </button>
                             </div>
                             
@@ -349,6 +381,7 @@
                                 </p>
                             </div>
                         </form>
+                        {% endif %}
                     </div>
 
                 </div>
@@ -357,14 +390,25 @@
     </div>
 </div>
 
+<!-- Only run script if normal form is showing -->
+{% if not show_otp %}
 <script>
+    // Ensure that selected role persists if page reloads with flash message
+    document.addEventListener("DOMContentLoaded", function() {
+        const urlParams = new URLSearchParams(window.location.search);
+        let activeRole = urlParams.get('role') || '{{ role }}' || 'customer';
+        selectRole(activeRole);
+    });
+
     function selectRole(role) {
         // 1. Reset active card classes
         document.querySelectorAll('.role-card').forEach(card => card.classList.remove('active'));
         
         // 2. Select corresponding hidden radio & activate card
-        document.getElementById('role_' + role).checked = true;
-        document.getElementById('card_' + role).classList.add('active');
+        const roleRadio = document.getElementById('role_' + role);
+        const roleCard = document.getElementById('card_' + role);
+        if(roleRadio) roleRadio.checked = true;
+        if(roleCard) roleCard.classList.add('active');
 
         // 3. DOM references
         const commonCredentials = document.getElementById('commonCredentials');
@@ -374,14 +418,14 @@
         const addressContainer = document.getElementById('addressContainer');
         const actionContainer = document.getElementById('actionContainer');
         
-        // Input Fields (No email here since it's universally required now)
+        // Input Fields
         const shopNameInput = document.getElementById('shopNameInput');
         const wageInput = document.getElementById('wageInput');
         const reqInputs = [document.getElementById('addressInput'), document.getElementById('expInput'), document.getElementById('expertInput')];
 
         // Always show the common credentials (Name, Email, Mobile, Password)
-        commonCredentials.style.display = 'block';
-        actionContainer.style.display = 'block';
+        if(commonCredentials) commonCredentials.style.display = 'block';
+        if(actionContainer) actionContainer.style.display = 'block';
 
         // 4. Role logic adaptation 
         if (role === 'customer') {
@@ -426,4 +470,5 @@
         }
     }
 </script>
+{% endif %}
 {% endblock %}
