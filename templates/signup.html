@@ -32,6 +32,60 @@
         overflow: hidden;
     }
 
+    /* Choice Cards Styling */
+    .signup-choice-card {
+        border: 2px solid var(--border-light);
+        border-radius: 20px;
+        padding: 2rem;
+        background: #fafafa;
+        transition: all 0.25s ease;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+    }
+
+    .signup-choice-card:hover {
+        border-color: var(--brand-amber);
+        background: #ffffff;
+        transform: translateY(-3px);
+        box-shadow: 0 12px 30px rgba(245, 158, 11, 0.1);
+    }
+
+    .choice-icon-box {
+        width: 56px;
+        height: 56px;
+        border-radius: 16px;
+        background: #fffbeb;
+        color: var(--brand-amber-dark);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+        margin-bottom: 1.25rem;
+    }
+
+    .benefit-list {
+        list-style: none;
+        padding: 0;
+        margin: 1.25rem 0;
+        text-align: left;
+    }
+
+    .benefit-list li {
+        font-size: 0.85rem;
+        color: var(--text-muted);
+        margin-bottom: 0.6rem;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .benefit-list li i {
+        color: #10b981;
+        font-size: 0.9rem;
+    }
+
     .role-selection-tile {
         border: 2px solid var(--border-light);
         border-radius: 16px;
@@ -107,30 +161,6 @@
     .clean-input-box-group .form-select:focus {
         box-shadow: none;
         background: transparent;
-    }
-
-    .btn-google-signup-top {
-        background: #ffffff;
-        border: 1.5px solid var(--border-light);
-        color: var(--text-main);
-        border-radius: 14px;
-        padding: 0.85rem;
-        font-weight: 700;
-        font-size: 0.95rem;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 12px;
-        text-decoration: none;
-        transition: all 0.25s ease;
-    }
-
-    .btn-google-signup-top:hover {
-        background: #fafafa;
-        border-color: var(--brand-amber);
-        transform: translateY(-2px);
-        box-shadow: 0 6px 16px rgba(245, 158, 11, 0.1);
-        color: var(--text-main);
     }
 
     .btn-amber-gradient {
@@ -222,11 +252,11 @@
                             </div>
                             
                             <div class="text-center mt-4">
-                                <a href="{{ url_for('signup', role=role) }}" class="text-decoration-none text-secondary small"><i class="fa-solid fa-arrow-left me-1"></i> Back to Registration Form</a>
+                                <a href="{{ url_for('signup') }}" class="text-decoration-none text-secondary small"><i class="fa-solid fa-arrow-left me-1"></i> Back to Registration</a>
                             </div>
                         </form>
 
-                        <!-- ================= REGISTRATION FORM BLOCK ================= -->
+                        <!-- ================= INITIAL CHOICE SCREEN OR MANUAL FORM ================= -->
                         {% else %}
                         
                         <!-- Header -->
@@ -237,193 +267,231 @@
                             <p class="text-muted small mb-0">Google account verify ho gaya. Kripya apna Role aur Mobile choose karein[cite: 3].</p>
                             {% else %}
                             <h3 class="fw-bold text-dark mb-1">Create Your Account</h3>
-                            <p class="text-muted small mb-0">Apne kaam ya business ke hisab se sahi category select karein[cite: 3].</p>
+                            <p class="text-muted small mb-0">Apna registration tareeka select karein aur judhein[cite: 3].</p>
                             {% endif %}
                         </div>
 
-                        <!-- TOP GOOGLE BUTTON IN SIGNUP -->
+                        <!-- 2 OPTIONS CHOICE SCREEN (Only shown if not in Google Step 2) -->
                         {% if not show_google_step2 %}
-                        <a href="{{ url_for('login_google') }}" class="btn-google-signup-top mb-3">
-                            <img src="https://www.svgrepo.com/show/475656/google-color.svg" alt="Google" style="width: 22px; height: 22px;">
-                            Sign up instantly with Google
-                        </a>
-
-                        <div class="divider-text-center mb-3 text-center">
-                            <span class="text-muted small fw-bold">OR FILL MANUAL DETAILS</span>
-                        </div>
-                        
-                        <div class="notice-box-card mb-4">
-                            <div class="d-flex align-items-start">
-                                <i class="fa-solid fa-circle-info fs-5 me-2 mt-1" style="color: #d97706;"></i>
-                                <div class="text-start">
-                                    <strong>Zaroori Instructions (Kripya dhyan dein):</strong>
-                                    <ul class="mb-0 ps-3 mt-1 small">
-                                        <li>Apni sabhi details bilkul sahi aur accurate bharein taaki log aapse asani se jud sakein[cite: 3].</li>
-                                        <li><b>Email Address bilkul sahi dalein:</b> Kyunki bina valid email aur uske OTP verification ke naya account nahi banega[cite: 3].</li>
-                                        <li>Aapki saari jankari 100% safe aur secure rakhi jati hai[cite: 3].</li>
-                                    </ul>
+                        <div id="signupChoiceScreen" class="row g-4 mb-4">
+                            
+                            <!-- Option 1: Google Signup -->
+                            <div class="col-md-6">
+                                <div class="signup-choice-card">
+                                    <div>
+                                        <div class="choice-icon-box">
+                                            <img src="https://www.svgrepo.com/show/475656/google-color.svg" alt="Google" style="width: 30px; height: 30px;">
+                                        </div>
+                                        <h5 class="fw-bold text-dark mb-2">Signup with Google</h5>
+                                        <p class="text-muted small mb-3">Ek click mein bina kisi password ke turant sign up karein.</p>
+                                        
+                                        <ul class="benefit-list">
+                                            <li><i class="fa-solid fa-circle-check"></i> Password yaad rakhne ki jhanjhat nahi</li>
+                                            <li><i class="fa-solid fa-circle-check"></i> Instant 1-click secure verification</li>
+                                            <li><i class="fa-solid fa-circle-check"></i> Google dwara 100% safe aur verified</li>
+                                        </ul>
+                                    </div>
+                                    <a href="{{ url_for('login_google') }}" class="btn btn-dark w-100 py-2.5 fw-bold rounded-3 mt-3" style="font-size: 0.92rem;">
+                                        <img src="https://www.svgrepo.com/show/475656/google-color.svg" alt="Google" style="width: 18px; height: 18px;" class="me-2"> Continue with Google
+                                    </a>
                                 </div>
                             </div>
+
+                            <!-- Option 2: Manual Details -->
+                            <div class="col-md-6">
+                                <div class="signup-choice-card">
+                                    <div>
+                                        <div class="choice-icon-box" style="background: #f0fdf4; color: #16a34a;">
+                                            <i class="fa-solid fa-file-pen"></i>
+                                        </div>
+                                        <h5 class="fw-bold text-dark mb-2">Signup with Manual Detail</h5>
+                                        <p class="text-muted small mb-3">Apni pasand ka email, password aur details manually bharein.</p>
+                                        
+                                        <ul class="benefit-list">
+                                            <li><i class="fa-solid fa-circle-check"></i> Apni marzi ka strong password set karein</li>
+                                            <li><i class="fa-solid fa-circle-check"></i> Kisi bhi personal email address ka use karein</li>
+                                            <li><i class="fa-solid fa-circle-check"></i> Poori profile details ka complete control</li>
+                                        </ul>
+                                    </div>
+                                    <button type="button" onclick="showManualForm()" class="btn btn-amber-gradient w-100 py-2.5 fw-bold rounded-3 mt-3 shadow-sm" style="font-size: 0.92rem;">
+                                        <i class="fa-solid fa-arrow-right me-2"></i> Fill Manual Details Form
+                                    </button>
+                                </div>
+                            </div>
+
                         </div>
                         {% endif %}
-                        
-                        <form method="POST" action="{% if show_google_step2 %}{{ url_for('google_step2') }}{% else %}{{ url_for('signup') }}{% endif %}">
+
+                        <!-- MANUAL REGISTRATION FORM (Hidden by default until Manual button is clicked, or always visible if show_google_step2) -->
+                        <div id="manualFormContainer" style="{% if not show_google_step2 %}display: none;{% else %}display: block;{% endif %}" class="anim-fade">
                             
-                            <!-- Role Selection -->
-                            <div class="mb-4">
-                                <label class="form-label fw-bold text-uppercase text-secondary mb-3 d-block text-center" style="font-size: 0.75rem; letter-spacing: 1px;">Choose Your Profile Category</label>
-                                <div class="row g-3">
-                                    <div class="col-4">
-                                        <div class="role-selection-tile text-center p-3 h-100 d-flex flex-column align-items-center justify-content-center" id="card_customer" onclick="selectRole('customer')">
-                                            <div class="role-icon-box mb-2 text-primary">
-                                                <i class="fa-solid fa-user-tie"></i>
-                                            </div>
-                                            <h6 class="fw-bold text-dark mb-1" style="font-size: 0.88rem;">Customer</h6>
-                                            <span class="text-muted d-none d-md-block" style="font-size: 0.72rem;">Kaam karwana hai</span>
-                                            <input type="radio" name="role" id="role_customer" value="customer" required class="d-none">
-                                        </div>
-                                    </div>
-                                    <div class="col-4">
-                                        <div class="role-selection-tile text-center p-3 h-100 d-flex flex-column align-items-center justify-content-center" id="card_shop_owner" onclick="selectRole('shop_owner')">
-                                            <div class="role-icon-box mb-2 text-success">
-                                                <i class="fa-solid fa-shop"></i>
-                                            </div>
-                                            <h6 class="fw-bold text-dark mb-1" style="font-size: 0.88rem;">Shop Owner</h6>
-                                            <span class="text-muted d-none d-md-block" style="font-size: 0.72rem;">Business & Leads</span>
-                                            <input type="radio" name="role" id="role_shop_owner" value="shop_owner" class="d-none">
-                                        </div>
-                                    </div>
-                                    <div class="col-4">
-                                        <div class="role-selection-tile text-center p-3 h-100 d-flex flex-column align-items-center justify-content-center" id="card_worker" onclick="selectRole('worker')">
-                                            <div class="role-icon-box mb-2 text-warning">
-                                                <i class="fa-solid fa-helmet-safety"></i>
-                                            </div>
-                                            <h6 class="fw-bold text-dark mb-1" style="font-size: 0.88rem;">Skilled Worker</h6>
-                                            <span class="text-muted d-none d-md-block" style="font-size: 0.72rem;">Daily/Monthly Job</span>
-                                            <input type="radio" name="role" id="role_worker" value="worker" class="d-none">
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- Common Credentials Section -->
-                            <div id="commonCredentials" style="display: none;" class="anim-fade mb-3">
-                                <div class="p-4 rounded-4" style="background: #fafafa; border: 1.5px solid var(--border-light);">
-                                    <div class="row g-3">
-                                        
-                                        <!-- Name (Editable even if coming from Google) -->
-                                        <div class="col-md-6">
-                                            <label class="form-label text-secondary mb-1" style="font-size: 0.75rem; font-weight: 700;">Full Name <span class="text-danger">*</span></label>
-                                            <div class="input-group clean-input-box-group">
-                                                <span class="input-group-text"><i class="fa-solid fa-user"></i></span>
-                                                {% if show_google_step2 %}
-                                                    <input type="text" name="name" class="form-control fw-bold" value="{{ google_data.name }}" required placeholder="Enter your full name">
-                                                {% else %}
-                                                    <input type="text" name="name" class="form-control" required placeholder="Enter your full name">
-                                                {% endif %}
-                                            </div>
-                                        </div>
-                                        
-                                        <!-- Email (Readonly to maintain session token integrity) -->
-                                        <div class="col-md-6">
-                                            <label class="form-label text-secondary mb-1" style="font-size: 0.75rem; font-weight: 700;">Email Address {% if not show_google_step2 %}<span class="text-danger">*</span>{% endif %}</label>
-                                            <div class="input-group clean-input-box-group">
-                                                <span class="input-group-text"><i class="fa-solid fa-envelope"></i></span>
-                                                {% if show_google_step2 %}
-                                                    <input type="email" name="email" class="form-control fw-bold" style="background: #fef3c7;" value="{{ google_data.email }}" readonly>
-                                                {% else %}
-                                                    <input type="email" name="email" class="form-control" required placeholder="name@example.com" pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$" title="Kripya ek valid email dalein jisme OTP aa sake">
-                                                {% endif %}
-                                            </div>
-                                            {% if not show_google_step2 %}
-                                            <small class="text-muted" style="font-size: 0.72rem;">Is email par verification OTP bheja jayega.</small>
-                                            {% else %}
-                                            <small class="text-success fw-bold" style="font-size: 0.72rem;"><i class="fa-solid fa-check-circle"></i> Verified securely by Google.</small>
-                                            {% endif %}
-                                        </div>
-
-                                        <!-- Mobile Number -->
-                                        <div class="col-md-6">
-                                            <label class="form-label text-secondary mb-1" style="font-size: 0.75rem; font-weight: 700;">Mobile Number <span class="text-danger">*</span></label>
-                                            <div class="input-group clean-input-box-group">
-                                                <select name="country_code" id="country_code" class="form-select px-2" style="max-width: 90px; border-right: 1.5px solid var(--border-light); border-radius: 0;">
-                                                    <option value="+91" selected>+91</option>
-                                                    <option value="+1">+1</option>
-                                                    <option value="+44">+44</option>
-                                                    <option value="+971">+971</option>
-                                                    <option value="+61">+61</option>
-                                                </select>
-                                                <input type="tel" name="mobile" class="form-control" required placeholder="Mobile number" pattern="[0-9]{7,15}">
-                                            </div>
-                                        </div>
-                                        
-                                        <!-- Password -->
-                                        <div class="col-md-6">
-                                            <label class="form-label text-secondary mb-1" style="font-size: 0.75rem; font-weight: 700;">Create Password <span class="text-danger">*</span></label>
-                                            <div class="input-group clean-input-box-group">
-                                                <span class="input-group-text"><i class="fa-solid fa-lock"></i></span>
-                                                <input type="password" name="password" class="form-control" required placeholder="Create secure password">
-                                            </div>
-                                        </div>
-
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- Professional / Details Section -->
-                            <div id="proFields" style="display: none;" class="anim-fade mb-3">
-                                <div class="p-4 rounded-4" style="background: #fafafa; border: 1.5px solid var(--border-light);">
-                                    <div class="mb-3" id="shopNameContainer" style="display: none;">
-                                        <label class="form-label text-secondary mb-1" style="font-size: 0.75rem; font-weight: 700;">Shop / Business Name <span class="text-danger">*</span></label>
-                                        <div class="input-group clean-input-box-group">
-                                            <span class="input-group-text"><i class="fa-solid fa-shop"></i></span>
-                                            <input type="text" name="shop_name" id="shopNameInput" class="form-control" placeholder="Enter shop or business name">
-                                        </div>
-                                    </div>
-                                    <div class="row g-3">
-                                        <div class="col-md-6">
-                                            <label class="form-label text-secondary mb-1" style="font-size: 0.75rem; font-weight: 700;">Expertise / Skill <span class="text-danger">*</span></label>
-                                            <div class="input-group clean-input-box-group">
-                                                <span class="input-group-text"><i class="fa-solid fa-screwdriver-wrench"></i></span>
-                                                <input type="text" name="expertise" id="expertInput" class="form-control" placeholder="e.g. Electrician, Painter, Plumber">
-                                            </div>
-                                        </div>
-                                        <div class="col-md-6">
-                                            <label class="form-label text-secondary mb-1" style="font-size: 0.75rem; font-weight: 700;">Experience (Years) <span class="text-danger">*</span></label>
-                                            <div class="input-group clean-input-box-group">
-                                                <span class="input-group-text"><i class="fa-solid fa-star"></i></span>
-                                                <input type="text" name="experience" id="expInput" class="form-control" placeholder="e.g. 4">
-                                            </div>
-                                        </div>
-                                        <div class="col-md-6" id="workerFields" style="display: none;">
-                                            <label class="form-label text-secondary mb-1" style="font-size: 0.75rem; font-weight: 700;">Expected Daily Wage (₹) <span class="text-danger">*</span></label>
-                                            <div class="input-group clean-input-box-group">
-                                                <span class="input-group-text"><i class="fa-solid fa-indian-rupee-sign"></i></span>
-                                                <input type="number" name="per_day_amount" id="wageInput" class="form-control" placeholder="e.g. 700">
-                                            </div>
-                                        </div>
-                                        <div class="col-12" id="addressContainer">
-                                            <label class="form-label text-secondary mb-1" style="font-size: 0.75rem; font-weight: 700;">Address / Location <span class="text-danger">*</span></label>
-                                            <div class="input-group clean-input-box-group">
-                                                <span class="input-group-text"><i class="fa-solid fa-location-dot"></i></span>
-                                                <input type="text" name="address" id="addressInput" class="form-control" placeholder="Gali, Shop No, Area, City...">
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- Submit Button -->
-                            <div id="actionContainer" style="display: none;" class="anim-fade mt-4">
-                                <button type="submit" class="btn btn-amber-gradient w-100 py-3 fw-bold shadow-sm" style="font-size: 0.98rem;">
-                                    {% if show_google_step2 %}
-                                        Complete Account Setup <i class="fa-solid fa-rocket ms-2"></i>
-                                    {% else %}
-                                        Proceed for OTP Verification <i class="fa-solid fa-arrow-right ms-2"></i>
-                                    {% endif %}
+                            {% if not show_google_step2 %}
+                            <div class="mb-3 text-start">
+                                <button type="button" onclick="hideManualForm()" class="btn btn-sm btn-outline-secondary rounded-pill px-3">
+                                    <i class="fa-solid fa-arrow-left me-1"></i> Back to Options
                                 </button>
                             </div>
-                        </form>
+                            {% endif %}
+
+                            <form method="POST" action="{% if show_google_step2 %}{{ url_for('google_step2') }}{% else %}{{ url_for('signup') }}{% endif %}">
+                                
+                                <!-- Role Selection -->
+                                <div class="mb-4">
+                                    <label class="form-label fw-bold text-uppercase text-secondary mb-3 d-block text-center" style="font-size: 0.75rem; letter-spacing: 1px;">Choose Your Profile Category</label>
+                                    <div class="row g-3">
+                                        <div class="col-4">
+                                            <div class="role-selection-tile text-center p-3 h-100 d-flex flex-column align-items-center justify-content-center" id="card_customer" onclick="selectRole('customer')">
+                                                <div class="role-icon-box mb-2 text-primary">
+                                                    <i class="fa-solid fa-user-tie"></i>
+                                                </div>
+                                                <h6 class="fw-bold text-dark mb-1" style="font-size: 0.88rem;">Customer</h6>
+                                                <span class="text-muted d-none d-md-block" style="font-size: 0.72rem;">Kaam karwana hai</span>
+                                                <input type="radio" name="role" id="role_customer" value="customer" required class="d-none">
+                                            </div>
+                                        </div>
+                                        <div class="col-4">
+                                            <div class="role-selection-tile text-center p-3 h-100 d-flex flex-column align-items-center justify-content-center" id="card_shop_owner" onclick="selectRole('shop_owner')">
+                                                <div class="role-icon-box mb-2 text-success">
+                                                    <i class="fa-solid fa-shop"></i>
+                                                </div>
+                                                <h6 class="fw-bold text-dark mb-1" style="font-size: 0.88rem;">Shop Owner</h6>
+                                                <span class="text-muted d-none d-md-block" style="font-size: 0.72rem;">Business & Leads</span>
+                                                <input type="radio" name="role" id="role_shop_owner" value="shop_owner" class="d-none">
+                                            </div>
+                                        </div>
+                                        <div class="col-4">
+                                            <div class="role-selection-tile text-center p-3 h-100 d-flex flex-column align-items-center justify-content-center" id="card_worker" onclick="selectRole('worker')">
+                                                <div class="role-icon-box mb-2 text-warning">
+                                                    <i class="fa-solid fa-helmet-safety"></i>
+                                                </div>
+                                                <h6 class="fw-bold text-dark mb-1" style="font-size: 0.88rem;">Skilled Worker</h6>
+                                                <span class="text-muted d-none d-md-block" style="font-size: 0.72rem;">Daily/Monthly Job</span>
+                                                <input type="radio" name="role" id="role_worker" value="worker" class="d-none">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Common Credentials Section -->
+                                <div id="commonCredentials" style="display: none;" class="anim-fade mb-3">
+                                    <div class="p-4 rounded-4" style="background: #fafafa; border: 1.5px solid var(--border-light);">
+                                        <div class="row g-3">
+                                            
+                                            <!-- Name (Editable) -->
+                                            <div class="col-md-6">
+                                                <label class="form-label text-secondary mb-1" style="font-size: 0.75rem; font-weight: 700;">Full Name <span class="text-danger">*</span></label>
+                                                <div class="input-group clean-input-box-group">
+                                                    <span class="input-group-text"><i class="fa-solid fa-user"></i></span>
+                                                    {% if show_google_step2 %}
+                                                        <input type="text" name="name" class="form-control fw-bold" value="{{ google_data.name }}" required placeholder="Enter your full name">
+                                                    {% else %}
+                                                        <input type="text" name="name" class="form-control" required placeholder="Enter your full name">
+                                                    {% endif %}
+                                                </div>
+                                            </div>
+                                            
+                                            <!-- Email -->
+                                            <div class="col-md-6">
+                                                <label class="form-label text-secondary mb-1" style="font-size: 0.75rem; font-weight: 700;">Email Address {% if not show_google_step2 %}<span class="text-danger">*</span>{% endif %}</label>
+                                                <div class="input-group clean-input-box-group">
+                                                    <span class="input-group-text"><i class="fa-solid fa-envelope"></i></span>
+                                                    {% if show_google_step2 %}
+                                                        <input type="email" name="email" class="form-control fw-bold" style="background: #fef3c7;" value="{{ google_data.email }}" readonly>
+                                                    {% else %}
+                                                        <input type="email" name="email" class="form-control" required placeholder="name@example.com" pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$" title="Kripya ek valid email dalein jisme OTP aa sake">
+                                                    {% endif %}
+                                                </div>
+                                                {% if not show_google_step2 %}
+                                                <small class="text-muted" style="font-size: 0.72rem;">Is email par verification OTP bheja jayega.</small>
+                                                {% else %}
+                                                <small class="text-success fw-bold" style="font-size: 0.72rem;"><i class="fa-solid fa-check-circle"></i> Verified securely by Google.</small>
+                                                {% endif %}
+                                            </div>
+
+                                            <!-- Mobile Number -->
+                                            <div class="col-md-6">
+                                                <label class="form-label text-secondary mb-1" style="font-size: 0.75rem; font-weight: 700;">Mobile Number <span class="text-danger">*</span></label>
+                                                <div class="input-group clean-input-box-group">
+                                                    <select name="country_code" id="country_code" class="form-select px-2" style="max-width: 90px; border-right: 1.5px solid var(--border-light); border-radius: 0;">
+                                                        <option value="+91" selected>+91</option>
+                                                        <option value="+1">+1</option>
+                                                        <option value="+44">+44</option>
+                                                        <option value="+971">+971</option>
+                                                        <option value="+61">+61</option>
+                                                    </select>
+                                                    <input type="tel" name="mobile" class="form-control" required placeholder="Mobile number" pattern="[0-9]{7,15}">
+                                                </div>
+                                            </div>
+                                            
+                                            <!-- Password -->
+                                            <div class="col-md-6">
+                                                <label class="form-label text-secondary mb-1" style="font-size: 0.75rem; font-weight: 700;">Create Password <span class="text-danger">*</span></label>
+                                                <div class="input-group clean-input-box-group">
+                                                    <span class="input-group-text"><i class="fa-solid fa-lock"></i></span>
+                                                    <input type="password" name="password" class="form-control" required placeholder="Create secure password">
+                                                </div>
+                                            </div>
+
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Professional / Details Section -->
+                                <div id="proFields" style="display: none;" class="anim-fade mb-3">
+                                    <div class="p-4 rounded-4" style="background: #fafafa; border: 1.5px solid var(--border-light);">
+                                        <div class="mb-3" id="shopNameContainer" style="display: none;">
+                                            <label class="form-label text-secondary mb-1" style="font-size: 0.75rem; font-weight: 700;">Shop / Business Name <span class="text-danger">*</span></label>
+                                            <div class="input-group clean-input-box-group">
+                                                <span class="input-group-text"><i class="fa-solid fa-shop"></i></span>
+                                                <input type="text" name="shop_name" id="shopNameInput" class="form-control" placeholder="Enter shop or business name">
+                                            </div>
+                                        </div>
+                                        <div class="row g-3">
+                                            <div class="col-md-6">
+                                                <label class="form-label text-secondary mb-1" style="font-size: 0.75rem; font-weight: 700;">Expertise / Skill <span class="text-danger">*</span></label>
+                                                <div class="input-group clean-input-box-group">
+                                                    <span class="input-group-text"><i class="fa-solid fa-screwdriver-wrench"></i></span>
+                                                    <input type="text" name="expertise" id="expertInput" class="form-control" placeholder="e.g. Electrician, Painter, Plumber">
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <label class="form-label text-secondary mb-1" style="font-size: 0.75rem; font-weight: 700;">Experience (Years) <span class="text-danger">*</span></label>
+                                                <div class="input-group clean-input-box-group">
+                                                    <span class="input-group-text"><i class="fa-solid fa-star"></i></span>
+                                                    <input type="text" name="experience" id="expInput" class="form-control" placeholder="e.g. 4">
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6" id="workerFields" style="display: none;">
+                                                <label class="form-label text-secondary mb-1" style="font-size: 0.75rem; font-weight: 700;">Expected Daily Wage (₹) <span class="text-danger">*</span></label>
+                                                <div class="input-group clean-input-box-group">
+                                                    <span class="input-group-text"><i class="fa-solid fa-indian-rupee-sign"></i></span>
+                                                    <input type="number" name="per_day_amount" id="wageInput" class="form-control" placeholder="e.g. 700">
+                                                </div>
+                                            </div>
+                                            <div class="col-12" id="addressContainer">
+                                                <label class="form-label text-secondary mb-1" style="font-size: 0.75rem; font-weight: 700;">Address / Location <span class="text-danger">*</span></label>
+                                                <div class="input-group clean-input-box-group">
+                                                    <span class="input-group-text"><i class="fa-solid fa-location-dot"></i></span>
+                                                    <input type="text" name="address" id="addressInput" class="form-control" placeholder="Gali, Shop No, Area, City...">
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Submit Button -->
+                                <div id="actionContainer" style="display: none;" class="anim-fade mt-4">
+                                    <button type="submit" class="btn btn-amber-gradient w-100 py-3 fw-bold shadow-sm" style="font-size: 0.98rem;">
+                                        {% if show_google_step2 %}
+                                            Complete Account Setup <i class="fa-solid fa-rocket ms-2"></i>
+                                        {% else %}
+                                            Proceed for OTP Verification <i class="fa-solid fa-arrow-right ms-2"></i>
+                                        {% endif %}
+                                    </button>
+                                </div>
+                            </form>
+
+                        </div>
 
                         <div class="text-center mt-4 pt-3 border-top" style="border-color: var(--border-light) !important;">
                             <p class="text-dark small mb-0" style="font-size: 0.9rem; font-weight: 500;">
@@ -445,8 +513,34 @@
     document.addEventListener("DOMContentLoaded", function() {
         const urlParams = new URLSearchParams(window.location.search);
         let activeRole = urlParams.get('role') || '{{ role }}' || 'customer';
+        
+        // If coming from Google Step 2, automatically show manual form container
+        {% if show_google_step2 %}
+        showManualForm();
+        {% endif %}
+
         selectRole(activeRole);
     });
+
+    function showManualForm() {
+        const choiceScreen = document.getElementById('signupChoiceScreen');
+        const manualForm = document.getElementById('manualFormContainer');
+        if(choiceScreen) choiceScreen.style.display = 'none';
+        if(manualForm) {
+            manualForm.style.display = 'block';
+            manualForm.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
+    }
+
+    function hideManualForm() {
+        const choiceScreen = document.getElementById('signupChoiceScreen');
+        const manualForm = document.getElementById('manualFormContainer');
+        if(manualForm) manualForm.style.display = 'none';
+        if(choiceScreen) {
+            choiceScreen.style.display = 'flex';
+            choiceScreen.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
+    }
 
     function selectRole(role) {
         document.querySelectorAll('.role-selection-tile').forEach(card => card.classList.remove('active'));
