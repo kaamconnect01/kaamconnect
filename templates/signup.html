@@ -17,7 +17,6 @@
         --input-focus: #4f46e5;
     }
 
-    /* Soft, Professional Clean Background Wrapper (No Loud Flashy Colors) */
     .clean-bg-wrapper {
         background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
         min-height: 88vh;
@@ -28,7 +27,6 @@
         margin: 1rem 0;
     }
 
-    /* Clean Modern Card */
     .auth-clean-card {
         background: var(--glass-bg);
         border: 1px solid var(--glass-border);
@@ -37,7 +35,6 @@
         overflow: hidden;
     }
 
-    /* Role Grid Cards */
     .role-card {
         border: 2px solid #e2e8f0;
         border-radius: 16px;
@@ -79,7 +76,6 @@
         transform: scale(1.05);
     }
 
-    /* Input Fields */
     .clean-input-group {
         background: var(--input-bg);
         border-radius: 12px;
@@ -118,7 +114,6 @@
         background: transparent;
     }
 
-    /* Primary Gradient Button */
     .btn-gradient {
         background: var(--primary-gradient);
         color: white;
@@ -134,6 +129,21 @@
         transform: translateY(-1px);
         box-shadow: 0 8px 20px rgba(79, 70, 229, 0.3);
     }
+    
+    .btn-google {
+        background: #ffffff;
+        border: 1.5px solid #e2e8f0;
+        color: #1e293b;
+        border-radius: 12px;
+        transition: all 0.3s ease;
+    }
+    
+    .btn-google:hover {
+        background: #f8fafc;
+        border-color: #cbd5e1;
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    }
 
     .trust-badge {
         background: #eef2ff;
@@ -147,7 +157,6 @@
         text-transform: uppercase;
     }
 
-    /* Notice Box for Trust & Instructions */
     .trust-notice-box {
         background: #fdf8f6;
         border: 1px dashed #f59e0b;
@@ -167,7 +176,6 @@
 </style>
 
 <div class="container py-2">
-    <!-- Clean Professional Background Wrapper -->
     <div class="clean-bg-wrapper shadow-sm">
         <div class="container">
             <div class="row justify-content-center">
@@ -175,7 +183,7 @@
                     
                     <div class="auth-clean-card p-4 p-md-5">
                         
-                        <!-- OTP VERIFICATION BLOCK -->
+                        <!-- ================= OTP VERIFICATION BLOCK ================= -->
                         {% if show_otp %}
                         <div class="text-center mb-4">
                             <span class="trust-badge mb-2 d-inline-block">Security Verification</span>
@@ -187,7 +195,7 @@
                             <div class="d-flex align-items-start">
                                 <i class="fa-solid fa-shield-halved text-warning fs-5 me-2 mt-1"></i>
                                 <div>
-                                    <strong>Aapka account secure hai:</strong> OTP enter karne ke baad aapka account turant active ho jayega. Agar aapko email nahi mila, toh apna <b>Spam/Junk folder</b> zaroor check karein ya live chat par madad lein.
+                                    <strong>Aapka account secure hai:</strong> OTP enter karne ke baad aapka account turant active ho jayega. Agar aapko email nahi mila, toh apna <b>Spam/Junk folder</b> zaroor check karein.
                                 </div>
                             </div>
                         </div>
@@ -215,17 +223,22 @@
                             </div>
                         </form>
 
-                        <!-- ORIGINAL REGISTRATION FORM BLOCK -->
+                        <!-- ================= REGISTRATION FORM BLOCK ================= -->
                         {% else %}
                         
                         <!-- Header -->
                         <div class="text-center mb-4">
                             <span class="trust-badge mb-2 d-inline-block">Kaamconnect Platform</span>
+                            {% if show_google_step2 %}
+                            <h3 class="fw-bold text-dark mb-1">Almost Done, {{ google_data.name.split()[0] }}!</h3>
+                            <p class="text-muted small mb-0">Google account verify ho gaya. Kripya apna Role aur Mobile choose karein.</p>
+                            {% else %}
                             <h3 class="fw-bold text-dark mb-1">Create Your Account</h3>
                             <p class="text-muted small mb-0">Apne kaam ya business ke hisab se sahi category select karein.</p>
+                            {% endif %}
                         </div>
 
-                        <!-- Positive Trust & Instruction Notice Box -->
+                        {% if not show_google_step2 %}
                         <div class="trust-notice-box mb-4">
                             <div class="d-flex align-items-start">
                                 <i class="fa-solid fa-circle-info text-warning fs-5 me-2 mt-1"></i>
@@ -233,20 +246,20 @@
                                     <strong>Zaroori Instructions (Kripya dhyan dein):</strong>
                                     <ul class="mb-0 ps-3 mt-1 small">
                                         <li>Apni sabhi details bilkul sahi aur accurate bharein taaki log aapse asani se jud sakein.</li>
-                                        <li><b>Email Address bilkul sahi dalein:</b> Kyunki bina valid email aur uske OTP verification ke naya account nahi banega. Isse platform par sirf genuine users hi judte hain.</li>
+                                        <li><b>Email Address bilkul sahi dalein:</b> Kyunki bina valid email aur uske OTP verification ke naya account nahi banega.</li>
                                         <li>Aapki saari jankari 100% safe aur secure rakhi jati hai.</li>
                                     </ul>
                                 </div>
                             </div>
                         </div>
+                        {% endif %}
                         
-                        <form method="POST" action="">
+                        <form method="POST" action="{% if show_google_step2 %}{{ url_for('google_step2') }}{% else %}{{ url_for('signup') }}{% endif %}">
                             
                             <!-- Role Selection -->
                             <div class="mb-4">
                                 <label class="form-label fw-bold text-uppercase text-secondary mb-3 d-block text-center" style="font-size: 0.75rem; letter-spacing: 0.8px;">Choose Your Profile Category</label>
                                 <div class="row g-3">
-                                    
                                     <div class="col-4">
                                         <div class="role-card text-center p-3 h-100 d-flex flex-column align-items-center justify-content-center" id="card_customer" onclick="selectRole('customer')">
                                             <div class="role-icon-box mb-2 text-primary">
@@ -257,7 +270,6 @@
                                             <input type="radio" name="role" id="role_customer" value="customer" required class="d-none">
                                         </div>
                                     </div>
-
                                     <div class="col-4">
                                         <div class="role-card text-center p-3 h-100 d-flex flex-column align-items-center justify-content-center" id="card_shop_owner" onclick="selectRole('shop_owner')">
                                             <div class="role-icon-box mb-2 text-success">
@@ -268,7 +280,6 @@
                                             <input type="radio" name="role" id="role_shop_owner" value="shop_owner" class="d-none">
                                         </div>
                                     </div>
-
                                     <div class="col-4">
                                         <div class="role-card text-center p-3 h-100 d-flex flex-column align-items-center justify-content-center" id="card_worker" onclick="selectRole('worker')">
                                             <div class="role-icon-box mb-2 text-warning">
@@ -279,7 +290,6 @@
                                             <input type="radio" name="role" id="role_worker" value="worker" class="d-none">
                                         </div>
                                     </div>
-
                                 </div>
                             </div>
 
@@ -290,21 +300,33 @@
                                         
                                         <!-- Name -->
                                         <div class="col-md-6">
-                                            <label class="form-label text-secondary mb-1" style="font-size: 0.75rem; font-weight: 600;">Full Name <span class="text-danger">*</span></label>
+                                            <label class="form-label text-secondary mb-1" style="font-size: 0.75rem; font-weight: 600;">Full Name {% if not show_google_step2 %}<span class="text-danger">*</span>{% endif %}</label>
                                             <div class="input-group clean-input-group">
                                                 <span class="input-group-text"><i class="fa-solid fa-user"></i></span>
-                                                <input type="text" name="name" class="form-control" required placeholder="Enter your full name">
+                                                {% if show_google_step2 %}
+                                                    <input type="text" class="form-control fw-bold" style="background: #eef2ff;" value="{{ google_data.name }}" readonly disabled>
+                                                {% else %}
+                                                    <input type="text" name="name" class="form-control" required placeholder="Enter your full name">
+                                                {% endif %}
                                             </div>
                                         </div>
                                         
                                         <!-- Email -->
                                         <div class="col-md-6">
-                                            <label class="form-label text-secondary mb-1" style="font-size: 0.75rem; font-weight: 600;">Email Address (For OTP Verification) <span class="text-danger">*</span></label>
+                                            <label class="form-label text-secondary mb-1" style="font-size: 0.75rem; font-weight: 600;">Email Address {% if not show_google_step2 %}<span class="text-danger">*</span>{% endif %}</label>
                                             <div class="input-group clean-input-group">
                                                 <span class="input-group-text"><i class="fa-solid fa-envelope"></i></span>
-                                                <input type="email" name="email" class="form-control" required placeholder="name@example.com" pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$" title="Kripya ek valid email dalein jisme OTP aa sake">
+                                                {% if show_google_step2 %}
+                                                    <input type="email" class="form-control fw-bold" style="background: #eef2ff;" value="{{ google_data.email }}" readonly disabled>
+                                                {% else %}
+                                                    <input type="email" name="email" class="form-control" required placeholder="name@example.com" pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$" title="Kripya ek valid email dalein jisme OTP aa sake">
+                                                {% endif %}
                                             </div>
+                                            {% if not show_google_step2 %}
                                             <small class="text-muted" style="font-size: 0.7rem;">Is email par verification OTP bheja jayega.</small>
+                                            {% else %}
+                                            <small class="text-success fw-bold" style="font-size: 0.7rem;"><i class="fa-solid fa-check-circle"></i> Verified securely by Google.</small>
+                                            {% endif %}
                                         </div>
 
                                         <!-- Mobile Number -->
@@ -322,9 +344,9 @@
                                             </div>
                                         </div>
                                         
-                                        <!-- Password -->
+                                        <!-- Password (For fallback manual login) -->
                                         <div class="col-md-6">
-                                            <label class="form-label text-secondary mb-1" style="font-size: 0.75rem; font-weight: 600;">Password <span class="text-danger">*</span></label>
+                                            <label class="form-label text-secondary mb-1" style="font-size: 0.75rem; font-weight: 600;">Create Password <span class="text-danger">*</span></label>
                                             <div class="input-group clean-input-group">
                                                 <span class="input-group-text"><i class="fa-solid fa-lock"></i></span>
                                                 <input type="password" name="password" class="form-control" required placeholder="Create secure password">
@@ -338,8 +360,6 @@
                             <!-- Professional / Details Section -->
                             <div id="proFields" style="display: none;" class="dynamic-field-anim mb-3">
                                 <div class="p-3 rounded-4" style="background: #f8fafc; border: 1px solid #e2e8f0;">
-                                    
-                                    <!-- Shop Name Input Field -->
                                     <div class="mb-3" id="shopNameContainer" style="display: none;">
                                         <label class="form-label text-secondary mb-1" style="font-size: 0.75rem; font-weight: 600;">Shop / Business Name <span class="text-danger">*</span></label>
                                         <div class="input-group clean-input-group">
@@ -347,7 +367,6 @@
                                             <input type="text" name="shop_name" id="shopNameInput" class="form-control" placeholder="Enter shop or business name">
                                         </div>
                                     </div>
-
                                     <div class="row g-3">
                                         <div class="col-md-6">
                                             <label class="form-label text-secondary mb-1" style="font-size: 0.75rem; font-weight: 600;">Expertise / Skill <span class="text-danger">*</span></label>
@@ -356,7 +375,6 @@
                                                 <input type="text" name="expertise" id="expertInput" class="form-control" placeholder="e.g. Electrician, Painter, Plumber">
                                             </div>
                                         </div>
-                                        
                                         <div class="col-md-6">
                                             <label class="form-label text-secondary mb-1" style="font-size: 0.75rem; font-weight: 600;">Experience (Years) <span class="text-danger">*</span></label>
                                             <div class="input-group clean-input-group">
@@ -364,7 +382,6 @@
                                                 <input type="text" name="experience" id="expInput" class="form-control" placeholder="e.g. 4">
                                             </div>
                                         </div>
-                                        
                                         <div class="col-md-6" id="workerFields" style="display: none;">
                                             <label class="form-label text-secondary mb-1" style="font-size: 0.75rem; font-weight: 600;">Expected Daily Wage (₹) <span class="text-danger">*</span></label>
                                             <div class="input-group clean-input-group">
@@ -372,7 +389,6 @@
                                                 <input type="number" name="per_day_amount" id="wageInput" class="form-control" placeholder="e.g. 700">
                                             </div>
                                         </div>
-                                        
                                         <div class="col-12" id="addressContainer">
                                             <label class="form-label text-secondary mb-1" style="font-size: 0.75rem; font-weight: 600;">Address / Location <span class="text-danger">*</span></label>
                                             <div class="input-group clean-input-group">
@@ -387,23 +403,33 @@
                             <!-- Submit Button -->
                             <div id="actionContainer" style="display: none;" class="dynamic-field-anim mt-4">
                                 <button type="submit" class="btn btn-gradient w-100 py-3 fw-bold shadow-sm" style="font-size: 1rem;">
-                                    Proceed for OTP Verification <i class="fa-solid fa-arrow-right ms-2"></i>
+                                    {% if show_google_step2 %}
+                                        Complete Account Setup <i class="fa-solid fa-rocket ms-2"></i>
+                                    {% else %}
+                                        Proceed for OTP Verification <i class="fa-solid fa-arrow-right ms-2"></i>
+                                    {% endif %}
                                 </button>
-                                
-                                <div class="text-center mt-3">
-                                    <p class="text-muted small mb-0">
-                                        <i class="fa-solid fa-headset text-primary me-1"></i> Koi bhi issue aane par niche diye gaye <b>Tawk.to Chat Widget</b> se turant madad lein.
-                                        <i class="fa-solid fa-headset text-primary me-1"></i> ya hume email kare <b>kaamconnect7@gmail.com</b>
-                                    </p>
-                                </div>
-                            </div>
-                            
-                            <div class="text-center mt-4">
-                                <p class="text-dark small mb-0" style="font-size: 0.85rem; font-weight: 500;">
-                                    Already have an account? <a href="{{ url_for('login') }}" class="fw-bold text-decoration-none" style="color: #4f46e5;">Sign in here</a>
-                                </p>
                             </div>
                         </form>
+                        
+                        <!-- GOOGLE SIGNUP BUTTON (Only show if not in step 2) -->
+                        {% if not show_google_step2 %}
+                        <div class="position-relative my-4 text-center dynamic-field-anim">
+                            <hr style="border-color: #e2e8f0;">
+                            <span class="position-absolute top-50 start-50 translate-middle px-3 bg-white text-muted small fw-bold" style="border-radius: 5px;">OR SIGN UP WITH</span>
+                        </div>
+                        <a href="{{ url_for('login_google') }}" class="btn btn-google w-100 py-3 fw-bold d-flex align-items-center justify-content-center text-decoration-none dynamic-field-anim">
+                            <img src="https://www.svgrepo.com/show/475656/google-color.svg" alt="Google" style="width: 22px; height: 22px; margin-right: 10px;">
+                            Continue with Google
+                        </a>
+                        {% endif %}
+
+                        <div class="text-center mt-4">
+                            <p class="text-dark small mb-0" style="font-size: 0.85rem; font-weight: 500;">
+                                Already have an account? <a href="{{ url_for('login') }}" class="fw-bold text-decoration-none" style="color: #4f46e5;">Sign in here</a>
+                            </p>
+                        </div>
+                        
                         {% endif %}
                     </div>
 
@@ -413,7 +439,6 @@
     </div>
 </div>
 
-<!-- Only run script if normal form is showing -->
 {% if not show_otp %}
 <script>
     document.addEventListener("DOMContentLoaded", function() {
