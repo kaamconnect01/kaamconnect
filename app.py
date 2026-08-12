@@ -250,7 +250,7 @@ def login_google():
 @app.route('/authorize/google')
 def authorize_google():
     token = google.authorize_access_token()
-    resp = google.get('userinfo')
+    resp = google.get('https://www.googleapis.com/oauth2/v1/userinfo')
     user_info = resp.json()
     
     email = user_info.get('email')
