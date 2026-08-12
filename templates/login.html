@@ -53,7 +53,6 @@
         overflow: hidden;
     }
 
-    /* Glowing Radial Backdrop Accent */
     .brand-side::before {
         content: '';
         position: absolute;
@@ -139,7 +138,6 @@
         font-size: 0.95rem;
     }
 
-    /* Custom Input Controls */
     .input-box-group {
         position: relative;
         margin-bottom: 22px;
@@ -209,7 +207,6 @@
         color: var(--apple-text-main);
     }
 
-    /* Primary Button */
     .btn-apple-submit {
         background: linear-gradient(180deg, #0077ed 0%, #0066cc 100%);
         color: #ffffff;
@@ -239,6 +236,21 @@
     .btn-apple-submit:active {
         transform: translateY(1px);
     }
+    
+    .btn-google {
+        background: #ffffff;
+        border: 1.5px solid #e5e5ea;
+        color: var(--apple-text-main);
+        border-radius: 99px;
+        padding: 14px;
+        transition: all 0.3s ease;
+    }
+    .btn-google:hover {
+        background: #f8fafc;
+        border-color: #d1d5db;
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    }
 
     .signup-link-box {
         margin-top: 28px;
@@ -247,14 +259,9 @@
         text-align: center;
     }
 
-    /* Mobile Responsive Adjustments */
     @media (max-width: 991.98px) {
-        .brand-side {
-            padding: 40px 30px;
-        }
-        .form-side {
-            padding: 40px 30px;
-        }
+        .brand-side { padding: 40px 30px; }
+        .form-side { padding: 40px 30px; }
     }
 </style>
 
@@ -276,7 +283,6 @@
             </div>
 
             <div class="my-4 position-relative z-1">
-                <!-- Info Pill 1 -->
                 <div class="info-pill">
                     <div class="d-flex align-items-center">
                         <div class="info-icon-wrapper bg-primary bg-opacity-20 text-primary me-3">
@@ -289,7 +295,6 @@
                     </div>
                 </div>
 
-                <!-- Info Pill 2 -->
                 <div class="info-pill">
                     <div class="d-flex align-items-center">
                         <div class="info-icon-wrapper bg-success bg-opacity-20 text-success me-3">
@@ -318,7 +323,6 @@
             </div>
 
             <form method="POST">
-                <!-- Mobile Number Input -->
                 <div class="input-box-group">
                     <label>REGISTERED MOBILE NUMBER</label>
                     <div class="custom-input-wrap">
@@ -327,7 +331,6 @@
                     </div>
                 </div>
                 
-                <!-- Password Input -->
                 <div class="input-box-group">
                     <label>ACCOUNT PASSWORD</label>
                     <div class="custom-input-wrap">
@@ -339,13 +342,23 @@
                     </div>
                 </div>
 
-                <!-- Submit Button -->
                 <button type="submit" class="btn-apple-submit">
                     <span>Sign In to Dashboard</span>
                     <i class="fa-solid fa-arrow-right fs-6"></i>
                 </button>
                 
-                <!-- Signup Redirection -->
+                <!-- Google Login Button Divider -->
+                <div class="position-relative my-4 text-center">
+                    <hr style="border-color: #e5e5ea;">
+                    <span class="position-absolute top-50 start-50 translate-middle px-3 text-muted small fw-bold" style="background-color: var(--apple-card-bg);">OR</span>
+                </div>
+                
+                <!-- Google Login Button -->
+                <a href="{{ url_for('login_google') }}" class="btn w-100 btn-google fw-bold d-flex align-items-center justify-content-center text-decoration-none">
+                    <img src="https://www.svgrepo.com/show/475656/google-color.svg" alt="Google" style="width: 22px; height: 22px; margin-right: 10px;">
+                    Continue with Google
+                </a>
+                
                 <div class="signup-link-box">
                     <p class="text-muted small mb-0">
                         Don't have an account yet? 
@@ -359,7 +372,6 @@
 </div>
 
 <script>
-    // Password visibility toggle handler
     function togglePasswordVisibility() {
         const passwordInput = document.getElementById('passwordInput');
         const toggleIcon = document.getElementById('toggleIcon');
