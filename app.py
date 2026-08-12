@@ -8,6 +8,9 @@ import os
 import re
 import random
 
+# IMPORT OAUTH FOR GOOGLE LOGIN (Requires: pip install authlib)
+from authlib.integrations.flask_client import OAuth
+
 app = Flask(__name__)
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'super_secret_key_for_local_kaamconnect')
 app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(days=30)
@@ -29,6 +32,21 @@ db = SQLAlchemy(app)
 login_manager = LoginManager()
 login_manager.init_app(app)
 login_manager.login_view = 'login'
+
+# ================= OAUTH CONFIGURATION (GOOGLE) =================
+oauth = OAuth(app)
+google = oauth.register(
+    name='google',
+    client_id=os.environ.get('GOOGLE_CLIENT_ID', 'YOUR_GOOGLE_CLIENT_ID'),
+    client_secret=os.environ.get('GOOGLE_CLIENT_SECRET', 'YOUR_GOOGLE_CLIENT_SECRET'),
+    access_token_url='https://accounts.google.com/o/oauth2/token',
+    access_token_params=None,
+    authorize_url='https://accounts.google.com/o/oauth2/auth',
+    authorize_params=None,
+    api_base_url='https://www.googleapis.com/oauth2/v1/',
+    client_kwargs={'scope': 'openid email profile'},
+    server_metadata_url='https://accounts.google.com/.well-known/openid-configuration'
+)
 
 # ================= DATABASE MODELS =================
 class User(UserMixin, db.Model):
@@ -219,6 +237,112 @@ def notify_admin_new_user(user):
     except Exception as e:
         print(f"Admin notification mail error: {e}")
 
+# ================= GOOGLE AUTH ROUTES =================
+@app.route('/login/google')
+def login_google():
+    redirect_uri = url_for('authorize_google', _external=True)
+    return google.authorize_redirect(redirect_uri)
+
+@app.route('/authorize/google')
+def authorize_google():
+    token = google.authorize_access_token()
+    resp = google.get('userinfo')
+    user_info = resp.json()
+    
+    email = user_info.get('email')
+    name = user_info.get('name')
+    
+    user = User.query.filter_by(email=email).first()
+    if user:
+        # FEATURE: ADMIN LOGIN OTP RULES REMAIN EXACTLY THE SAME
+        if user.role == 'admin':
+            otp = str(random.randint(100000, 999999))
+            session['admin_login_id'] = user.id
+            session['admin_login_otp'] = otp
+            send_otp_email(user.email, otp, context="Admin Login")
+            flash(f'Admin Security Alert: Ek OTP aapke registered email ({user.email}) par bheja gaya hai.', 'info')
+            return redirect(url_for('verify_admin_otp'))
+        
+        # Normal user login
+        session.permanent = True
+        login_user(user)
+        flash('Google se successfully login ho gaye hain!', 'success')
+        if user.role == 'customer': return redirect(url_for('customer_dash'))
+        elif user.role == 'shop_owner': return redirect(url_for('shop_dash'))
+        elif user.role == 'worker': return redirect(url_for('worker_dash'))
+        return redirect(url_for('index'))
+    else:
+        # Naya User - Redirect to Step 2 (Collect Mobile & Role)
+        session['google_signup'] = {'email': email, 'name': name}
+        flash('Google Email Verify ho gaya hai. Kripya apna Role aur baki details confirm karein.', 'info')
+        return redirect(url_for('google_step2'))
+
+@app.route('/google_step2', methods=['GET', 'POST'])
+def google_step2():
+    if 'google_signup' not in session:
+        return redirect(url_for('signup'))
+        
+    if request.method == 'POST':
+        role = request.form.get('role', 'customer').strip()
+        country_code = request.form.get('country_code', '+91').strip()
+        raw_mobile = request.form.get('mobile', '').strip()
+        mobile = f"{country_code} {raw_mobile}"
+        password = request.form.get('password', '').strip()
+        address = request.form.get('address', '').strip()
+        experience = request.form.get('experience', '').strip()
+        expertise = request.form.get('expertise', '').strip()
+        shop_name = request.form.get('shop_name', '').strip()
+        
+        per_day_raw = request.form.get('per_day_amount')
+        per_day_amount = int(per_day_raw) if per_day_raw and per_day_raw.strip().isdigit() else None
+        
+        # Admin Number block system
+        restricted_numbers = ["9999999999", "+91 9999999999"]
+        admin_users = User.query.filter_by(role='admin').all()
+        for admin in admin_users:
+            restricted_numbers.append(admin.mobile)
+            if ' ' in admin.mobile:
+                restricted_numbers.append(admin.mobile.split(' ', 1)[1])
+                
+        if raw_mobile in restricted_numbers or mobile in restricted_numbers:
+            flash('Kripya apna valid mobile number use karein. System admin ka number allowed nahi hai.', 'danger')
+            return redirect(url_for('google_step2'))
+            
+        user_exists = User.query.filter_by(mobile=mobile).first()
+        if user_exists:
+            flash('Mobile number pehle se hi kisi aur account se registered hai!', 'danger')
+            return redirect(url_for('google_step2'))
+            
+        hashed_password = generate_password_hash(password, method='scrypt')
+        ist_time = datetime.now(ZoneInfo("Asia/Kolkata")).replace(tzinfo=None)
+        
+        new_user = User(
+            role=role, mobile=mobile, password=hashed_password, 
+            name=session['google_signup']['name'],
+            email=session['google_signup']['email'], 
+            address=address, experience=experience, expertise=expertise,
+            shop_name=shop_name, per_day_amount=per_day_amount,
+            wallet_balance=50, is_available=True, created_at=ist_time
+        )
+        
+        db.session.add(new_user)
+        db.session.commit()
+        
+        notify_admin_new_user(new_user)
+        login_user(new_user)
+        session.pop('google_signup', None)
+        
+        if new_user.role == 'shop_owner':
+            session['show_welcome_popup'] = True
+        
+        flash('Account setup complete! Aap securely login ho gaye hain.', 'success')
+        if new_user.role == 'customer': return redirect(url_for('customer_dash'))
+        elif new_user.role == 'shop_owner': return redirect(url_for('shop_dash'))
+        elif new_user.role == 'worker': return redirect(url_for('worker_dash'))
+        return redirect(url_for('index'))
+        
+    return render_template('signup.html', show_google_step2=True, google_data=session['google_signup'])
+
 # ================= ROUTES =================
 @app.route('/')
 def index():
@@ -289,7 +413,7 @@ def signup():
         return render_template('signup.html', role=role, show_otp=True, email=email)
         
     role = request.args.get('role', 'customer')
-    return render_template('signup.html', role=role, show_otp=False)
+    return render_template('signup.html', role=role, show_otp=False, show_google_step2=False)
 
 @app.route('/verify_signup_otp', methods=['POST'])
 def verify_signup_otp():
@@ -571,7 +695,7 @@ def unlock_lead(req_id):
         
     already_unlocked = UnlockedLead.query.filter_by(shop_owner_id=current_user.id, requirement_id=req.id).first()
     if already_unlocked:
-        flash('Yeh lead aapne pehle से hi unlock ki hui hai!', 'info')
+        flash('Yeh lead aapne pehle se hi unlock ki hui hai!', 'info')
         return redirect(url_for('shop_dash'))
 
     if current_user.wallet_balance >= credit_cost:
