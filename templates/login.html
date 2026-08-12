@@ -1,51 +1,44 @@
 {% extends 'base.html' %}
 {% block content %}
 <style>
-    /* =========================================
-       ULTRA-PREMIUM APPLE-STYLE LOGIN PAGE
-       ========================================= */
     :root {
-        --apple-blue: #0071e3;
-        --apple-blue-hover: #0077ed;
-        --apple-dark-bg: #0d1117;
-        --apple-card-bg: #ffffff;
-        --apple-border: rgba(0, 0, 0, 0.08);
-        --apple-text-main: #1d1d1f;
-        --apple-text-sub: #86868b;
-        --apple-input-bg: #f5f5f7;
+        --primary-color: #6366f1;
+        --primary-hover: #4f46e5;
+        --accent-glow: rgba(99, 102, 241, 0.2);
+        --bg-main: #f8fafc;
+        --card-bg: #ffffff;
+        --text-main: #0f172a;
+        --text-muted: #64748b;
+        --border-color: #e2e8f0;
     }
 
     body {
-        background-color: #f2f2f7;
-        font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        background-color: var(--bg-main);
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
     }
 
-    .login-wrapper {
-        min-height: calc(85vh - 80px);
+    .auth-wrapper {
+        min-height: 85vh;
         display: flex;
         align-items: center;
         justify-content: center;
-        padding: 40px 15px;
+        padding: 2rem 1rem;
     }
 
-    .login-card {
-        background: var(--apple-card-bg);
-        border-radius: 32px;
-        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.06), 0 1px 3px rgba(0, 0, 0, 0.02);
-        overflow: hidden;
-        border: 1px solid var(--apple-border);
+    .auth-container {
+        background: var(--card-bg);
+        border-radius: 28px;
+        box-shadow: 0 25px 50px -12px rgba(15, 23, 42, 0.08), 0 0 0 1px var(--border-color);
         width: 100%;
-        max-width: 1020px;
-        transition: transform 0.4s ease, box-shadow 0.4s ease;
+        max-width: 1100px;
+        overflow: hidden;
     }
 
-    /* -----------------------------------------
-       BRAND PANEL (LEFT / BOTTOM)
-       ----------------------------------------- */
-    .brand-side {
-        background: linear-gradient(145deg, #0b0f19 0%, #161f33 100%);
+    /* Left Brand Panel */
+    .auth-brand-pane {
+        background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
         color: #ffffff;
-        padding: 50px 45px;
+        padding: 3.5rem 3rem;
         display: flex;
         flex-direction: column;
         justify-content: space-between;
@@ -53,316 +46,287 @@
         overflow: hidden;
     }
 
-    .brand-side::before {
+    .auth-brand-pane::before {
         content: '';
         position: absolute;
-        top: -30%;
-        right: -30%;
-        width: 380px;
-        height: 380px;
-        background: radial-gradient(circle, rgba(0, 113, 227, 0.25) 0%, rgba(0,0,0,0) 70%);
-        pointer-events: none;
+        top: -50px;
+        right: -50px;
+        width: 250px;
+        height: 250px;
+        background: radial-gradient(circle, rgba(99, 102, 241, 0.3) 0%, transparent 70%);
+        border-radius: 50%;
     }
 
-    .brand-side::after {
-        content: '';
-        position: absolute;
-        bottom: -20%;
-        left: -20%;
-        width: 300px;
-        height: 300px;
-        background: radial-gradient(circle, rgba(16, 185, 129, 0.15) 0%, rgba(0,0,0,0) 70%);
-        pointer-events: none;
-    }
-
-    .brand-badge {
+    .brand-badge-pill {
         display: inline-flex;
         align-items: center;
         gap: 8px;
         background: rgba(255, 255, 255, 0.08);
-        border: 1px solid rgba(255, 255, 255, 0.12);
-        padding: 6px 16px;
-        border-radius: 99px;
-        font-size: 0.82rem;
+        border: 1px solid rgba(255, 255, 255, 0.15);
+        padding: 8px 18px;
+        border-radius: 50px;
+        font-size: 0.85rem;
         font-weight: 500;
-        letter-spacing: 0.3px;
+        backdrop-filter: blur(10px);
+    }
+
+    .feature-card-item {
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: 18px;
+        padding: 1.25rem;
+        margin-bottom: 1rem;
+        transition: all 0.3s ease;
         backdrop-filter: blur(12px);
     }
 
-    .info-pill {
-        background: rgba(255, 255, 255, 0.04);
-        border: 1px solid rgba(255, 255, 255, 0.08);
-        padding: 18px 20px;
-        border-radius: 20px;
-        margin-bottom: 16px;
-        backdrop-filter: blur(16px);
-        transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    .feature-card-item:hover {
+        background: rgba(255, 255, 255, 0.09);
+        transform: translateY(-3px);
+        border-color: rgba(99, 102, 241, 0.4);
     }
 
-    .info-pill:hover {
-        background: rgba(255, 255, 255, 0.08);
-        transform: translateY(-2px);
-        border-color: rgba(0, 113, 227, 0.4);
-    }
-
-    .info-icon-wrapper {
-        width: 42px;
-        height: 42px;
-        border-radius: 12px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 1.1rem;
-        flex-shrink: 0;
-    }
-
-    /* -----------------------------------------
-       FORM PANEL (RIGHT / TOP)
-       ----------------------------------------- */
-    .form-side {
-        padding: 55px 50px;
+    /* Right Form Panel */
+    .auth-form-pane {
+        padding: 3.5rem 3rem;
         display: flex;
         flex-direction: column;
         justify-content: center;
     }
 
-    .form-header h3 {
-        font-size: 1.9rem;
-        font-weight: 700;
-        color: var(--apple-text-main);
-        letter-spacing: -0.6px;
+    .form-title {
+        font-size: 2rem;
+        font-weight: 800;
+        color: var(--text-main);
+        letter-spacing: -0.5px;
     }
 
-    .form-header p {
-        color: var(--apple-text-sub);
+    .form-subtitle {
+        color: var(--text-muted);
         font-size: 0.95rem;
     }
 
-    .input-box-group {
-        position: relative;
-        margin-bottom: 22px;
+    .input-field-group {
+        margin-bottom: 1.5rem;
     }
 
-    .input-box-group label {
-        font-size: 0.83rem;
-        font-weight: 600;
-        color: #48484a;
-        margin-bottom: 8px;
+    .input-field-group label {
+        font-size: 0.8rem;
+        font-weight: 700;
+        color: #475569;
+        margin-bottom: 0.5rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
         display: block;
-        letter-spacing: 0.2px;
     }
 
-    .custom-input-wrap {
+    .custom-input-wrapper {
         position: relative;
         display: flex;
         align-items: center;
     }
 
-    .input-icon {
+    .input-icon-prefix {
         position: absolute;
-        left: 18px;
-        color: #8e8e93;
+        left: 1rem;
+        color: #94a3b8;
         font-size: 1rem;
         transition: color 0.3s ease;
-        pointer-events: none;
         z-index: 2;
+        pointer-events: none;
     }
 
-    .form-control-apple {
+    .form-control-modern {
         width: 100%;
-        padding: 14px 18px 14px 48px;
+        padding: 0.85rem 1rem 0.85rem 3rem;
         font-size: 0.98rem;
-        border-radius: 16px;
-        border: 1.5px solid #e5e5ea;
-        background-color: var(--apple-input-bg);
-        color: var(--apple-text-main);
+        border-radius: 14px;
+        border: 1.5px solid var(--border-color);
+        background-color: #f8fafc;
+        color: var(--text-main);
         font-weight: 500;
         transition: all 0.25s ease;
     }
 
-    .form-control-apple:focus {
+    .form-control-modern:focus {
         outline: none;
         background-color: #ffffff;
-        border-color: var(--apple-blue);
-        box-shadow: 0 0 0 4px rgba(0, 113, 227, 0.15);
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 4px var(--accent-glow);
     }
 
-    .form-control-apple:focus + .input-icon {
-        color: var(--apple-blue);
+    .form-control-modern:focus ~ .input-icon-prefix {
+        color: var(--primary-color);
     }
 
-    .password-toggle-btn {
+    .password-toggle-action {
         position: absolute;
-        right: 16px;
+        right: 1rem;
         background: none;
         border: none;
-        color: #8e8e93;
+        color: #94a3b8;
         cursor: pointer;
         padding: 4px;
-        font-size: 0.95rem;
+        font-size: 1rem;
         transition: color 0.2s ease;
     }
 
-    .password-toggle-btn:hover {
-        color: var(--apple-text-main);
+    .password-toggle-action:hover {
+        color: var(--text-main);
     }
 
-    .btn-apple-submit {
-        background: linear-gradient(180deg, #0077ed 0%, #0066cc 100%);
+    .btn-submit-modern {
+        background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
         color: #ffffff;
-        border-radius: 99px;
-        padding: 15px;
-        font-weight: 600;
+        border-radius: 14px;
+        padding: 0.95rem;
+        font-weight: 700;
         font-size: 1rem;
         border: none;
         width: 100%;
-        margin-top: 10px;
         cursor: pointer;
-        box-shadow: 0 8px 20px rgba(0, 113, 227, 0.25);
+        box-shadow: 0 10px 25px -5px rgba(99, 102, 241, 0.4);
         transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
         display: flex;
         align-items: center;
         justify-content: center;
-        gap: 8px;
+        gap: 10px;
     }
 
-    .btn-apple-submit:hover {
-        transform: translateY(-1px);
-        box-shadow: 0 12px 28px rgba(0, 113, 227, 0.35);
-        background: linear-gradient(180deg, #0077ed 0%, #005bb5 100%);
+    .btn-submit-modern:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 15px 30px -5px rgba(99, 102, 241, 0.5);
+        background: linear-gradient(135deg, #4f46e5 0%, #4338ca 100%);
         color: white;
     }
 
-    .btn-apple-submit:active {
-        transform: translateY(1px);
-    }
-    
-    .btn-google {
+    .btn-google-modern {
         background: #ffffff;
-        border: 1.5px solid #e5e5ea;
-        color: var(--apple-text-main);
-        border-radius: 99px;
-        padding: 14px;
+        border: 1.5px solid var(--border-color);
+        color: var(--text-main);
+        border-radius: 14px;
+        padding: 0.85rem;
+        font-weight: 600;
         transition: all 0.3s ease;
-    }
-    .btn-google:hover {
-        background: #f8fafc;
-        border-color: #d1d5db;
-        transform: translateY(-1px);
-        box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 12px;
+        text-decoration: none;
     }
 
-    .signup-link-box {
-        margin-top: 28px;
-        padding-top: 20px;
-        border-top: 1px solid #f2f2f7;
-        text-align: center;
+    .btn-google-modern:hover {
+        background: #f8fafc;
+        border-color: #cbd5e1;
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.04);
+        color: var(--text-main);
     }
 
     @media (max-width: 991.98px) {
-        .brand-side { padding: 40px 30px; }
-        .form-side { padding: 40px 30px; }
+        .auth-brand-pane { padding: 2.5rem 1.5rem; }
+        .auth-form-pane { padding: 2.5rem 1.5rem; }
     }
 </style>
 
-<div class="container login-wrapper">
-    <div class="row login-card g-0 d-flex flex-column-reverse flex-lg-row">
+<div class="container auth-wrapper">
+    <div class="auth-container row g-0 d-flex flex-column-reverse flex-lg-row">
         
-        <!-- ================= LEFT BRAND SIDE ================= -->
-        <div class="col-lg-5 brand-side">
+        <!-- LEFT BRAND PANEL -->
+        <div class="col-lg-5 auth-brand-pane">
             <div class="position-relative z-1">
                 <div class="mb-4">
-                    <span class="brand-badge text-white-50">
-                        <i class="fa-solid fa-shield-halved text-primary"></i> Kaamconnect Gateway
+                    <span class="brand-badge-pill text-white-50">
+                        <i class="fa-solid fa-shield-halved text-indigo-400"></i> Kaamconnect Secure Gateway
                     </span>
                 </div>
-                <h2 class="fw-bold mb-3" style="letter-spacing: -1px; font-size: 2.1rem;">Welcome Back!</h2>
-                <p class="text-white-50" style="font-size: 0.95rem; line-height: 1.6;">
-                    Log in to access your unified dashboard, manage active labor requests, check live leads, or instant top-up your wallet seamlessly.
+                <h2 class="fw-bold mb-3" style="font-size: 2.2rem; letter-spacing: -1px;">Welcome Back!</h2>
+                <p class="text-white-50 mb-0" style="font-size: 0.95rem; line-height: 1.7;">
+                    Sign in to manage your active labour requests, track customer inquiries, view live analytics, and manage payments effortlessly[cite: 2].
                 </p>
             </div>
 
             <div class="my-4 position-relative z-1">
-                <div class="info-pill">
+                <div class="feature-card-item">
                     <div class="d-flex align-items-center">
-                        <div class="info-icon-wrapper bg-primary bg-opacity-20 text-primary me-3">
-                            <i class="fa-solid fa-chart-line"></i>
+                        <div class="rounded-3 bg-indigo-500 bg-opacity-20 text-indigo-300 d-flex align-items-center justify-content-center me-3" style="width: 45px; height: 45px; font-size: 1.2rem; flex-shrink: 0;">
+                            <i class="fa-solid fa-bolt"></i>
                         </div>
                         <div>
-                            <h6 class="mb-0 fw-bold text-white" style="font-size: 0.93rem;">Live Dashboard Control</h6>
-                            <small class="text-white-50" style="font-size: 0.82rem;">Track customer leads and profile interactions in real-time.</small>
+                            <h6 class="mb-0 fw-bold text-white" style="font-size: 0.95rem;">Instant Dashboard Access</h6>
+                            <small class="text-white-50">Real-time updates on your leads and service orders.</small>
                         </div>
                     </div>
                 </div>
 
-                <div class="info-pill">
+                <div class="feature-card-item">
                     <div class="d-flex align-items-center">
-                        <div class="info-icon-wrapper bg-success bg-opacity-20 text-success me-3">
-                            <i class="fa-solid fa-circle-nodes"></i>
+                        <div class="rounded-3 bg-emerald-500 bg-opacity-20 text-emerald-300 d-flex align-items-center justify-content-center me-3" style="width: 45px; height: 45px; font-size: 1.2rem; flex-shrink: 0;">
+                            <i class="fa-solid fa-handshake"></i>
                         </div>
                         <div>
-                            <h6 class="mb-0 fw-bold text-white" style="font-size: 0.93rem;">Direct Marketplace Access</h6>
-                            <small class="text-white-50" style="font-size: 0.82rem;">Connect directly with clients without commission fees.</small>
+                            <h6 class="mb-0 fw-bold text-white" style="font-size: 0.95rem;">Direct & Commission-Free</h6>
+                            <small class="text-white-50">Connect directly with customers with zero hidden fees.</small>
                         </div>
                     </div>
                 </div>
             </div>
 
             <div class="position-relative z-1 pt-2">
-                <small class="text-white-50 d-flex align-items-center gap-2" style="font-size: 0.82rem;">
-                    <i class="fa-solid fa-lock text-success"></i> 256-bit Encrypted SSL Connection
+                <small class="text-white-50 d-flex align-items-center gap-2" style="font-size: 0.85rem;">
+                    <i class="fa-solid fa-lock text-emerald-400"></i> Protected by 256-Bit Advanced SSL Encryption
                 </small>
             </div>
         </div>
 
-        <!-- ================= RIGHT FORM SIDE ================= -->
-        <div class="col-lg-7 form-side">
-            <div class="form-header mb-4">
-                <h3>Account Sign In</h3>
-                <p class="mt-1">Please enter your registered mobile number and password below.</p>
+        <!-- RIGHT FORM PANEL -->
+        <div class="col-lg-7 auth-form-pane">
+            <div class="mb-4">
+                <h3 class="form-title">Account Sign In</h3>
+                <p class="form-subtitle mt-1">Please enter your registered mobile number and password to proceed[cite: 2].</p>
             </div>
 
             <form method="POST">
-                <div class="input-box-group">
-                    <label>REGISTERED MOBILE NUMBER</label>
-                    <div class="custom-input-wrap">
-                        <input type="tel" name="mobile" class="form-control-apple" required placeholder="e.g. 9876543210" pattern="[0-9]{10}" maxlength="10">
-                        <i class="fa-solid fa-mobile-screen input-icon"></i>
+                <div class="input-field-group">
+                    <label>Registered Mobile Number</label>
+                    <div class="custom-input-wrapper">
+                        <input type="tel" name="mobile" class="form-control-modern" required placeholder="e.g. 9876543210" pattern="[0-9]{10}" maxlength="10">
+                        <i class="fa-solid fa-mobile-screen input-icon-prefix"></i>
                     </div>
                 </div>
                 
-                <div class="input-box-group">
-                    <label>ACCOUNT PASSWORD</label>
-                    <div class="custom-input-wrap">
-                        <input type="password" id="passwordInput" name="password" class="form-control-apple" required placeholder="Enter your password">
-                        <i class="fa-solid fa-lock input-icon"></i>
-                        <button type="button" class="password-toggle-btn" onclick="togglePasswordVisibility()" aria-label="Toggle password visibility">
+                <div class="input-field-group">
+                    <label>Account Password</label>
+                    <div class="custom-input-wrapper">
+                        <input type="password" id="passwordInput" name="password" class="form-control-modern" required placeholder="Enter your secure password">
+                        <i class="fa-solid fa-lock input-icon-prefix"></i>
+                        <button type="button" class="password-toggle-action" onclick="togglePasswordVisibility()" aria-label="Toggle password visibility">
                             <i class="fa-regular fa-eye" id="toggleIcon"></i>
                         </button>
                     </div>
                 </div>
 
-                <button type="submit" class="btn-apple-submit">
+                <button type="submit" class="btn-submit-modern mb-4">
                     <span>Sign In to Dashboard</span>
-                    <i class="fa-solid fa-arrow-right fs-6"></i>
+                    <i class="fa-solid fa-arrow-right"></i>
                 </button>
                 
-                <!-- Google Login Button Divider -->
+                <!-- Divider -->
                 <div class="position-relative my-4 text-center">
-                    <hr style="border-color: #e5e5ea;">
-                    <span class="position-absolute top-50 start-50 translate-middle px-3 text-muted small fw-bold" style="background-color: var(--apple-card-bg);">OR</span>
+                    <hr style="border-color: var(--border-color);">
+                    <span class="position-absolute top-50 start-50 translate-middle px-3 text-muted small fw-bold" style="background-color: var(--card-bg); letter-spacing: 1px;">OR</span>
                 </div>
                 
                 <!-- Google Login Button -->
-                <a href="{{ url_for('login_google') }}" class="btn w-100 btn-google fw-bold d-flex align-items-center justify-content-center text-decoration-none">
-                    <img src="https://www.svgrepo.com/show/475656/google-color.svg" alt="Google" style="width: 22px; height: 22px; margin-right: 10px;">
+                <a href="{{ url_for('login_google') }}" class="btn-google-modern w-100 mb-4">
+                    <img src="https://www.svgrepo.com/show/475656/google-color.svg" alt="Google" style="width: 22px; height: 22px;">
                     Continue with Google
                 </a>
                 
-                <div class="signup-link-box">
-                    <p class="text-muted small mb-0">
+                <div class="text-center pt-3 border-top" style="border-color: #f1f5f9 !important;">
+                    <p class="text-muted small mb-0" style="font-size: 0.9rem;">
                         Don't have an account yet? 
-                        <a href="{{ url_for('signup') }}" class="text-primary fw-bold text-decoration-none ms-1">Create an account here</a>
+                        <a href="{{ url_for('signup') }}" class="fw-bold text-decoration-none ms-1" style="color: var(--primary-color);">Create an account here</a>
                     </p>
                 </div>
             </form>
