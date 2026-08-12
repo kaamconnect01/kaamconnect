@@ -1,194 +1,207 @@
 {% extends 'base.html' %}
 {% block content %}
 <style>
+    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+
     :root {
-        --primary-color: #6366f1;
-        --primary-hover: #4f46e5;
-        --accent-glow: rgba(99, 102, 241, 0.15);
-        --bg-gradient: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
+        --brand-amber: #f59e0b;
+        --brand-amber-dark: #d97706;
+        --bg-gradient: linear-gradient(135deg, #fef3c7 0%, #f4f4f5 100%);
         --card-bg: #ffffff;
-        --text-main: #0f172a;
-        --text-muted: #64748b;
-        --border-color: #e2e8f0;
+        --text-main: #18181b;
+        --text-muted: #71717a;
+        --border-light: #e4e4e7;
     }
 
-    .signup-page-wrapper {
+    .luxury-signup-wrapper {
         background: var(--bg-gradient);
-        min-height: 90vh;
-        border-radius: 24px;
+        min-height: 92vh;
+        border-radius: 32px;
         display: flex;
         align-items: center;
-        padding: 2.5rem 0;
+        padding: 3rem 0;
         margin: 1rem 0;
     }
 
-    .signup-card-box {
+    .luxury-signup-card {
         background: var(--card-bg);
-        border: 1px solid var(--border-color);
-        border-radius: 28px;
-        box-shadow: 0 20px 40px -15px rgba(15, 23, 42, 0.08);
+        border: 1px solid var(--border-light);
+        border-radius: 32px;
+        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.08);
         overflow: hidden;
     }
 
-    .role-selection-card {
-        border: 2px solid var(--border-color);
-        border-radius: 18px;
+    .role-tile-card {
+        border: 2px solid var(--border-light);
+        border-radius: 20px;
         cursor: pointer;
         transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-        background: #f8fafc;
+        background: #fafafa;
         position: relative;
         overflow: hidden;
     }
     
-    .role-selection-card:hover {
+    .role-tile-card:hover {
         background: #ffffff;
-        border-color: #cbd5e1;
+        border-color: #d4d4d8;
         transform: translateY(-3px);
         box-shadow: 0 10px 25px rgba(0,0,0,0.04);
     }
     
-    .role-selection-card.active {
-        border-color: var(--primary-color);
-        background: #ffffff;
-        box-shadow: 0 10px 25px rgba(99, 102, 241, 0.18);
+    .role-tile-card.active {
+        border-color: var(--brand-amber);
+        background: #fffbeb;
+        box-shadow: 0 10px 25px rgba(245, 158, 11, 0.18);
     }
 
-    .role-icon-container {
-        width: 50px;
-        height: 50px;
-        border-radius: 14px;
-        background: rgba(99, 102, 241, 0.08);
+    .role-tile-icon {
+        width: 52px;
+        height: 52px;
+        border-radius: 16px;
+        background: #f4f4f5;
         display: flex;
         align-items: center;
         justify-content: center;
         transition: all 0.3s ease;
-        font-size: 1.3rem;
+        font-size: 1.35rem;
     }
     
-    .role-selection-card.active .role-icon-container {
-        background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
+    .role-tile-card.active .role-tile-icon {
+        background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
         color: white !important;
         transform: scale(1.08);
     }
 
-    .clean-input-wrapper-box {
-        background: #f8fafc;
-        border-radius: 14px;
-        border: 1.5px solid var(--border-color);
+    .luxury-input-group-box {
+        background: #fafafa;
+        border-radius: 16px;
+        border: 2px solid var(--border-light);
         overflow: hidden;
         transition: all 0.3s ease;
     }
 
-    .clean-input-wrapper-box:focus-within {
-        border-color: var(--primary-color);
-        box-shadow: 0 0 0 4px var(--accent-glow);
+    .luxury-input-group-box:focus-within {
+        border-color: var(--brand-amber);
+        box-shadow: 0 0 0 4px rgba(245, 158, 11, 0.15);
         background: #ffffff;
     }
 
-    .clean-input-wrapper-box .input-group-text {
+    .luxury-input-group-box .input-group-text {
         background: transparent;
         border: none;
         color: var(--text-muted);
     }
     
-    .clean-input-wrapper-box:focus-within .input-group-text {
-        color: var(--primary-color);
+    .luxury-input-group-box:focus-within .input-group-text {
+        color: var(--brand-amber-dark);
     }
 
-    .clean-input-wrapper-box .form-control, 
-    .clean-input-wrapper-box .form-select {
+    .luxury-input-group-box .form-control, 
+    .luxury-input-group-box .form-select {
         border: none;
         background: transparent;
         color: var(--text-main);
-        font-size: 0.95rem;
+        font-size: 0.98srem;
+        font-weight: 600;
     }
 
-    .clean-input-wrapper-box .form-control:focus, 
-    .clean-input-wrapper-box .form-select:focus {
+    .luxury-input-group-box .form-control:focus, 
+    .luxury-input-group-box .form-select:focus {
         box-shadow: none;
         background: transparent;
     }
 
-    .btn-gradient-custom {
-        background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
+    /* TOP GOOGLE BUTTON IN SIGNUP */
+    .btn-top-google-signup {
+        background: #ffffff;
+        border: 2px solid var(--border-light);
+        color: var(--text-main);
+        border-radius: 16px;
+        padding: 0.95rem;
+        font-weight: 700;
+        font-size: 0.98rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 12px;
+        text-decoration: none;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.02);
+    }
+
+    .btn-top-google-signup:hover {
+        background: #fafafa;
+        border-color: var(--brand-amber);
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(245, 158, 11, 0.12);
+        color: var(--text-main);
+    }
+
+    .btn-amber-gradient {
+        background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
         color: white;
         border: none;
-        border-radius: 14px;
+        border-radius: 16px;
         transition: all 0.3s ease;
         letter-spacing: 0.5px;
     }
     
-    .btn-gradient-custom:hover {
-        background: linear-gradient(135deg, #4f46e5 0%, #4338ca 100%);
+    .btn-amber-gradient:hover {
+        background: linear-gradient(135deg, #d97706 0%, #b45309 100%);
         color: white;
         transform: translateY(-2px);
-        box-shadow: 0 10px 25px rgba(99, 102, 241, 0.4);
-    }
-    
-    .btn-google-custom {
-        background: #ffffff;
-        border: 1.5px solid var(--border-color);
-        color: var(--text-main);
-        border-radius: 14px;
-        transition: all 0.3s ease;
-    }
-    
-    .btn-google-custom:hover {
-        background: #f8fafc;
-        border-color: #cbd5e1;
-        transform: translateY(-2px);
-        box-shadow: 0 6px 15px rgba(0,0,0,0.04);
+        box-shadow: 0 10px 25px rgba(245, 158, 11, 0.4);
     }
 
-    .trust-pill-badge {
-        background: #eef2ff;
-        color: var(--primary-color);
-        border: 1px solid #c7d2fe;
+    .pill-trust-badge {
+        background: #fef3c7;
+        color: #b45309;
+        border: 1px solid #fde68a;
         padding: 6px 16px;
         border-radius: 50px;
         font-weight: 700;
         font-size: 0.78rem;
-        letter-spacing: 0.5px;
+        letter-spacing: 0.8px;
         text-transform: uppercase;
     }
 
-    .trust-notice-card {
+    .notice-warning-card {
         background: #fffbeb;
         border: 1px dashed #f59e0b;
-        border-radius: 16px;
-        padding: 1rem 1.25rem;
+        border-radius: 18px;
+        padding: 1.15rem 1.35rem;
         font-size: 0.9rem;
         color: #78350f;
     }
 
-    @keyframes fadeInUpSmooth {
+    @keyframes smoothSlideUp {
         0% { opacity: 0; transform: translateY(15px); }
         100% { opacity: 1; transform: translateY(0); }
     }
-    .anim-fade-up {
-        animation: fadeInUpSmooth 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    .anim-smooth-slide {
+        animation: smoothSlideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
     }
 </style>
 
-<div class="container py-2">
-    <div class="signup-page-wrapper shadow-sm">
+<div class="container py-2 font-jakarta">
+    <div class="luxury-signup-wrapper shadow-sm">
         <div class="container">
             <div class="row justify-content-center">
                 <div class="col-lg-10 col-xl-9">
                     
-                    <div class="signup-card-box p-4 p-md-5">
+                    <div class="luxury-signup-card p-4 p-md-5">
                         
                         <!-- ================= OTP VERIFICATION BLOCK ================= -->
                         {% if show_otp %}
                         <div class="text-center mb-4">
-                            <span class="trust-pill-badge mb-2 d-inline-block">Security Verification</span>
+                            <span class="pill-trust-badge mb-2 d-inline-block">Security Verification</span>
                             <h3 class="fw-bold text-dark mb-1">Verify Your Email Address</h3>
                             <p class="text-muted small mb-0">Humne aapke email <b>{{ email }}</b> par ek secure 6-digit OTP bheja hai[cite: 3].</p>
                         </div>
 
-                        <div class="trust-notice-card mb-4 text-start">
+                        <div class="notice-warning-card mb-4 text-start">
                             <div class="d-flex align-items-start">
-                                <i class="fa-solid fa-shield-halved text-warning fs-5 me-2 mt-1"></i>
+                                <i class="fa-solid fa-shield-halved text-amber-600 fs-5 me-2 mt-1" style="color: #d97706;"></i>
                                 <div>
                                     <strong>Aapka account secure hai:</strong> OTP enter karne ke baad aapka account turant active ho jayega. Agar aapko email nahi mila, toh apna <b>Spam/Junk folder</b> zaroor check karein[cite: 3].
                                 </div>
@@ -198,7 +211,7 @@
                         <form method="POST" action="{{ url_for('verify_signup_otp') }}">
                             <div class="mb-4 d-flex justify-content-center">
                                 <div class="col-md-8">
-                                    <div class="input-group clean-input-wrapper-box p-1">
+                                    <div class="input-group luxury-input-group-box p-1">
                                         <span class="input-group-text"><i class="fa-solid fa-key"></i></span>
                                         <input type="text" name="otp" class="form-control text-center fw-bold fs-3" required placeholder="• • • • • •" maxlength="6" style="letter-spacing: 6px;">
                                     </div>
@@ -207,7 +220,7 @@
                             
                             <div class="d-flex justify-content-center">
                                 <div class="col-md-8">
-                                    <button type="submit" class="btn btn-gradient-custom w-100 py-3 fw-bold shadow-sm" style="font-size: 1rem;">
+                                    <button type="submit" class="btn btn-amber-gradient w-100 py-3 fw-bold shadow-sm" style="font-size: 1rem;">
                                         Verify & Create Account <i class="fa-solid fa-check-circle ms-2"></i>
                                     </button>
                                 </div>
@@ -223,7 +236,7 @@
                         
                         <!-- Header -->
                         <div class="text-center mb-4">
-                            <span class="trust-pill-badge mb-2 d-inline-block">Kaamconnect Platform</span>
+                            <span class="pill-trust-badge mb-2 d-inline-block">Kaamconnect Platform</span>
                             {% if show_google_step2 %}
                             <h3 class="fw-bold text-dark mb-1">Almost Done, {{ google_data.name.split()[0] }}!</h3>
                             <p class="text-muted small mb-0">Google account verify ho gaya. Kripya apna Role aur Mobile choose karein[cite: 3].</p>
@@ -233,10 +246,21 @@
                             {% endif %}
                         </div>
 
+                        <!-- GOOGLE BUTTON PLACED AT THE TOP OF SIGNUP FORM -->
                         {% if not show_google_step2 %}
-                        <div class="trust-notice-card mb-4">
+                        <a href="{{ url_for('login_google') }}" class="btn-top-google-signup mb-3">
+                            <img src="https://www.svgrepo.com/show/475656/google-color.svg" alt="Google" style="width: 24px; height: 24px;">
+                            Sign up instantly with Google
+                        </a>
+
+                        <div class="divider-or-text mb-4">
+                            <hr>
+                            <span>OR FILL MANUAL DETAILS</span>
+                        </div>
+                        
+                        <div class="notice-warning-card mb-4">
                             <div class="d-flex align-items-start">
-                                <i class="fa-solid fa-circle-info text-warning fs-5 me-2 mt-1"></i>
+                                <i class="fa-solid fa-circle-info text-amber-600 fs-5 me-2 mt-1" style="color: #d97706;"></i>
                                 <div class="text-start">
                                     <strong>Zaroori Instructions (Kripya dhyan dein):</strong>
                                     <ul class="mb-0 ps-3 mt-1 small">
@@ -256,8 +280,8 @@
                                 <label class="form-label fw-bold text-uppercase text-secondary mb-3 d-block text-center" style="font-size: 0.78rem; letter-spacing: 1px;">Choose Your Profile Category</label>
                                 <div class="row g-3">
                                     <div class="col-4">
-                                        <div class="role-selection-card text-center p-3 h-100 d-flex flex-column align-items-center justify-content-center" id="card_customer" onclick="selectRole('customer')">
-                                            <div class="role-icon-container mb-2 text-primary">
+                                        <div class="role-tile-card text-center p-3 h-100 d-flex flex-column align-items-center justify-content-center" id="card_customer" onclick="selectRole('customer')">
+                                            <div class="role-tile-icon mb-2 text-primary">
                                                 <i class="fa-solid fa-user-tie"></i>
                                             </div>
                                             <h6 class="fw-bold text-dark mb-1" style="font-size: 0.9rem;">Customer</h6>
@@ -266,8 +290,8 @@
                                         </div>
                                     </div>
                                     <div class="col-4">
-                                        <div class="role-selection-card text-center p-3 h-100 d-flex flex-column align-items-center justify-content-center" id="card_shop_owner" onclick="selectRole('shop_owner')">
-                                            <div class="role-icon-container mb-2 text-success">
+                                        <div class="role-tile-card text-center p-3 h-100 d-flex flex-column align-items-center justify-content-center" id="card_shop_owner" onclick="selectRole('shop_owner')">
+                                            <div class="role-tile-icon mb-2 text-success">
                                                 <i class="fa-solid fa-shop"></i>
                                             </div>
                                             <h6 class="fw-bold text-dark mb-1" style="font-size: 0.9rem;">Shop Owner</h6>
@@ -276,8 +300,8 @@
                                         </div>
                                     </div>
                                     <div class="col-4">
-                                        <div class="role-selection-card text-center p-3 h-100 d-flex flex-column align-items-center justify-content-center" id="card_worker" onclick="selectRole('worker')">
-                                            <div class="role-icon-container mb-2 text-warning">
+                                        <div class="role-tile-card text-center p-3 h-100 d-flex flex-column align-items-center justify-content-center" id="card_worker" onclick="selectRole('worker')">
+                                            <div class="role-tile-icon mb-2 text-warning">
                                                 <i class="fa-solid fa-helmet-safety"></i>
                                             </div>
                                             <h6 class="fw-bold text-dark mb-1" style="font-size: 0.9rem;">Skilled Worker</h6>
@@ -289,17 +313,17 @@
                             </div>
 
                             <!-- Common Credentials Section -->
-                            <div id="commonCredentials" style="display: none;" class="anim-fade-up mb-3">
-                                <div class="p-4 rounded-4" style="background: #f8fafc; border: 1px solid var(--border-color);">
+                            <div id="commonCredentials" style="display: none;" class="anim-smooth-slide mb-3">
+                                <div class="p-4 rounded-4" style="background: #fafafa; border: 2px solid var(--border-light);">
                                     <div class="row g-3">
                                         
                                         <!-- Name -->
                                         <div class="col-md-6">
                                             <label class="form-label text-secondary mb-1" style="font-size: 0.78rem; font-weight: 700;">Full Name {% if not show_google_step2 %}<span class="text-danger">*</span>{% endif %}</label>
-                                            <div class="input-group clean-input-wrapper-box">
+                                            <div class="input-group luxury-input-group-box">
                                                 <span class="input-group-text"><i class="fa-solid fa-user"></i></span>
                                                 {% if show_google_step2 %}
-                                                    <input type="text" class="form-control fw-bold" style="background: #eef2ff;" value="{{ google_data.name }}" readonly disabled>
+                                                    <input type="text" class="form-control fw-bold" style="background: #fef3c7;" value="{{ google_data.name }}" readonly disabled>
                                                 {% else %}
                                                     <input type="text" name="name" class="form-control" required placeholder="Enter your full name">
                                                 {% endif %}
@@ -309,10 +333,10 @@
                                         <!-- Email -->
                                         <div class="col-md-6">
                                             <label class="form-label text-secondary mb-1" style="font-size: 0.78rem; font-weight: 700;">Email Address {% if not show_google_step2 %}<span class="text-danger">*</span>{% endif %}</label>
-                                            <div class="input-group clean-input-wrapper-box">
+                                            <div class="input-group luxury-input-group-box">
                                                 <span class="input-group-text"><i class="fa-solid fa-envelope"></i></span>
                                                 {% if show_google_step2 %}
-                                                    <input type="email" class="form-control fw-bold" style="background: #eef2ff;" value="{{ google_data.email }}" readonly disabled>
+                                                    <input type="email" class="form-control fw-bold" style="background: #fef3c7;" value="{{ google_data.email }}" readonly disabled>
                                                 {% else %}
                                                     <input type="email" name="email" class="form-control" required placeholder="name@example.com" pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$" title="Kripya ek valid email dalein jisme OTP aa sake">
                                                 {% endif %}
@@ -327,8 +351,8 @@
                                         <!-- Mobile Number -->
                                         <div class="col-md-6">
                                             <label class="form-label text-secondary mb-1" style="font-size: 0.78rem; font-weight: 700;">Mobile Number <span class="text-danger">*</span></label>
-                                            <div class="input-group clean-input-wrapper-box">
-                                                <select name="country_code" id="country_code" class="form-select px-2" style="max-width: 95px; border-right: 1px solid var(--border-color); border-radius: 0;">
+                                            <div class="input-group luxury-input-group-box">
+                                                <select name="country_code" id="country_code" class="form-select px-2" style="max-width: 95px; border-right: 2px solid var(--border-light); border-radius: 0;">
                                                     <option value="+91" selected>+91</option>
                                                     <option value="+1">+1</option>
                                                     <option value="+44">+44</option>
@@ -342,7 +366,7 @@
                                         <!-- Password -->
                                         <div class="col-md-6">
                                             <label class="form-label text-secondary mb-1" style="font-size: 0.78rem; font-weight: 700;">Create Password <span class="text-danger">*</span></label>
-                                            <div class="input-group clean-input-wrapper-box">
+                                            <div class="input-group luxury-input-group-box">
                                                 <span class="input-group-text"><i class="fa-solid fa-lock"></i></span>
                                                 <input type="password" name="password" class="form-control" required placeholder="Create secure password">
                                             </div>
@@ -353,11 +377,11 @@
                             </div>
 
                             <!-- Professional / Details Section -->
-                            <div id="proFields" style="display: none;" class="anim-fade-up mb-3">
-                                <div class="p-4 rounded-4" style="background: #f8fafc; border: 1px solid var(--border-color);">
+                            <div id="proFields" style="display: none;" class="anim-smooth-slide mb-3">
+                                <div class="p-4 rounded-4" style="background: #fafafa; border: 2px solid var(--border-light);">
                                     <div class="mb-3" id="shopNameContainer" style="display: none;">
                                         <label class="form-label text-secondary mb-1" style="font-size: 0.78rem; font-weight: 700;">Shop / Business Name <span class="text-danger">*</span></label>
-                                        <div class="input-group clean-input-wrapper-box">
+                                        <div class="input-group luxury-input-group-box">
                                             <span class="input-group-text"><i class="fa-solid fa-shop"></i></span>
                                             <input type="text" name="shop_name" id="shopNameInput" class="form-control" placeholder="Enter shop or business name">
                                         </div>
@@ -365,28 +389,28 @@
                                     <div class="row g-3">
                                         <div class="col-md-6">
                                             <label class="form-label text-secondary mb-1" style="font-size: 0.78rem; font-weight: 700;">Expertise / Skill <span class="text-danger">*</span></label>
-                                            <div class="input-group clean-input-wrapper-box">
+                                            <div class="input-group luxury-input-group-box">
                                                 <span class="input-group-text"><i class="fa-solid fa-screwdriver-wrench"></i></span>
                                                 <input type="text" name="expertise" id="expertInput" class="form-control" placeholder="e.g. Electrician, Painter, Plumber">
                                             </div>
                                         </div>
                                         <div class="col-md-6">
                                             <label class="form-label text-secondary mb-1" style="font-size: 0.78rem; font-weight: 700;">Experience (Years) <span class="text-danger">*</span></label>
-                                            <div class="input-group clean-input-wrapper-box">
+                                            <div class="input-group luxury-input-group-box">
                                                 <span class="input-group-text"><i class="fa-solid fa-star"></i></span>
                                                 <input type="text" name="experience" id="expInput" class="form-control" placeholder="e.g. 4">
                                             </div>
                                         </div>
                                         <div class="col-md-6" id="workerFields" style="display: none;">
                                             <label class="form-label text-secondary mb-1" style="font-size: 0.78rem; font-weight: 700;">Expected Daily Wage (₹) <span class="text-danger">*</span></label>
-                                            <div class="input-group clean-input-wrapper-box">
+                                            <div class="input-group luxury-input-group-box">
                                                 <span class="input-group-text"><i class="fa-solid fa-indian-rupee-sign"></i></span>
                                                 <input type="number" name="per_day_amount" id="wageInput" class="form-control" placeholder="e.g. 700">
                                             </div>
                                         </div>
                                         <div class="col-12" id="addressContainer">
                                             <label class="form-label text-secondary mb-1" style="font-size: 0.78rem; font-weight: 700;">Address / Location <span class="text-danger">*</span></label>
-                                            <div class="input-group clean-input-wrapper-box">
+                                            <div class="input-group luxury-input-group-box">
                                                 <span class="input-group-text"><i class="fa-solid fa-location-dot"></i></span>
                                                 <input type="text" name="address" id="addressInput" class="form-control" placeholder="Gali, Shop No, Area, City...">
                                             </div>
@@ -396,8 +420,8 @@
                             </div>
 
                             <!-- Submit Button -->
-                            <div id="actionContainer" style="display: none;" class="anim-fade-up mt-4">
-                                <button type="submit" class="btn btn-gradient-custom w-100 py-3 fw-bold shadow-sm" style="font-size: 1rem;">
+                            <div id="actionContainer" style="display: none;" class="anim-smooth-slide mt-4">
+                                <button type="submit" class="btn btn-amber-gradient w-100 py-3 fw-bold shadow-sm" style="font-size: 1rem;">
                                     {% if show_google_step2 %}
                                         Complete Account Setup <i class="fa-solid fa-rocket ms-2"></i>
                                     {% else %}
@@ -406,22 +430,10 @@
                                 </button>
                             </div>
                         </form>
-                        
-                        <!-- GOOGLE SIGNUP BUTTON -->
-                        {% if not show_google_step2 %}
-                        <div class="position-relative my-4 text-center anim-fade-up">
-                            <hr style="border-color: var(--border-color);">
-                            <span class="position-absolute top-50 start-50 translate-middle px-3 bg-white text-muted small fw-bold" style="border-radius: 5px; letter-spacing: 1px;">OR SIGN UP WITH</span>
-                        </div>
-                        <a href="{{ url_for('login_google') }}" class="btn btn-google-custom w-100 py-3 fw-bold d-flex align-items-center justify-content-center text-decoration-none anim-fade-up">
-                            <img src="https://www.svgrepo.com/show/475656/google-color.svg" alt="Google" style="width: 22px; height: 22px; margin-right: 10px;">
-                            Continue with Google
-                        </a>
-                        {% endif %}
 
-                        <div class="text-center mt-4">
-                            <p class="text-dark small mb-0" style="font-size: 0.9rem; font-weight: 500;">
-                                Already have an account? <a href="{{ url_for('login') }}" class="fw-bold text-decoration-none" style="color: var(--primary-color);">Sign in here</a>
+                        <div class="text-center mt-4 pt-3 border-top" style="border-color: var(--border-light) !important;">
+                            <p class="text-dark small mb-0" style="font-size: 0.92rem; font-weight: 500;">
+                                Already have an account? <a href="{{ url_for('login') }}" class="fw-bold text-decoration-none" style="color: #d97706;">Sign in here</a>
                             </p>
                         </div>
                         
@@ -443,7 +455,7 @@
     });
 
     function selectRole(role) {
-        document.querySelectorAll('.role-selection-card').forEach(card => card.classList.remove('active'));
+        document.querySelectorAll('.role-tile-card').forEach(card => card.classList.remove('active'));
         
         const roleRadio = document.getElementById('role_' + role);
         const roleCard = document.getElementById('card_' + role);
