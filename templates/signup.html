@@ -109,7 +109,6 @@
         background: transparent;
     }
 
-    /* Top Google Button in Signup */
     .btn-google-signup-top {
         background: #ffffff;
         border: 1.5px solid var(--border-light);
@@ -249,9 +248,8 @@
                             Sign up instantly with Google
                         </a>
 
-                        <div class="divider-text-center mb-3">
-                            <hr>
-                            <span>OR FILL MANUAL DETAILS</span>
+                        <div class="divider-text-center mb-3 text-center">
+                            <span class="text-muted small fw-bold">OR FILL MANUAL DETAILS</span>
                         </div>
                         
                         <div class="notice-box-card mb-4">
@@ -313,26 +311,26 @@
                                 <div class="p-4 rounded-4" style="background: #fafafa; border: 1.5px solid var(--border-light);">
                                     <div class="row g-3">
                                         
-                                        <!-- Name -->
+                                        <!-- Name (Editable even if coming from Google) -->
                                         <div class="col-md-6">
-                                            <label class="form-label text-secondary mb-1" style="font-size: 0.75rem; font-weight: 700;">Full Name {% if not show_google_step2 %}<span class="text-danger">*</span>{% endif %}</label>
+                                            <label class="form-label text-secondary mb-1" style="font-size: 0.75rem; font-weight: 700;">Full Name <span class="text-danger">*</span></label>
                                             <div class="input-group clean-input-box-group">
                                                 <span class="input-group-text"><i class="fa-solid fa-user"></i></span>
                                                 {% if show_google_step2 %}
-                                                    <input type="text" class="form-control fw-bold" style="background: #fef3c7;" value="{{ google_data.name }}" readonly disabled>
+                                                    <input type="text" name="name" class="form-control fw-bold" value="{{ google_data.name }}" required placeholder="Enter your full name">
                                                 {% else %}
                                                     <input type="text" name="name" class="form-control" required placeholder="Enter your full name">
                                                 {% endif %}
                                             </div>
                                         </div>
                                         
-                                        <!-- Email -->
+                                        <!-- Email (Readonly to maintain session token integrity) -->
                                         <div class="col-md-6">
                                             <label class="form-label text-secondary mb-1" style="font-size: 0.75rem; font-weight: 700;">Email Address {% if not show_google_step2 %}<span class="text-danger">*</span>{% endif %}</label>
                                             <div class="input-group clean-input-box-group">
                                                 <span class="input-group-text"><i class="fa-solid fa-envelope"></i></span>
                                                 {% if show_google_step2 %}
-                                                    <input type="email" class="form-control fw-bold" style="background: #fef3c7;" value="{{ google_data.email }}" readonly disabled>
+                                                    <input type="email" name="email" class="form-control fw-bold" style="background: #fef3c7;" value="{{ google_data.email }}" readonly>
                                                 {% else %}
                                                     <input type="email" name="email" class="form-control" required placeholder="name@example.com" pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$" title="Kripya ek valid email dalein jisme OTP aa sake">
                                                 {% endif %}
