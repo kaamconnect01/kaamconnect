@@ -254,7 +254,6 @@ def authorize_google():
     
     user = User.query.filter_by(email=email).first()
     if user:
-        # FEATURE: ADMIN LOGIN OTP RULES REMAIN EXACTLY THE SAME
         if user.role == 'admin':
             otp = str(random.randint(100000, 999999))
             session['admin_login_id'] = user.id
@@ -263,7 +262,6 @@ def authorize_google():
             flash(f'Admin Security Alert: Ek OTP aapke registered email ({user.email}) par bheja gaya hai.', 'info')
             return redirect(url_for('verify_admin_otp'))
         
-        # Normal user login
         session.permanent = True
         login_user(user)
         flash('Google se successfully login ho gaye hain!', 'success')
@@ -272,7 +270,6 @@ def authorize_google():
         elif user.role == 'worker': return redirect(url_for('worker_dash'))
         return redirect(url_for('index'))
     else:
-        # Naya User - Redirect to Step 2 (Collect Mobile & Role)
         session['google_signup'] = {'email': email, 'name': name}
         flash('Google Email Verify ho gaya hai. Kripya apna Role aur baki details confirm karein.', 'info')
         return redirect(url_for('google_step2'))
@@ -296,7 +293,6 @@ def google_step2():
         per_day_raw = request.form.get('per_day_amount')
         per_day_amount = int(per_day_raw) if per_day_raw and per_day_raw.strip().isdigit() else None
         
-        # Admin Number block system
         restricted_numbers = ["9999999999", "+91 9999999999"]
         admin_users = User.query.filter_by(role='admin').all()
         for admin in admin_users:
@@ -369,13 +365,11 @@ def signup():
             flash('Please fill all mandatory fields including Email.', 'danger')
             return redirect(url_for('signup', role=role))
 
-        # Validate Email Format via Regex
         email_regex = r'^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$'
         if not re.match(email_regex, email, re.IGNORECASE):
             flash('Kripya ek valid Email address dalein (jaise name@example.com).', 'danger')
             return redirect(url_for('signup', role=role))
 
-        # FEATURE 2: ADMIN NUMBER BLOCKING SYSTEM
         restricted_numbers = ["9999999999", "+91 9999999999"]
         admin_users = User.query.filter_by(role='admin').all()
         for admin in admin_users:
@@ -387,7 +381,6 @@ def signup():
             flash('Kripya apna valid mobile number use karein. System admin ka number allowed nahi hai.', 'danger')
             return redirect(url_for('signup', role=role))
 
-        # Combine Country Code and Mobile Number
         mobile = f"{country_code} {raw_mobile}"
 
         user_exists = User.query.filter_by(mobile=mobile).first()
@@ -395,7 +388,6 @@ def signup():
             flash('Mobile number pehle se registered hai!', 'danger')
             return redirect(url_for('signup', role=role))
 
-        # FEATURE 1: SEND OTP INSTEAD OF SAVING DIRECTLY
         hashed_password = generate_password_hash(password, method='scrypt')
         
         otp = str(random.randint(100000, 999999))
@@ -464,9 +456,7 @@ def login():
             user = User.query.filter_by(mobile=raw_mobile).first()
         
         if user and check_password_hash(user.password, password):
-            # FEATURE 3: ADMIN LOGIN OTP
             if user.role == 'admin':
-                # Auto-fix admin email if missing in DB
                 if not user.email:
                     user.email = os.environ.get('ADMIN_EMAIL') or os.environ.get('MAIL_USERNAME') or 'kaamconnect7@gmail.com'
                     db.session.commit()
@@ -478,7 +468,6 @@ def login():
                 flash(f'Admin Security Alert: Ek OTP aapke registered email ({user.email}) par bheja gaya hai.', 'info')
                 return redirect(url_for('verify_admin_otp'))
             
-            # Normal users login directly
             session.permanent = True
             login_user(user)
             if user.role == 'customer': return redirect(url_for('customer_dash'))
@@ -916,17 +905,20 @@ def approve_payment(req_id, action):
 @app.route('/create_admin')
 def create_admin():
     admin = User.query.filter_by(role='admin').first()
+    admin_password = os.environ.get('ADMIN_PASSWORD', 'admin123')
+    admin_email = os.environ.get('ADMIN_EMAIL') or os.environ.get('MAIL_USERNAME') or 'admin@kaamconnect.com'
+    
     if not admin:
-        hashed_pw = generate_password_hash('admin123', method='scrypt')
-        admin = User(role='admin', name='Super Admin', mobile='9999999999', email='admin@kaamconnect.com', password=hashed_pw, address='Head Office')
+        hashed_pw = generate_password_hash(admin_password, method='scrypt')
+        admin = User(role='admin', name='Super Admin', mobile='9999999999', email=admin_email, password=hashed_pw, address='Head Office')
         db.session.add(admin)
         db.session.commit()
-        return "Admin account created successfully! Mobile: 9999999999, Pass: admin123"
-    elif not admin.email:
-        admin.email = 'admin@kaamconnect.com'
+        return f"Admin account created successfully! Mobile: 9999999999, Pass: {admin_password}"
+    else:
+        admin.email = admin_email
+        admin.password = generate_password_hash(admin_password, method='scrypt')
         db.session.commit()
-        return "Admin email updated successfully to admin@kaamconnect.com!"
-    return "Admin already exists! Disabled for security.", 403
+        return "Admin account already exists! Password & Email updated from environment variables successfully."
 
 @app.route('/reset_db_danger_123')
 def reset_db_safely():
