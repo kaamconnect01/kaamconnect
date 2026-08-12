@@ -2,16 +2,25 @@ from flask import Flask, render_template, request, redirect, url_for, flash, ses
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
+from werkzeug.middleware.proxy_fix import ProxyFix   # <--- 1. Yeh import add karein
 from datetime import timedelta, datetime
 from zoneinfo import ZoneInfo
 import os
 import re
 import random
 
-# IMPORT OAUTH FOR GOOGLE LOGIN (Requires: pip install authlib)
+# IMPORT OAUTH FOR GOOGLE LOGIN
 from authlib.integrations.flask_client import OAuth
 
 app = Flask(__name__)
+
+# --- 2. RENDER PROXY FIX & URL SCHEME CONFIGURATION ---
+app.wsgi_app = ProxyFix(
+    app.wsgi_app, x_for=1, x_proto=1, x_host=1, x_prefix=1
+)
+app.config['PREFERRED_URL_SCHEME'] = 'https'
+
+# --- 3. SECURE SECRET KEY ---
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'super_secret_key_for_local_kaamconnect')
 app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(days=30)
 app.config['REMEMBER_COOKIE_DURATION'] = timedelta(days=30)
@@ -33,19 +42,14 @@ login_manager = LoginManager()
 login_manager.init_app(app)
 login_manager.login_view = 'login'
 
-# ================= OAUTH CONFIGURATION (GOOGLE) =================
+# ================= 4. OAUTH CONFIGURATION (GOOGLE) =================
 oauth = OAuth(app)
 google = oauth.register(
     name='google',
     client_id=os.environ.get('GOOGLE_CLIENT_ID', 'YOUR_GOOGLE_CLIENT_ID'),
     client_secret=os.environ.get('GOOGLE_CLIENT_SECRET', 'YOUR_GOOGLE_CLIENT_SECRET'),
-    access_token_url='https://accounts.google.com/o/oauth2/token',
-    access_token_params=None,
-    authorize_url='https://accounts.google.com/o/oauth2/auth',
-    authorize_params=None,
-    api_base_url='https://www.googleapis.com/oauth2/v1/',
-    client_kwargs={'scope': 'openid email profile'},
-    server_metadata_url='https://accounts.google.com/.well-known/openid-configuration'
+    server_metadata_url='https://accounts.google.com/.well-known/openid-configuration',
+    client_kwargs={'scope': 'openid email profile'}
 )
 
 # ================= DATABASE MODELS =================
