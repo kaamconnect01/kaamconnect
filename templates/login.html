@@ -6,339 +6,317 @@
     :root {
         --brand-amber: #f59e0b;
         --brand-amber-dark: #d97706;
-        --dark-bg: #09090b;
-        --card-bg: #ffffff;
         --text-main: #18181b;
         --text-muted: #71717a;
         --border-light: #e4e4e7;
     }
 
     body {
-        background-color: #f4f4f5;
+        background-color: #ffffff !important;
         font-family: 'Plus Jakarta Sans', sans-serif;
     }
 
-    .luxury-login-wrapper {
-        min-height: 88vh;
+    .clean-page-wrapper {
+        min-height: 85vh;
         display: flex;
         align-items: center;
         justify-content: center;
-        padding: 2.5rem 1rem;
+        padding: 2rem 1rem;
+        background: transparent;
     }
 
-    .luxury-card-container {
-        background: var(--card-bg);
-        border-radius: 32px;
-        box-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.08), 0 0 0 1px var(--border-light);
+    .clean-main-card {
+        background: #ffffff;
+        border-radius: 28px;
+        border: 1px solid var(--border-light);
+        box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.05);
         width: 100%;
-        max-width: 1100px;
+        max-width: 1050px;
         overflow: hidden;
     }
 
-    /* Left Side: Brand Experience */
-    .luxury-brand-side {
-        background: radial-gradient(circle at top left, #27272a 0%, #09090b 100%);
+    /* Left Brand Side */
+    .clean-brand-side {
+        background: #09090b;
         color: #ffffff;
-        padding: 4rem 3rem;
+        padding: 3.5rem 3rem;
         display: flex;
         flex-direction: column;
         justify-content: space-between;
-        position: relative;
-        overflow: hidden;
     }
 
-    .luxury-brand-side::after {
-        content: '';
-        position: absolute;
-        bottom: -50px;
-        right: -50px;
-        width: 200px;
-        height: 200px;
-        background: radial-gradient(circle, rgba(245, 158, 11, 0.25) 0%, transparent 70%);
-        border-radius: 50%;
-    }
-
-    .amber-badge {
+    .amber-badge-pill {
         display: inline-flex;
         align-items: center;
         gap: 8px;
         background: rgba(245, 158, 11, 0.12);
         border: 1px solid rgba(245, 158, 11, 0.3);
         color: #fbbf24;
-        padding: 8px 18px;
+        padding: 6px 16px;
         border-radius: 50px;
-        font-size: 0.85rem;
+        font-size: 0.8rem;
         font-weight: 600;
     }
 
-    .feature-point-box {
+    .feature-item-box {
         background: rgba(255, 255, 255, 0.04);
         border: 1px solid rgba(255, 255, 255, 0.08);
-        border-radius: 20px;
-        padding: 1.25rem;
-        margin-bottom: 1rem;
-        backdrop-filter: blur(10px);
-        transition: transform 0.3s ease;
+        border-radius: 16px;
+        padding: 1.1rem;
+        margin-bottom: 0.85rem;
     }
 
-    .feature-point-box:hover {
-        transform: translateY(-3px);
-        border-color: rgba(245, 158, 11, 0.4);
-    }
-
-    /* Right Side: Form Panel */
-    .luxury-form-side {
-        padding: 4rem 3.5rem;
+    /* Right Form Side */
+    .clean-form-side {
+        padding: 3.5rem 3rem;
         display: flex;
         flex-direction: column;
         justify-content: center;
     }
 
-    .form-heading-title {
-        font-size: 2.1rem;
+    .form-heading {
+        font-size: 2rem;
         font-weight: 800;
         color: var(--text-main);
         letter-spacing: -0.5px;
     }
 
-    /* TOP GOOGLE BUTTON STYLING */
-    .btn-top-google {
+    /* Top Google Button */
+    .btn-google-top {
         background: #ffffff;
-        border: 2px solid var(--border-light);
+        border: 1.5px solid var(--border-light);
         color: var(--text-main);
-        border-radius: 16px;
-        padding: 0.95rem;
+        border-radius: 14px;
+        padding: 0.85rem;
         font-weight: 700;
-        font-size: 0.98rem;
+        font-size: 0.95rem;
         display: flex;
         align-items: center;
         justify-content: center;
         gap: 12px;
         text-decoration: none;
-        transition: all 0.3s ease;
-        box-shadow: 0 4px 12px rgba(0,0,0,0.02);
+        transition: all 0.25s ease;
     }
 
-    .btn-top-google:hover {
+    .btn-google-top:hover {
         background: #fafafa;
         border-color: var(--brand-amber);
         transform: translateY(-2px);
-        box-shadow: 0 8px 20px rgba(245, 158, 11, 0.12);
+        box-shadow: 0 6px 16px rgba(245, 158, 11, 0.1);
         color: var(--text-main);
     }
 
-    .divider-or-text {
+    .divider-text-center {
         position: relative;
         text-align: center;
-        margin: 1.75rem 0;
+        margin: 1.5rem 0;
     }
 
-    .divider-or-text hr {
+    .divider-text-center hr {
         border-color: var(--border-light);
     }
 
-    .divider-or-text span {
+    .divider-text-center span {
         position: absolute;
         top: 50%;
         left: 50%;
         transform: translate(-50%, -50%);
-        background: var(--card-bg);
+        background: #ffffff;
         padding: 0 1rem;
         color: var(--text-muted);
-        font-size: 0.78rem;
+        font-size: 0.75rem;
         font-weight: 700;
         letter-spacing: 1px;
     }
 
-    .input-group-element {
-        margin-bottom: 1.25rem;
+    .input-block-group {
+        margin-bottom: 1.2rem;
     }
 
-    .input-group-element label {
+    .input-block-group label {
         font-size: 0.78rem;
         font-weight: 700;
         color: #52525b;
-        margin-bottom: 0.5rem;
+        margin-bottom: 0.4rem;
         text-transform: uppercase;
-        letter-spacing: 0.8px;
+        letter-spacing: 0.5px;
         display: block;
     }
 
-    .input-box-wrapper {
+    .input-wrapper-inner {
         position: relative;
         display: flex;
         align-items: center;
     }
 
-    .input-icon-left {
+    .input-prefix-icon {
         position: absolute;
-        left: 1.15rem;
+        left: 1rem;
         color: #a1a1aa;
-        font-size: 1rem;
+        font-size: 0.95rem;
         z-index: 2;
         pointer-events: none;
     }
 
-    .luxury-form-control {
+    .clean-form-input {
         width: 100%;
-        padding: 0.9rem 1rem 0.9rem 3.2rem;
-        font-size: 0.98rem;
-        border-radius: 16px;
-        border: 2px solid var(--border-light);
+        padding: 0.85rem 1rem 0.85rem 3rem;
+        font-size: 0.95rem;
+        border-radius: 14px;
+        border: 1.5px solid var(--border-light);
         background-color: #fafafa;
         color: var(--text-main);
         font-weight: 600;
-        transition: all 0.25s ease;
+        transition: all 0.2s ease;
     }
 
-    .luxury-form-control:focus {
+    .clean-form-input:focus {
         outline: none;
         background-color: #ffffff;
         border-color: var(--brand-amber);
-        box-shadow: 0 0 0 4px rgba(245, 158, 11, 0.15);
+        box-shadow: 0 0 0 4px rgba(245, 158, 11, 0.12);
     }
 
-    .pass-toggle-action {
+    .password-eye-btn {
         position: absolute;
-        right: 1.15rem;
+        right: 1rem;
         background: none;
         border: none;
         color: #a1a1aa;
         cursor: pointer;
-        font-size: 1rem;
     }
 
-    .pass-toggle-action:hover {
+    .password-eye-btn:hover {
         color: var(--text-main);
     }
 
-    .btn-amber-submit {
+    .btn-amber-action {
         background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
         color: #ffffff;
-        border-radius: 16px;
-        padding: 1rem;
+        border-radius: 14px;
+        padding: 0.9rem;
         font-weight: 700;
-        font-size: 1rem;
+        font-size: 0.98rem;
         border: none;
         width: 100%;
         cursor: pointer;
-        box-shadow: 0 10px 25px -5px rgba(245, 158, 11, 0.4);
-        transition: all 0.3s ease;
+        box-shadow: 0 8px 20px -4px rgba(245, 158, 11, 0.4);
+        transition: all 0.25s ease;
         display: flex;
         align-items: center;
         justify-content: center;
         gap: 10px;
-        margin-top: 0.5rem;
+        margin-top: 0.4rem;
     }
 
-    .btn-amber-submit:hover {
+    .btn-amber-action:hover {
         transform: translateY(-2px);
-        box-shadow: 0 15px 30px -5px rgba(245, 158, 11, 0.5);
+        box-shadow: 0 12px 24px -4px rgba(245, 158, 11, 0.5);
         background: linear-gradient(135deg, #d97706 0%, #b45309 100%);
         color: white;
     }
 
     @media (max-width: 991.98px) {
-        .luxury-brand-side { padding: 3rem 2rem; }
-        .luxury-form-side { padding: 3rem 2rem; }
+        .clean-brand-side { padding: 2.5rem 1.5rem; }
+        .clean-form-side { padding: 2.5rem 1.5rem; }
     }
 </style>
 
-<div class="container luxury-login-wrapper">
-    <div class="luxury-card-container row g-0 d-flex flex-column-reverse flex-lg-row">
+<div class="container clean-page-wrapper">
+    <div class="clean-main-card row g-0 d-flex flex-column-reverse flex-lg-row">
         
         <!-- LEFT BRAND SIDE -->
-        <div class="col-lg-5 luxury-brand-side">
-            <div class="position-relative z-1">
-                <div class="mb-4">
-                    <span class="amber-badge">
-                        <i class="fa-solid fa-crown"></i> Kaamconnect Premium
+        <div class="col-lg-5 clean-brand-side">
+            <div>
+                <div class="mb-3">
+                    <span class="amber-badge-pill">
+                        <i class="fa-solid fa-crown"></i> Kaamconnect Portal
                     </span>
                 </div>
-                <h2 class="fw-bold mb-3" style="font-size: 2.3rem; letter-spacing: -1px;">Welcome Back!</h2>
-                <p class="text-zinc-400 mb-0" style="font-size: 0.98rem; line-height: 1.7; color: #a1a1aa;">
-                    Sign in to manage your active labor assignments, verify live customer requests, and track business growth seamlessly[cite: 2].
+                <h2 class="fw-bold mb-2" style="font-size: 2.1rem; letter-spacing: -1px;">Welcome Back!</h2>
+                <p class="text-zinc-400 mb-0" style="font-size: 0.92rem; line-height: 1.6; color: #a1a1aa;">
+                    Sign in to manage your active labor assignments, verify live requests, and track business growth seamlessly[cite: 2].
                 </p>
             </div>
 
-            <div class="my-4 position-relative z-1">
-                <div class="feature-point-box">
+            <div class="my-4">
+                <div class="feature-item-box">
                     <div class="d-flex align-items-center">
-                        <div class="rounded-3 bg-amber-500 bg-opacity-20 text-amber-400 d-flex align-items-center justify-content-center me-3" style="width: 48px; height: 48px; font-size: 1.25rem; flex-shrink: 0;">
+                        <div class="rounded-3 bg-amber-500 bg-opacity-20 text-amber-400 d-flex align-items-center justify-content-center me-3" style="width: 42px; height: 42px; font-size: 1.1rem; flex-shrink: 0;">
                             <i class="fa-solid fa-bolt-lightning"></i>
                         </div>
                         <div>
-                            <h6 class="mb-0 fw-bold text-white" style="font-size: 0.98rem;">Lightning Fast Access</h6>
-                            <small style="color: #a1a1aa;">Jump straight into your customized user portal.</small>
+                            <h6 class="mb-0 fw-bold text-white" style="font-size: 0.92rem;">Lightning Fast Access</h6>
+                            <small style="color: #a1a1aa; font-size: 0.8rem;">Direct jump to your custom dashboard.</small>
                         </div>
                     </div>
                 </div>
 
-                <div class="feature-point-box">
+                <div class="feature-item-box">
                     <div class="d-flex align-items-center">
-                        <div class="rounded-3 bg-emerald-500 bg-opacity-20 text-emerald-400 d-flex align-items-center justify-content-center me-3" style="width: 48px; height: 48px; font-size: 1.25rem; flex-shrink: 0;">
+                        <div class="rounded-3 bg-emerald-500 bg-opacity-20 text-emerald-400 d-flex align-items-center justify-content-center me-3" style="width: 42px; height: 42px; font-size: 1.1rem; flex-shrink: 0;">
                             <i class="fa-solid fa-shield-check"></i>
                         </div>
                         <div>
-                            <h6 class="mb-0 fw-bold text-white" style="font-size: 0.98rem;">Secured & Verified</h6>
-                            <small style="color: #a1a1aa;">Enterprise-grade security guarding your data.</small>
+                            <h6 class="mb-0 fw-bold text-white" style="font-size: 0.92rem;">Secured & Verified</h6>
+                            <small style="color: #a1a1aa; font-size: 0.8rem;">Enterprise-grade security protection.</small>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <div class="position-relative z-1 pt-2">
-                <small class="d-flex align-items-center gap-2" style="font-size: 0.85rem; color: #71717a;">
-                    <i class="fa-solid fa-lock text-amber-400"></i> End-to-end encrypted portal connection
+            <div>
+                <small class="d-flex align-items-center gap-2" style="font-size: 0.8rem; color: #71717a;">
+                    <i class="fa-solid fa-lock text-amber-400"></i> Encrypted secure connection
                 </small>
             </div>
         </div>
 
         <!-- RIGHT FORM SIDE -->
-        <div class="col-lg-7 luxury-form-side">
-            <div class="mb-4">
-                <h3 class="form-heading-title">Sign In to Portal</h3>
-                <p class="text-muted mt-1" style="font-size: 0.95rem;">Choose Google for instant login or enter credentials below[cite: 2].</p>
+        <div class="col-lg-7 clean-form-side">
+            <div class="mb-3">
+                <h3 class="form-heading">Sign In</h3>
+                <p class="text-muted mt-1" style="font-size: 0.92rem;">Choose Google for instant access or use your mobile number[cite: 2].</p>
             </div>
 
-            <!-- GOOGLE BUTTON PLACED AT THE TOP -->
-            <a href="{{ url_for('login_google') }}" class="btn-top-google mb-2">
-                <img src="https://www.svgrepo.com/show/475656/google-color.svg" alt="Google" style="width: 24px; height: 24px;">
-                Continue instantly with Google
+            <!-- GOOGLE BUTTON AT TOP -->
+            <a href="{{ url_for('login_google') }}" class="btn-google-top mb-2">
+                <img src="https://www.svgrepo.com/show/475656/google-color.svg" alt="Google" style="width: 22px; height: 22px;">
+                Continue with Google
             </a>
 
-            <div class="divider-or-text">
+            <div class="divider-text-center">
                 <hr>
-                <span>OR USE MOBILE & PASSWORD</span>
+                <span>OR USE MOBILE NUMBER</span>
             </div>
 
             <form method="POST">
-                <div class="input-group-element">
+                <div class="input-block-group">
                     <label>Registered Mobile Number</label>
-                    <div class="input-box-wrapper">
-                        <input type="tel" name="mobile" class="luxury-form-control" required placeholder="e.g. 9876543210" pattern="[0-9]{10}" maxlength="10">
-                        <i class="fa-solid fa-mobile-screen input-icon-left"></i>
+                    <div class="input-wrapper-inner">
+                        <input type="tel" name="mobile" class="clean-form-input" required placeholder="e.g. 9876543210" pattern="[0-9]{10}" maxlength="10">
+                        <i class="fa-solid fa-mobile-screen input-prefix-icon"></i>
                     </div>
                 </div>
                 
-                <div class="input-group-element">
+                <div class="input-block-group">
                     <label>Account Password</label>
-                    <div class="input-box-wrapper">
-                        <input type="password" id="passwordInput" name="password" class="luxury-form-control" required placeholder="Enter secure password">
-                        <i class="fa-solid fa-lock input-icon-left"></i>
-                        <button type="button" class="pass-toggle-action" onclick="togglePasswordVisibility()" aria-label="Toggle password visibility">
+                    <div class="input-wrapper-inner">
+                        <input type="password" id="passwordInput" name="password" class="clean-form-input" required placeholder="Enter your password">
+                        <i class="fa-solid fa-lock input-prefix-icon"></i>
+                        <button type="button" class="password-eye-btn" onclick="togglePasswordVisibility()" aria-label="Toggle password visibility">
                             <i class="fa-regular fa-eye" id="toggleIcon"></i>
                         </button>
                     </div>
                 </div>
 
-                <button type="submit" class="btn-amber-submit">
+                <button type="submit" class="btn-amber-action">
                     <span>Sign In Now</span>
                     <i class="fa-solid fa-arrow-right"></i>
                 </button>
                 
-                <div class="text-center pt-4 mt-3 border-top" style="border-color: var(--border-light) !important;">
-                    <p class="text-muted small mb-0" style="font-size: 0.92rem;">
+                <div class="text-center pt-3 mt-3 border-top" style="border-color: var(--border-light) !important;">
+                    <p class="text-muted small mb-0" style="font-size: 0.9rem;">
                         Don't have an account yet? 
                         <a href="{{ url_for('signup') }}" class="fw-bold text-decoration-none ms-1" style="color: #d97706;">Create an account</a>
                     </p>
