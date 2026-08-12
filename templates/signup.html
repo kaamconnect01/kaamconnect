@@ -208,6 +208,41 @@
     }
 </style>
 
+<!-- ================= GOOGLE SUCCESS POPUP (Auto-close in 5s) ================= -->
+{% if show_google_step2 %}
+<div id="googleSuccessPopup" class="position-fixed top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center" style="background: rgba(0,0,0,0.5); z-index: 1050; backdrop-filter: blur(4px);">
+    <div class="bg-white p-4 p-md-5 rounded-4 shadow-lg text-center anim-fade mx-3" style="max-width: 420px; border: 2px solid #10b981;">
+        <div class="mb-3">
+            <div class="rounded-circle d-inline-flex align-items-center justify-content-center shadow-sm" style="width: 75px; height: 75px; background: #ecfdf5; color: #10b981; font-size: 2.2rem;">
+                <i class="fa-solid fa-circle-check"></i>
+            </div>
+        </div>
+        <h4 class="fw-bold text-dark mb-2">Email Verified Successfully!</h4>
+        <p class="text-muted small mb-4">Google dwara email successfully verify ho gaya hai. Ab OTP ki zaroorat nahi hai. Kripya apni baaki details fill karke setup complete karein.</p>
+        <button type="button" onclick="closeGooglePopup()" class="btn btn-success w-100 py-2.5 fw-bold rounded-3 shadow-sm" style="background: #10b981; border: none;">
+            Continue Setup <i class="fa-solid fa-arrow-right ms-2"></i>
+        </button>
+    </div>
+</div>
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        // Auto close popup after 5 seconds (5000 milliseconds)
+        setTimeout(function() {
+            closeGooglePopup();
+        }, 5000);
+    });
+
+    function closeGooglePopup() {
+        const popup = document.getElementById('googleSuccessPopup');
+        if (popup) {
+            popup.style.transition = 'opacity 0.4s ease';
+            popup.style.opacity = '0';
+            setTimeout(() => popup.remove(), 400);
+        }
+    }
+</script>
+{% endif %}
+
 <div class="container py-2">
     <div class="clean-signup-wrapper">
         <div class="container">
@@ -221,14 +256,14 @@
                         <div class="text-center mb-4">
                             <span class="badge-trust-tag mb-2 d-inline-block">Security Verification</span>
                             <h3 class="fw-bold text-dark mb-1">Verify Your Email Address</h3>
-                            <p class="text-muted small mb-0">Humne aapke email <b>{{ email }}</b> par ek secure 6-digit OTP bheja hai[cite: 3].</p>
+                            <p class="text-muted small mb-0">Humne aapke email <b>{{ email }}</b> par ek secure 6-digit OTP bheja hai.</p>
                         </div>
 
                         <div class="notice-box-card mb-4 text-start">
                             <div class="d-flex align-items-start">
                                 <i class="fa-solid fa-shield-halved fs-5 me-2 mt-1" style="color: #d97706;"></i>
                                 <div>
-                                    <strong>Aapka account secure hai:</strong> OTP enter karne ke baad aapka account turant active ho jayega. Agar aapko email nahi mila, toh apna <b>Spam/Junk folder</b> zaroor check karein[cite: 3].
+                                    <strong>Aapka account secure hai:</strong> OTP enter karne ke baad aapka account turant active ho jayega. Agar aapko email nahi mila, toh apna <b>Spam/Junk folder</b> zaroor check karein.
                                 </div>
                             </div>
                         </div>
@@ -262,13 +297,8 @@
                         <!-- Header -->
                         <div class="text-center mb-4">
                             <span class="badge-trust-tag mb-2 d-inline-block">Kaamconnect Platform</span>
-                            {% if show_google_step2 %}
-                            <h3 class="fw-bold text-dark mb-1">Almost Done, {{ google_data.name.split()[0] }}!</h3>
-                            <p class="text-muted small mb-0">Google account verify ho gaya. Kripya apna Role aur Mobile choose karein[cite: 3].</p>
-                            {% else %}
                             <h3 class="fw-bold text-dark mb-1">Create Your Account</h3>
-                            <p class="text-muted small mb-0">Apna registration tareeka select karein aur judhein[cite: 3].</p>
-                            {% endif %}
+                            <p class="text-muted small mb-0">Apna registration tareeka select karein aur judhein.</p>
                         </div>
 
                         <!-- 2 OPTIONS CHOICE SCREEN (Only shown if not in Google Step 2) -->
