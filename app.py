@@ -105,6 +105,18 @@ class SiteSettings(db.Model):
     maintenance_mode = db.Column(db.Boolean, default=False)
     admin_upi = db.Column(db.String(100), default='admin@upi')
 
+class LeadReport(db.Model):
+    __tablename__ = 'lead_report'
+    id = db.Column(db.Integer, primary_key=True)
+    shop_owner_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+    requirement_id = db.Column(db.Integer, db.ForeignKey('requirement.id'), nullable=False)
+    reason = db.Column(db.Text, nullable=False)
+    status = db.Column(db.String(20), default='Pending')
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+    shop_owner = db.relationship('User', backref='lead_reports')
+    requirement = db.relationship('Requirement', backref='reports')
+
 class Vacancy(db.Model):
     __tablename__ = 'vacancy'
     id = db.Column(db.Integer, primary_key=True)
@@ -279,6 +291,51 @@ def authorize_google():
         flash('Google Email Verify ho gaya hai. Kripya apna Role aur baki details confirm karein.', 'info')
         return redirect(url_for('google_step2'))
 
+def notify_admin_reported_lead(shop_owner, req, reason):
+    try:
+        api_key = os.environ.get('BREVO_API_KEY')
+        admin_email = os.environ.get('ADMIN_EMAIL') or os.environ.get('MAIL_USERNAME')
+        sender_email = os.environ.get('MAIL_USERNAME', 'no-reply@kaamconnect.com')
+        
+        if api_key and admin_email:
+            import urllib.request
+            import json
+            url = "https://api.brevo.com/v3/smtp/email"
+            payload = {
+                "sender": {"name": "Kaamconnect System", "email": sender_email},
+                "to": [{"email": admin_email}],
+                "subject": f"⚠️ Lead Reported by Shop Owner ({shop_owner.name})",
+                "htmlContent": f"""
+                <html>
+                    <body>
+                        <div style="font-family: Arial, sans-serif; padding: 20px; border: 1px solid #ddd; border-radius: 5px;">
+                            <h2 style="color: #dc3545;">⚠️ Ek Lead Report Ki Gayi Hai!</h2>
+                            <p>Shop owner ne ek requirement/lead ke khilaf report darj ki hai. Details niche hain:</p>
+                            <ul>
+                                <li><b>Shop Owner Name:</b> {shop_owner.name}</li>
+                                <li><b>Shop Mobile:</b> {shop_owner.mobile}</li>
+                                <li><b>Requirement ID:</b> #{req.id}</li>
+                                <li><b>Category:</b> {req.category}</li>
+                                <li><b>Reason / Issue:</b> {reason}</li>
+                            </ul>
+                            <p>Kripya Admin Dashboard par jakar ise check karein.</p>
+                        </div>
+                    </body>
+                </html>
+                """
+            }
+            headers = {
+                "accept": "application/json",
+                "api-key": api_key,
+                "content-type": "application/json"
+            }
+            req_data = json.dumps(payload).encode('utf-8')
+            req_obj = urllib.request.Request(url, data=req_data, headers=headers, method='POST')
+            with urllib.request.urlopen(req_obj, timeout=5) as response:
+                print("Admin report notification email sent.")
+    except Exception as e:
+        print(f"Admin report notification error: {e}")
+
 @app.route('/google_step2', methods=['GET', 'POST'])
 def google_step2():
     if 'google_signup' not in session:
@@ -355,10 +412,23 @@ def report_lead(req_id):
     if current_user.role.lower() != 'shop_owner':
         return "Unauthorized", 403
         
-    reason = request.form.get('reason', 'No reason provided')
+    reason = request.form.get('reason', 'No reason provided').strip()
+    req = Requirement.query.get_or_404(req_id)
     
-    # Aap yahan report database mein save kar sakte hain ya admin ko notify kar sakte hain
-    flash('Lead successfully report ho gayi hai. Admin iski jaanch karega.', 'success')
+    # Save report to database
+    new_report = LeadReport(
+        shop_owner_id=current_user.id,
+        requirement_id=req.id,
+        reason=reason,
+        status='Pending'
+    )
+    db.session.add(new_report)
+    db.session.commit()
+    
+    # Send email notification to admin
+    notify_admin_reported_lead(current_user, req, reason)
+    
+    flash('Lead successfully report ho gayi hai aur Admin ko email bhej diya gaya hai.', 'success')
     return redirect(url_for('shop_dash'))
 
 @app.route('/signup', methods=['GET', 'POST'])
@@ -792,6 +862,9 @@ def admin_dash():
     total_vacancies = Vacancy.query.count()
     pending_requests = PaymentRequest.query.filter_by(status='Pending').all()
     
+    # NEW: Fetch reported leads for admin
+    reported_leads = LeadReport.query.order_by(LeadReport.id.desc()).all()
+    
     customer_req_counts = {}
     for c in customers:
         count = Requirement.query.filter_by(customer_id=c.id).count()
@@ -809,6 +882,7 @@ def admin_dash():
                            total_reqs=total_reqs, 
                            total_vacancies=total_vacancies, 
                            pending_requests=pending_requests, 
+                           reported_leads=reported_leads,   # <--- Pass here
                            admin_upi=admin_upi)
 
 @app.route('/admin/delete_user/<int:user_id>', methods=['POST'])
