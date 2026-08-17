@@ -237,6 +237,50 @@
             </div>
         </div>
     </div>
+    <!-- REPORTED LEADS SECTION -->
+    <div class="card shadow-sm mb-4 border-0">
+        <div class="card-header bg-danger text-white fw-bold">
+            <i class="fa-solid fa-triangle-exclamation me-2"></i> Reported Leads / Requirements ({% if reported_leads %}{{ reported_leads|length }}{% else %}0{% endif %})
+        </div>
+        <div class="card-body table-responsive">
+            {% if reported_leads %}
+            <table class="table table-hover align-middle">
+                <thead class="table-light">
+                    <tr>
+                        <th>ID</th>
+                        <th>Shop Owner</th>
+                        <th>Requirement ID</th>
+                        <th>Reason / Issue</th>
+                        <th>Date</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for rep in reported_leads %}
+                    <tr>
+                        <td>#{{ rep.id }}</td>
+                        <td>
+                            <b>{{ rep.shop_owner.name if rep.shop_owner else 'N/A' }}</b><br>
+                            <small class="text-muted">{{ rep.shop_owner.mobile if rep.shop_owner else '' }}</small>
+                        </td>
+                        <td>
+                            <a href="#" data-bs-toggle="modal" data-bs-target="#reqModal{{ rep.requirement_id }}">
+                                Req #{{ rep.requirement_id }}
+                            </a>
+                        </td>
+                        <td class="text-danger fw-semibold">{{ rep.reason }}</td>
+                        <td><small>{{ rep.created_at.strftime('%d-%m-%Y %H:%M') if rep.created_at else 'N/A' }}</small></td>
+                        <td><span class="badge bg-warning text-dark">{{ rep.status }}</span></td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% else %}
+            <p class="text-muted text-center my-3">Koi bhi lead report nahi ki gayi hai.</p>
+            {% endif %}
+        </div>
+    </div>
+    
     <div class="col-md-6">
         <div class="glass-panel h-100 p-0 overflow-hidden border-md-start border-4 border-warning">
             <div class="bg-warning bg-opacity-10 text-dark fw-bold p-3 border-bottom border-warning border-opacity-25 d-flex justify-content-between align-items-center">
