@@ -90,15 +90,13 @@
             <p class="text-muted small">Welcome back! Please enter your details.</p>
         </div>
 
-        <!-- YAHAN OTP LOGIC ADD KIYA GAYA HAI TAQKI OTP SEND HONE PAR YAHI RUKHE -->
         {% if show_otp %}
         
         <div class="alert alert-success text-center mb-4" style="font-size: 0.85rem;">
-            A secure 6-digit OTP has been sent to your registered mobile number[cite: 2].
+            A secure 6-digit OTP has been sent to your registered mobile number.
         </div>
         
-        <form method="POST">
-            <!-- Hidden input to keep mobile number in request -->
+        <form method="POST" onsubmit="document.getElementById('otpLoginBtn').disabled = true; document.getElementById('otpLoginBtn').innerText = 'Verifying...';">
             <input type="hidden" name="mobile" value="{{ request.form.get('mobile') or mobile }}">
             
             <div class="mb-4">
@@ -106,7 +104,7 @@
                 <input type="text" name="otp" class="form-control text-center fw-bold fs-4" required placeholder="• • • • • •" maxlength="6" style="letter-spacing: 6px;">
             </div>
             
-            <button type="submit" class="btn btn-primary-custom w-100 mb-3">
+            <button type="submit" id="otpLoginBtn" class="btn btn-primary-custom w-100 mb-3">
                 Verify OTP & Login
             </button>
             
@@ -117,7 +115,6 @@
 
         {% else %}
         
-        <!-- NORMAL LOGIN FORM -->
         <a href="{{ url_for('login_google') }}" class="btn-google w-100 mb-4">
             <img src="https://www.svgrepo.com/show/475656/google-color.svg" alt="Google" style="width: 20px; height: 20px;">
             Continue with Google
@@ -129,7 +126,7 @@
             <hr class="flex-grow-1" style="border-color: #e4e4e7;">
         </div>
 
-        <form method="POST">
+        <form method="POST" onsubmit="document.getElementById('loginBtn').disabled = true; document.getElementById('loginBtn').innerText = 'Please wait...';">
             <div class="mb-3">
                 <label class="form-label">Registered Mobile Number</label>
                 <input type="tel" name="mobile" class="form-control" required placeholder="e.g. 9876543210" pattern="[0-9]{10}" maxlength="10">
@@ -145,7 +142,7 @@
                 </div>
             </div>
 
-            <button type="submit" class="btn btn-primary-custom w-100 mb-4">
+            <button type="submit" id="loginBtn" class="btn btn-primary-custom w-100 mb-4">
                 Sign In
             </button>
             
