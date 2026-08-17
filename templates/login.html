@@ -1,329 +1,163 @@
 {% extends 'base.html' %}
 {% block content %}
 <style>
-    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
-
-    :root {
-        --brand-amber: #f59e0b;
-        --brand-amber-dark: #d97706;
-        --text-main: #18181b;
-        --text-muted: #71717a;
-        --border-light: #e4e4e7;
-    }
+    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap');
 
     body {
-        background-color: #ffffff !important;
+        background-color: #f8f9fa !important;
         font-family: 'Plus Jakarta Sans', sans-serif;
     }
 
-    .clean-page-wrapper {
+    .auth-wrapper {
         min-height: 85vh;
         display: flex;
         align-items: center;
         justify-content: center;
         padding: 2rem 1rem;
-        background: transparent;
     }
 
-    .clean-main-card {
+    .auth-card {
         background: #ffffff;
-        border-radius: 28px;
-        border: 1px solid var(--border-light);
-        box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.05);
-        width: 100%;
-        max-width: 1050px;
-        overflow: hidden;
-    }
-
-    /* Left Brand Side */
-    .clean-brand-side {
-        background: #09090b;
-        color: #ffffff;
-        padding: 3.5rem 3rem;
-        display: flex;
-        flex-direction: column;
-        justify-content: space-between;
-    }
-
-    .amber-badge-pill {
-        display: inline-flex;
-        align-items: center;
-        gap: 8px;
-        background: rgba(245, 158, 11, 0.12);
-        border: 1px solid rgba(245, 158, 11, 0.3);
-        color: #fbbf24;
-        padding: 6px 16px;
-        border-radius: 50px;
-        font-size: 0.8rem;
-        font-weight: 600;
-    }
-
-    .feature-item-box {
-        background: rgba(255, 255, 255, 0.04);
-        border: 1px solid rgba(255, 255, 255, 0.08);
         border-radius: 16px;
-        padding: 1.1rem;
-        margin-bottom: 0.85rem;
-    }
-
-    /* Right Form Side */
-    .clean-form-side {
-        padding: 3.5rem 3rem;
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-    }
-
-    .form-heading {
-        font-size: 2rem;
-        font-weight: 800;
-        color: var(--text-main);
-        letter-spacing: -0.5px;
-    }
-
-    /* Top Google Button */
-    .btn-google-top {
-        background: #ffffff;
-        border: 1.5px solid var(--border-light);
-        color: var(--text-main);
-        border-radius: 14px;
-        padding: 0.85rem;
-        font-weight: 700;
-        font-size: 0.95rem;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 12px;
-        text-decoration: none;
-        transition: all 0.25s ease;
-    }
-
-    .btn-google-top:hover {
-        background: #fafafa;
-        border-color: var(--brand-amber);
-        transform: translateY(-2px);
-        box-shadow: 0 6px 16px rgba(245, 158, 11, 0.1);
-        color: var(--text-main);
-    }
-
-    .divider-text-center {
-        position: relative;
-        text-align: center;
-        margin: 1.5rem 0;
-    }
-
-    .divider-text-center hr {
-        border-color: var(--border-light);
-    }
-
-    .divider-text-center span {
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        background: #ffffff;
-        padding: 0 1rem;
-        color: var(--text-muted);
-        font-size: 0.75rem;
-        font-weight: 700;
-        letter-spacing: 1px;
-    }
-
-    .input-block-group {
-        margin-bottom: 1.2rem;
-    }
-
-    .input-block-group label {
-        font-size: 0.78rem;
-        font-weight: 700;
-        color: #52525b;
-        margin-bottom: 0.4rem;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-        display: block;
-    }
-
-    .input-wrapper-inner {
-        position: relative;
-        display: flex;
-        align-items: center;
-    }
-
-    .input-prefix-icon {
-        position: absolute;
-        left: 1rem;
-        color: #a1a1aa;
-        font-size: 0.95rem;
-        z-index: 2;
-        pointer-events: none;
-    }
-
-    .clean-form-input {
+        border: 1px solid #e4e4e7;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.04);
         width: 100%;
-        padding: 0.85rem 1rem 0.85rem 3rem;
-        font-size: 0.95rem;
-        border-radius: 14px;
-        border: 1.5px solid var(--border-light);
-        background-color: #fafafa;
-        color: var(--text-main);
+        max-width: 450px;
+        padding: 2.5rem;
+    }
+
+    .btn-google {
+        background: #ffffff;
+        border: 1px solid #e4e4e7;
+        color: #18181b;
+        border-radius: 10px;
+        padding: 0.75rem;
         font-weight: 600;
-        transition: all 0.2s ease;
-    }
-
-    .clean-form-input:focus {
-        outline: none;
-        background-color: #ffffff;
-        border-color: var(--brand-amber);
-        box-shadow: 0 0 0 4px rgba(245, 158, 11, 0.12);
-    }
-
-    .password-eye-btn {
-        position: absolute;
-        right: 1rem;
-        background: none;
-        border: none;
-        color: #a1a1aa;
-        cursor: pointer;
-    }
-
-    .password-eye-btn:hover {
-        color: var(--text-main);
-    }
-
-    .btn-amber-action {
-        background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
-        color: #ffffff;
-        border-radius: 14px;
-        padding: 0.9rem;
-        font-weight: 700;
-        font-size: 0.98rem;
-        border: none;
-        width: 100%;
-        cursor: pointer;
-        box-shadow: 0 8px 20px -4px rgba(245, 158, 11, 0.4);
-        transition: all 0.25s ease;
         display: flex;
         align-items: center;
         justify-content: center;
         gap: 10px;
-        margin-top: 0.4rem;
+        text-decoration: none;
+        transition: background 0.2s;
     }
 
-    .btn-amber-action:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 12px 24px -4px rgba(245, 158, 11, 0.5);
-        background: linear-gradient(135deg, #d97706 0%, #b45309 100%);
-        color: white;
+    .btn-google:hover {
+        background: #f4f4f5;
+        color: #18181b;
     }
 
-    @media (max-width: 991.98px) {
-        .clean-brand-side { padding: 2.5rem 1.5rem; }
-        .clean-form-side { padding: 2.5rem 1.5rem; }
+    .form-label {
+        font-size: 0.85rem;
+        font-weight: 600;
+        color: #3f3f46;
+        margin-bottom: 0.4rem;
+    }
+
+    .form-control {
+        padding: 0.75rem 1rem;
+        border-radius: 10px;
+        border: 1px solid #e4e4e7;
+        font-size: 0.95rem;
+    }
+
+    .form-control:focus {
+        border-color: #f59e0b;
+        box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.15);
+    }
+
+    .btn-primary-custom {
+        background-color: #f59e0b;
+        border: none;
+        color: #ffffff;
+        border-radius: 10px;
+        padding: 0.8rem;
+        font-weight: 600;
+        font-size: 1rem;
+        transition: background 0.2s;
+    }
+
+    .btn-primary-custom:hover {
+        background-color: #d97706;
+        color: #ffffff;
     }
 </style>
 
-<div class="container clean-page-wrapper">
-    <div class="clean-main-card row g-0 d-flex flex-column-reverse flex-lg-row">
+<div class="container auth-wrapper">
+    <div class="auth-card">
         
-        <!-- LEFT BRAND SIDE -->
-        <div class="col-lg-5 clean-brand-side">
-            <div>
-                <div class="mb-3">
-                    <span class="amber-badge-pill">
-                        <i class="fa-solid fa-crown"></i> Kaamconnect Portal
-                    </span>
+        <div class="text-center mb-4">
+            <h3 class="fw-bold mb-1">Kaamconnect</h3>
+            <p class="text-muted small">Welcome back! Please enter your details.</p>
+        </div>
+
+        <!-- YAHAN OTP LOGIC ADD KIYA GAYA HAI TAQKI OTP SEND HONE PAR YAHI RUKHE -->
+        {% if show_otp %}
+        
+        <div class="alert alert-success text-center mb-4" style="font-size: 0.85rem;">
+            A secure 6-digit OTP has been sent to your registered mobile number[cite: 2].
+        </div>
+        
+        <form method="POST">
+            <!-- Hidden input to keep mobile number in request -->
+            <input type="hidden" name="mobile" value="{{ request.form.get('mobile') or mobile }}">
+            
+            <div class="mb-4">
+                <label class="form-label text-center w-100">Enter OTP to Login</label>
+                <input type="text" name="otp" class="form-control text-center fw-bold fs-4" required placeholder="• • • • • •" maxlength="6" style="letter-spacing: 6px;">
+            </div>
+            
+            <button type="submit" class="btn btn-primary-custom w-100 mb-3">
+                Verify OTP & Login
+            </button>
+            
+            <div class="text-center">
+                <a href="{{ url_for('login') }}" class="text-decoration-none text-muted small"><i class="fa-solid fa-arrow-left me-1"></i> Back to Login</a>
+            </div>
+        </form>
+
+        {% else %}
+        
+        <!-- NORMAL LOGIN FORM -->
+        <a href="{{ url_for('login_google') }}" class="btn-google w-100 mb-4">
+            <img src="https://www.svgrepo.com/show/475656/google-color.svg" alt="Google" style="width: 20px; height: 20px;">
+            Continue with Google
+        </a>
+
+        <div class="d-flex align-items-center mb-4">
+            <hr class="flex-grow-1" style="border-color: #e4e4e7;">
+            <span class="mx-3 text-muted" style="font-size: 0.8rem; font-weight: 600;">OR</span>
+            <hr class="flex-grow-1" style="border-color: #e4e4e7;">
+        </div>
+
+        <form method="POST">
+            <div class="mb-3">
+                <label class="form-label">Registered Mobile Number</label>
+                <input type="tel" name="mobile" class="form-control" required placeholder="e.g. 9876543210" pattern="[0-9]{10}" maxlength="10">
+            </div>
+            
+            <div class="mb-4">
+                <label class="form-label">Password</label>
+                <div class="input-group">
+                    <input type="password" id="passwordInput" name="password" class="form-control" required placeholder="Enter your password">
+                    <button type="button" class="btn btn-outline-secondary" style="border-color: #e4e4e7;" onclick="togglePasswordVisibility()">
+                        <i class="fa-regular fa-eye" id="toggleIcon"></i>
+                    </button>
                 </div>
-                <h2 class="fw-bold mb-2" style="font-size: 2.1rem; letter-spacing: -1px;">Welcome Back!</h2>
-                <p class="text-zinc-400 mb-0" style="font-size: 0.92rem; line-height: 1.6; color: #a1a1aa;">
-                    Sign in to manage your active labor assignments, verify live requests, and track business growth seamlessly[cite: 2].
+            </div>
+
+            <button type="submit" class="btn btn-primary-custom w-100 mb-4">
+                Sign In
+            </button>
+            
+            <div class="text-center">
+                <p class="text-muted small mb-0">
+                    Don't have an account? 
+                    <a href="{{ url_for('signup') }}" class="fw-bold text-decoration-none ms-1" style="color: #d97706;">Sign up here</a>
                 </p>
             </div>
-
-            <div class="my-4">
-                <div class="feature-item-box">
-                    <div class="d-flex align-items-center">
-                        <div class="rounded-3 bg-amber-500 bg-opacity-20 text-amber-400 d-flex align-items-center justify-content-center me-3" style="width: 42px; height: 42px; font-size: 1.1rem; flex-shrink: 0;">
-                            <i class="fa-solid fa-bolt-lightning"></i>
-                        </div>
-                        <div>
-                            <h6 class="mb-0 fw-bold text-white" style="font-size: 0.92rem;">Lightning Fast Access</h6>
-                            <small style="color: #a1a1aa; font-size: 0.8rem;">Direct jump to your custom dashboard.</small>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="feature-item-box">
-                    <div class="d-flex align-items-center">
-                        <div class="rounded-3 bg-emerald-500 bg-opacity-20 text-emerald-400 d-flex align-items-center justify-content-center me-3" style="width: 42px; height: 42px; font-size: 1.1rem; flex-shrink: 0;">
-                            <i class="fa-solid fa-shield-check"></i>
-                        </div>
-                        <div>
-                            <h6 class="mb-0 fw-bold text-white" style="font-size: 0.92rem;">Secured & Verified</h6>
-                            <small style="color: #a1a1aa; font-size: 0.8rem;">Enterprise-grade security protection.</small>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div>
-                <small class="d-flex align-items-center gap-2" style="font-size: 0.8rem; color: #71717a;">
-                    <i class="fa-solid fa-lock text-amber-400"></i> Encrypted secure connection
-                </small>
-            </div>
-        </div>
-
-        <!-- RIGHT FORM SIDE -->
-        <div class="col-lg-7 clean-form-side">
-            <div class="mb-3">
-                <h3 class="form-heading">Sign In</h3>
-                <p class="text-muted mt-1" style="font-size: 0.92rem;">Choose Google for instant access or use your mobile number[cite: 2].</p>
-            </div>
-
-            <!-- GOOGLE BUTTON AT TOP -->
-            <a href="{{ url_for('login_google') }}" class="btn-google-top mb-2">
-                <img src="https://www.svgrepo.com/show/475656/google-color.svg" alt="Google" style="width: 22px; height: 22px;">
-                Continue with Google
-            </a>
-
-            <div class="divider-text-center">
-                <hr>
-                <span>OR USE MOBILE NUMBER</span>
-            </div>
-
-            <form method="POST">
-                <div class="input-block-group">
-                    <label>Registered Mobile Number</label>
-                    <div class="input-wrapper-inner">
-                        <input type="tel" name="mobile" class="clean-form-input" required placeholder="e.g. 9876543210" pattern="[0-9]{10}" maxlength="10">
-                        <i class="fa-solid fa-mobile-screen input-prefix-icon"></i>
-                    </div>
-                </div>
-                
-                <div class="input-block-group">
-                    <label>Account Password</label>
-                    <div class="input-wrapper-inner">
-                        <input type="password" id="passwordInput" name="password" class="clean-form-input" required placeholder="Enter your password">
-                        <i class="fa-solid fa-lock input-prefix-icon"></i>
-                        <button type="button" class="password-eye-btn" onclick="togglePasswordVisibility()" aria-label="Toggle password visibility">
-                            <i class="fa-regular fa-eye" id="toggleIcon"></i>
-                        </button>
-                    </div>
-                </div>
-
-                <button type="submit" class="btn-amber-action">
-                    <span>Sign In Now</span>
-                    <i class="fa-solid fa-arrow-right"></i>
-                </button>
-                
-                <div class="text-center pt-3 mt-3 border-top" style="border-color: var(--border-light) !important;">
-                    <p class="text-muted small mb-0" style="font-size: 0.9rem;">
-                        Don't have an account yet? 
-                        <a href="{{ url_for('signup') }}" class="fw-bold text-decoration-none ms-1" style="color: #d97706;">Create an account</a>
-                    </p>
-                </div>
-            </form>
-        </div>
-
+        </form>
+        {% endif %}
+        
     </div>
 </div>
 
