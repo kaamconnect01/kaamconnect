@@ -1,201 +1,369 @@
 {% extends 'base.html' %}
 {% block content %}
 <style>
-    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Grand+Hotel&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap');
 
     body {
-        background-color: #f8f9fa !important;
-        font-family: 'Plus Jakarta Sans', sans-serif;
+        background-color: #fafafa !important;
+        font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        color: #262626;
     }
 
-    .auth-wrapper {
-        min-height: 85vh;
+    .ig-signup-wrapper {
+        min-height: 88vh;
         display: flex;
+        flex-direction: column;
         align-items: center;
         justify-content: center;
         padding: 2rem 1rem;
     }
 
-    .auth-card {
+    .ig-card {
         background: #ffffff;
-        border-radius: 16px;
-        border: 1px solid #e4e4e7;
-        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.04);
+        border: 1px solid #dbdbdb;
+        border-radius: 12px;
         width: 100%;
-        max-width: 650px;
-        padding: 2.5rem;
+        max-width: 480px;
+        padding: 2.25rem 2rem;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
     }
 
-    .form-label {
-        font-size: 0.85rem;
-        font-weight: 600;
-        color: #3f3f46;
+    .ig-logo {
+        font-family: 'Grand Hotel', cursive;
+        font-size: 2.8rem;
+        color: #262626;
+        text-align: center;
+        margin-bottom: 0.25rem;
+    }
+
+    .ig-subtext {
+        color: #737373;
+        font-size: 0.88rem;
+        text-align: center;
+        margin-bottom: 1.5rem;
+        font-weight: 500;
+    }
+
+    /* Choice Cards */
+    .ig-choice-card {
+        border: 1px solid #dbdbdb;
+        border-radius: 10px;
+        padding: 1.25rem;
+        background: #ffffff;
+        transition: all 0.2s ease;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+    }
+
+    .ig-choice-card:hover {
+        border-color: #a8a8a8;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+    }
+
+    .ig-choice-icon {
+        width: 42px;
+        height: 42px;
+        border-radius: 50%;
+        background: #fafafa;
+        border: 1px solid #efefef;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.2rem;
+        margin-bottom: 0.75rem;
+    }
+
+    .ig-benefit-list {
+        list-style: none;
+        padding: 0;
+        margin: 0.75rem 0 1.25rem 0;
+    }
+
+    .ig-benefit-list li {
+        font-size: 0.78rem;
+        color: #737373;
         margin-bottom: 0.4rem;
+        display: flex;
+        align-items: center;
+        gap: 6px;
     }
 
-    .form-control, .form-select {
-        padding: 0.75rem 1rem;
-        border-radius: 10px;
-        border: 1px solid #e4e4e7;
-        font-size: 0.95rem;
-    }
-
-    .form-control:focus, .form-select:focus {
-        border-color: #f59e0b;
-        box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.15);
-    }
-
-    .btn-primary-custom {
-        background-color: #f59e0b;
-        border: none;
-        color: #ffffff;
-        border-radius: 10px;
-        padding: 0.8rem;
-        font-weight: 600;
-        font-size: 1rem;
-        transition: background 0.2s;
-    }
-
-    .btn-primary-custom:hover {
-        background-color: #d97706;
-        color: #ffffff;
+    .ig-benefit-list li i {
+        color: #0095f6;
     }
 
     /* Role Selection Tiles */
-    .role-selection-tile {
-        border: 1.5px solid #e4e4e7;
-        border-radius: 12px;
+    .ig-role-tile {
+        border: 1px solid #dbdbdb;
+        border-radius: 10px;
         cursor: pointer;
-        background: #ffffff;
         transition: all 0.2s ease;
-    }
-    
-    .role-selection-tile:hover {
-        border-color: #d4d4d8;
         background: #fafafa;
-    }
-    
-    .role-selection-tile.active {
-        border-color: #f59e0b;
-        background: #fffbeb;
+        padding: 0.85rem 0.5rem;
     }
 
-    .role-icon-box {
-        font-size: 1.25rem;
-        margin-bottom: 0.5rem;
-    }
-    
-    .role-selection-tile.active .role-icon-box {
-        color: #d97706 !important;
-    }
-
-    .choice-card {
-        border: 1px solid #e4e4e7;
-        border-radius: 12px;
-        padding: 1.5rem;
+    .ig-role-tile:hover {
+        border-color: #a8a8a8;
         background: #ffffff;
-        height: 100%;
     }
 
-    /* Override input group addon */
-    .input-group-text {
-        background: #f4f4f5;
-        border: 1px solid #e4e4e7;
-        border-right: none;
-        color: #71717a;
+    .ig-role-tile.active {
+        border-color: #0095f6;
+        background: #f0f8ff;
     }
-    .input-group .form-control {
-        border-left: none;
+
+    .ig-role-icon {
+        width: 38px;
+        height: 38px;
+        border-radius: 50%;
+        background: #ffffff;
+        border: 1px solid #dbdbdb;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 0.5rem auto;
+        font-size: 1rem;
+        color: #262626;
     }
-    .input-group .form-control:focus {
-        border-left: 1px solid #f59e0b;
+
+    .ig-role-tile.active .ig-role-icon {
+        background: #0095f6;
+        color: #ffffff;
+        border-color: #0095f6;
+    }
+
+    /* Inputs & Form */
+    .ig-input-group {
+        position: relative;
+        margin-bottom: 0.75rem;
+    }
+
+    .ig-input {
+        width: 100%;
+        background: #fafafa;
+        border: 1px solid #dbdbdb;
+        border-radius: 6px;
+        padding: 0.65rem 0.75rem;
+        font-size: 0.85rem;
+        color: #262626;
+        outline: none;
+        transition: border-color 0.2s ease;
+    }
+
+    .ig-input:focus {
+        border-color: #a8a8a8;
+        background: #ffffff;
+    }
+
+    .ig-btn-primary {
+        background-color: #0095f6;
+        color: #ffffff;
+        border: none;
+        border-radius: 8px;
+        font-weight: 600;
+        font-size: 0.88rem;
+        padding: 0.65rem 1rem;
+        width: 100%;
+        cursor: pointer;
+        transition: background 0.2s ease;
+    }
+
+    .ig-btn-primary:hover {
+        background-color: #1877f2;
+        color: #ffffff;
+    }
+
+    .ig-btn-dark {
+        background-color: #262626;
+        color: #ffffff;
+        border: none;
+        border-radius: 8px;
+        font-weight: 600;
+        font-size: 0.85rem;
+        padding: 0.65rem 1rem;
+        width: 100%;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        text-decoration: none;
+    }
+
+    .ig-btn-dark:hover {
+        background-color: #000000;
+        color: #ffffff;
+    }
+
+    .ig-divider {
+        display: flex;
+        align-items: center;
+        text-align: center;
+        margin: 1.25rem 0;
+        color: #8e8e8e;
+        font-size: 0.75rem;
+        font-weight: 600;
+    }
+
+    .ig-divider::before, .ig-divider::after {
+        content: '';
+        flex: 1;
+        border-bottom: 1px solid #dbdbdb;
+    }
+
+    .ig-divider span {
+        padding: 0 0.75rem;
+    }
+
+    .ig-footer-box {
+        background: #ffffff;
+        border: 1px solid #dbdbdb;
+        border-radius: 12px;
+        width: 100%;
+        max-width: 480px;
+        padding: 1.25rem;
+        text-align: center;
+        margin-top: 0.75rem;
+        font-size: 0.88rem;
+    }
+
+    .ig-footer-box a {
+        color: #0095f6;
+        font-weight: 600;
+        text-decoration: none;
+    }
+
+    .anim-fade {
+        animation: fadeInSmooth 0.25s ease forwards;
+    }
+
+    @keyframes fadeInSmooth {
+        0% { opacity: 0; transform: translateY(6px); }
+        100% { opacity: 1; transform: translateY(0); }
     }
 </style>
 
-<!-- GOOGLE SUCCESS POPUP -->
+<!-- ================= GOOGLE SUCCESS POPUP ================= -->
 {% if show_google_step2 %}
-<div id="googleSuccessPopup" class="position-fixed top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center" style="background: rgba(0,0,0,0.5); z-index: 1050;">
-    <div class="bg-white p-4 rounded-4 shadow-lg text-center mx-3" style="max-width: 400px; border: 2px solid #10b981;">
-        <i class="fa-solid fa-circle-check text-success mb-3" style="font-size: 3rem;"></i>
-        <h5 class="fw-bold text-dark">Email Verified Successfully!</h5>
-        <p class="text-muted small mb-4">Google verification successful. Please complete the remaining details to setup your account.</p>
-        <button type="button" onclick="closeGooglePopup()" class="btn btn-success w-100 fw-bold">
-            Continue Setup
+<div id="googleSuccessPopup" class="position-fixed top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center" style="background: rgba(0,0,0,0.6); z-index: 1050; backdrop-filter: blur(3px);">
+    <div class="bg-white p-4 rounded-4 shadow text-center anim-fade mx-3" style="max-width: 380px; border: 1px solid #dbdbdb;">
+        <div class="mb-3">
+            <div class="rounded-circle d-inline-flex align-items-center justify-content-center" style="width: 60px; height: 60px; background: #e8f5e9; color: #2e7d32; font-size: 1.8rem;">
+                <i class="fa-solid fa-check"></i>
+            </div>
+        </div>
+        <h5 class="fw-bold text-dark mb-2">Email Verified!</h5>
+        <p class="text-muted small mb-4">Google dwara email successfully verify ho gaya hai. Kripya apni baaki details fill karke setup complete karein.</p>
+        <button type="button" onclick="closeGooglePopup()" class="ig-btn-primary py-2">
+            Continue Setup <i class="fa-solid fa-arrow-right ms-1"></i>
         </button>
     </div>
 </div>
 <script>
     document.addEventListener("DOMContentLoaded", function() {
-        setTimeout(function() { closeGooglePopup(); }, 6000);
+        setTimeout(function() { closeGooglePopup(); }, 10000);
     });
+
     function closeGooglePopup() {
         const popup = document.getElementById('googleSuccessPopup');
-        if (popup) popup.remove();
+        if (popup) {
+            popup.style.transition = 'opacity 0.3s ease';
+            popup.style.opacity = '0';
+            setTimeout(() => popup.remove(), 300);
+        }
     }
 </script>
 {% endif %}
 
-<div class="container auth-wrapper">
-    <div class="auth-card">
+<div class="ig-signup-wrapper">
+    
+    <div class="ig-card">
+        <div class="ig-logo">Kaamconnect</div>
         
-        <!-- OTP VERIFICATION BLOCK -->
+        <!-- ================= OTP VERIFICATION BLOCK ================= -->
         {% if show_otp %}
-        <div class="text-center mb-4">
-            <h4 class="fw-bold mb-1">Verify Your Email/Mobile</h4>
-            <p class="text-muted small">We have sent a 6-digit OTP for verification.</p>
+        <p class="ig-subtext">Verify your email address to continue</p>
+        
+        <div class="p-3 mb-3 text-start rounded-3" style="background: #fafafa; border: 1px solid #dbdbdb; font-size: 0.8rem; color: #555;">
+            <i class="fa-solid fa-shield-halved me-1 text-primary"></i>
+            Humne aapke email <b>{{ email }}</b> par 6-digit OTP bheja hai. (Spam folder bhi check karein)
         </div>
 
         <form method="POST" action="{{ url_for('verify_signup_otp') }}">
-            <div class="mb-4">
-                <input type="text" name="otp" class="form-control text-center fw-bold fs-3 mx-auto" required placeholder="• • • • • •" maxlength="6" style="letter-spacing: 6px; max-width: 300px;">
+            <div class="ig-input-group mb-3">
+                <input type="text" name="otp" class="ig-input text-center fw-bold fs-4 py-2" required placeholder="• • • • • •" maxlength="6" style="letter-spacing: 5px;">
             </div>
             
-            <button type="submit" class="btn btn-primary-custom w-100 mb-3">
+            <button type="submit" class="ig-btn-primary py-2.5">
                 Verify & Create Account
             </button>
             
-            <div class="text-center">
+            <div class="text-center mt-3">
                 <a href="{{ url_for('signup') }}" class="text-decoration-none text-muted small"><i class="fa-solid fa-arrow-left me-1"></i> Back to Registration</a>
             </div>
         </form>
 
-        <!-- SETUP FORM BLOCK -->
+        <!-- ================= INITIAL CHOICE SCREEN OR MANUAL FORM ================= -->
         {% else %}
         
-        <div class="text-center mb-4">
-            <h4 class="fw-bold mb-1">Create an Account</h4>
-            <p class="text-muted small">Join Kaamconnect platform today.</p>
-        </div>
+        <p class="ig-subtext">Sign up to get started with your account</p>
 
         <!-- 2 OPTIONS CHOICE SCREEN -->
         {% if not show_google_step2 %}
-        <div id="signupChoiceScreen" class="row g-3 mb-4">
-            <div class="col-md-6">
-                <div class="choice-card text-center d-flex flex-column justify-content-center">
-                    <p class="text-dark fw-bold mb-3" style="font-size: 0.9rem;">Instant Signup</p>
-                    <a href="{{ url_for('login_google') }}" class="btn btn-dark w-100 fw-bold d-flex align-items-center justify-content-center gap-2">
-                        <img src="https://www.svgrepo.com/show/475656/google-color.svg" alt="Google" style="width: 18px; height: 18px;"> Google
+        <div id="signupChoiceScreen" class="row g-3 mb-2">
+            
+            <!-- Option 1: Google Signup -->
+            <div class="col-12 col-md-6">
+                <div class="ig-choice-card">
+                    <div>
+                        <div class="ig-choice-icon">
+                            <img src="https://www.svgrepo.com/show/475656/google-color.svg" alt="Google" style="width: 20px; height: 20px;">
+                        </div>
+                        <h6 class="fw-bold text-dark mb-1" style="font-size: 0.9rem;">With Google</h6>
+                        <p class="text-muted small mb-2" style="font-size: 0.75rem;">Instant 1-click registration</p>
+                        
+                        <ul class="ig-benefit-list">
+                            <li><i class="fa-solid fa-check"></i> No password needed</li>
+                            <li><i class="fa-solid fa-check"></i> 100% Verified</li>
+                        </ul>
+                    </div>
+                    <a href="{{ url_for('login_google') }}" class="ig-btn-dark mt-2">
+                        <img src="https://www.svgrepo.com/show/475656/google-color.svg" alt="Google" style="width: 16px; height: 16px;" class="me-2"> Google
                     </a>
                 </div>
             </div>
-            <div class="col-md-6">
-                <div class="choice-card text-center d-flex flex-column justify-content-center">
-                    <p class="text-dark fw-bold mb-3" style="font-size: 0.9rem;">Custom Setup</p>
-                    <button type="button" onclick="showManualForm()" class="btn btn-outline-dark w-100 fw-bold">
-                        Fill Manual Form
+
+            <!-- Option 2: Manual Details -->
+            <div class="col-12 col-md-6">
+                <div class="ig-choice-card">
+                    <div>
+                        <div class="ig-choice-icon" style="color: #10b981;">
+                            <i class="fa-solid fa-pen"></i>
+                        </div>
+                        <h6 class="fw-bold text-dark mb-1" style="font-size: 0.9rem;">Manual Details</h6>
+                        <p class="text-muted small mb-2" style="font-size: 0.75rem;">Custom email & password</p>
+                        
+                        <ul class="ig-benefit-list">
+                            <li><i class="fa-solid fa-check"></i> Set own password</li>
+                            <li><i class="fa-solid fa-check"></i> Complete profile</li>
+                        </ul>
+                    </div>
+                    <button type="button" onclick="showManualForm()" class="ig-btn-primary mt-2">
+                        Fill Details
                     </button>
                 </div>
             </div>
+
         </div>
         {% endif %}
 
         <!-- MANUAL REGISTRATION FORM -->
-        <div id="manualFormContainer" style="{% if not show_google_step2 %}display: none;{% else %}display: block;{% endif %}">
+        <div id="manualFormContainer" style="{% if not show_google_step2 %}display: none;{% else %}display: block;{% endif %}" class="anim-fade">
             
             {% if not show_google_step2 %}
-            <div class="mb-4">
-                <button type="button" onclick="hideManualForm()" class="btn btn-sm btn-light border">
-                    <i class="fa-solid fa-arrow-left me-1"></i> Back
+            <div class="mb-3 text-start">
+                <button type="button" onclick="hideManualForm()" class="btn btn-sm btn-light border rounded-pill px-3" style="font-size: 0.78rem;">
+                    <i class="fa-solid fa-arrow-left me-1"></i> Back to Options
                 </button>
             </div>
             {% endif %}
@@ -203,113 +371,129 @@
             <form method="POST" action="{% if show_google_step2 %}{{ url_for('google_step2') }}{% else %}{{ url_for('signup') }}{% endif %}">
                 
                 <!-- Role Selection -->
-                <div class="mb-4">
-                    <label class="form-label text-center w-100 mb-3">Select Account Type</label>
-                    <div class="row g-3">
+                <div class="mb-3">
+                    <label class="form-label text-muted fw-bold text-uppercase d-block text-center mb-2" style="font-size: 0.7rem; letter-spacing: 0.5px;">Choose Category</label>
+                    <div class="row g-2">
                         <div class="col-4">
-                            <div class="role-selection-tile text-center p-3 h-100" id="card_customer" onclick="selectRole('customer')">
-                                <div class="role-icon-box text-primary"><i class="fa-solid fa-user-tie"></i></div>
-                                <h6 class="fw-bold mb-0" style="font-size: 0.85rem;">Customer</h6>
+                            <div class="ig-role-tile text-center" id="card_customer" onclick="selectRole('customer')">
+                                <div class="ig-role-icon">
+                                    <i class="fa-solid fa-user"></i>
+                                </div>
+                                <div class="fw-bold text-dark" style="font-size: 0.78rem;">Customer</div>
                                 <input type="radio" name="role" id="role_customer" value="customer" required class="d-none">
                             </div>
                         </div>
                         <div class="col-4">
-                            <div class="role-selection-tile text-center p-3 h-100" id="card_shop_owner" onclick="selectRole('shop_owner')">
-                                <div class="role-icon-box text-success"><i class="fa-solid fa-shop"></i></div>
-                                <h6 class="fw-bold mb-0" style="font-size: 0.85rem;">Shop Owner</h6>
+                            <div class="ig-role-tile text-center" id="card_shop_owner" onclick="selectRole('shop_owner')">
+                                <div class="ig-role-icon">
+                                    <i class="fa-solid fa-shop"></i>
+                                </div>
+                                <div class="fw-bold text-dark" style="font-size: 0.78rem;">Shop Owner</div>
                                 <input type="radio" name="role" id="role_shop_owner" value="shop_owner" class="d-none">
                             </div>
                         </div>
                         <div class="col-4">
-                            <div class="role-selection-tile text-center p-3 h-100" id="card_worker" onclick="selectRole('worker')">
-                                <div class="role-icon-box text-warning"><i class="fa-solid fa-helmet-safety"></i></div>
-                                <h6 class="fw-bold mb-0" style="font-size: 0.85rem;">Skilled Worker</h6>
+                            <div class="ig-role-tile text-center" id="card_worker" onclick="selectRole('worker')">
+                                <div class="ig-role-icon">
+                                    <i class="fa-solid fa-helmet-safety"></i>
+                                </div>
+                                <div class="fw-bold text-dark" style="font-size: 0.78rem;">Worker</div>
                                 <input type="radio" name="role" id="role_worker" value="worker" class="d-none">
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <!-- Common Credentials -->
-                <div id="commonCredentials" style="display: none;" class="mb-3">
-                    <div class="row g-3">
-                        <div class="col-md-6">
-                            <label class="form-label">Full Name <span class="text-danger">*</span></label>
-                            <input type="text" name="name" class="form-control" {% if show_google_step2 %}value="{{ google_data.name }}"{% endif %} required placeholder="Enter full name">
-                        </div>
-                        
-                        <div class="col-md-6">
-                            <label class="form-label">Email Address {% if not show_google_step2 %}<span class="text-danger">*</span>{% endif %}</label>
-                            {% if show_google_step2 %}
-                                <input type="email" name="email" class="form-control bg-light" value="{{ google_data.email }}" readonly>
-                            {% else %}
-                                <input type="email" name="email" class="form-control" required placeholder="name@example.com">
-                            {% endif %}
-                        </div>
+                <!-- Common Credentials Section -->
+                <div id="commonCredentials" style="display: none;" class="anim-fade mb-2">
+                    <!-- Name -->
+                    <div class="ig-input-group">
+                        {% if show_google_step2 %}
+                            <input type="text" name="name" class="ig-input fw-bold" value="{{ google_data.name }}" required placeholder="Full Name">
+                        {% else %}
+                            <input type="text" name="name" class="ig-input" required placeholder="Full Name">
+                        {% endif %}
+                    </div>
+                    
+                    <!-- Email -->
+                    <div class="ig-input-group">
+                        {% if show_google_step2 %}
+                            <input type="email" name="email" class="ig-input fw-bold" style="background: #eef2ff;" value="{{ google_data.email }}" readonly>
+                        {% else %}
+                            <input type="email" name="email" class="ig-input" required placeholder="Email address" pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$">
+                        {% endif %}
+                    </div>
 
-                        <div class="col-md-6">
-                            <label class="form-label">Mobile Number <span class="text-danger">*</span></label>
-                            <div class="d-flex gap-2">
-                                <select name="country_code" id="country_code" class="form-select" style="width: 80px;">
-                                    <option value="+91" selected>+91</option>
-                                    <option value="+1">+1</option>
-                                    <option value="+44">+44</option>
-                                </select>
-                                <input type="tel" name="mobile" class="form-control w-100" required placeholder="Mobile number" pattern="[0-9]{7,15}">
-                            </div>
-                        </div>
-                        
-                        <div class="col-md-6">
-                            <label class="form-label">Create Password <span class="text-danger">*</span></label>
-                            <input type="password" name="password" class="form-control" required placeholder="Create password">
-                        </div>
+                    <!-- Mobile Number -->
+                    <div class="ig-input-group d-flex gap-2">
+                        <select name="country_code" id="country_code" class="ig-input" style="max-width: 80px;">
+                            <option value="+91" selected>+91</option>
+                            <option value="+1">+1</option>
+                            <option value="+44">+44</option>
+                            <option value="+971">+971</option>
+                            <option value="+61">+61</option>
+                        </select>
+                        <input type="tel" name="mobile" class="ig-input" required placeholder="Mobile Number" pattern="[0-9]{7,15}">
+                    </div>
+                    
+                    <!-- Password -->
+                    <div class="ig-input-group">
+                        <input type="password" name="password" class="ig-input" required placeholder="Password">
                     </div>
                 </div>
 
-                <!-- Professional Details -->
-                <div id="proFields" style="display: none;" class="mb-3 mt-3 pt-3 border-top">
-                    <div class="mb-3" id="shopNameContainer" style="display: none;">
-                        <label class="form-label">Shop / Business Name <span class="text-danger">*</span></label>
-                        <input type="text" name="shop_name" id="shopNameInput" class="form-control" placeholder="Enter shop or business name">
+                <!-- Professional / Details Section -->
+                <div id="proFields" style="display: none;" class="anim-fade mb-2">
+                    <div id="shopNameContainer" class="ig-input-group" style="display: none;">
+                        <input type="text" name="shop_name" id="shopNameInput" class="ig-input" placeholder="Shop / Business Name">
                     </div>
                     
-                    <div class="row g-3">
-                        <div class="col-md-6">
-                            <label class="form-label">Expertise / Skill <span class="text-danger">*</span></label>
-                            <input type="text" name="expertise" id="expertInput" class="form-control" placeholder="e.g. Electrician, Painter">
+                    <div class="row g-2">
+                        <div class="col-6">
+                            <div class="ig-input-group">
+                                <input type="text" name="expertise" id="expertInput" class="ig-input" placeholder="Expertise (e.g. Electrician)">
+                            </div>
                         </div>
-                        <div class="col-md-6">
-                            <label class="form-label">Experience (Years) <span class="text-danger">*</span></label>
-                            <input type="text" name="experience" id="expInput" class="form-control" placeholder="e.g. 4">
+                        <div class="col-6">
+                            <div class="ig-input-group">
+                                <input type="text" name="experience" id="expInput" class="ig-input" placeholder="Experience (Years)">
+                            </div>
                         </div>
-                        <div class="col-md-6" id="workerFields" style="display: none;">
-                            <label class="form-label">Expected Daily Wage (₹) <span class="text-danger">*</span></label>
-                            <input type="number" name="per_day_amount" id="wageInput" class="form-control" placeholder="e.g. 700">
-                        </div>
-                        <div class="col-12" id="addressContainer">
-                            <label class="form-label">Address / Location <span class="text-danger">*</span></label>
-                            <input type="text" name="address" id="addressInput" class="form-control" placeholder="Complete address...">
-                        </div>
+                    </div>
+
+                    <div id="workerFields" class="ig-input-group" style="display: none;">
+                        <input type="number" name="per_day_amount" id="wageInput" class="ig-input" placeholder="Expected Daily Wage (₹)">
+                    </div>
+
+                    <div id="addressContainer" class="ig-input-group">
+                        <input type="text" name="address" id="addressInput" class="ig-input" placeholder="Address / Location">
                     </div>
                 </div>
 
                 <!-- Submit Button -->
-                <div id="actionContainer" style="display: none;" class="mt-4">
-                    <button type="submit" class="btn btn-primary-custom w-100">
-                        {% if show_google_step2 %} Complete Account Setup {% else %} Proceed for Verification {% endif %}
+                <div id="actionContainer" style="display: none;" class="anim-fade mt-3">
+                    <button type="submit" class="ig-btn-primary py-2.5">
+                        {% if show_google_step2 %}
+                            Complete Setup <i class="fa-solid fa-arrow-right ms-1"></i>
+                        {% else %}
+                            Proceed for Verification <i class="fa-solid fa-arrow-right ms-1"></i>
+                        {% endif %}
                     </button>
                 </div>
             </form>
-        </div>
 
-        <div class="text-center mt-4 pt-3 border-top">
-            <p class="text-muted small mb-0">
-                Already have an account? <a href="{{ url_for('login') }}" class="fw-bold text-decoration-none" style="color: #d97706;">Sign in here</a>
-            </p>
         </div>
         
         {% endif %}
     </div>
+
+    <!-- Bottom Footer Card -->
+    {% if not show_otp %}
+    <div class="ig-footer-box">
+        Already have an account? <a href="{{ url_for('login') }}">Sign in</a>
+    </div>
+    {% endif %}
+
 </div>
 
 {% if not show_otp %}
@@ -318,7 +502,10 @@
         const urlParams = new URLSearchParams(window.location.search);
         let activeRole = urlParams.get('role') || '{{ role }}' || 'customer';
         
-        {% if show_google_step2 %} showManualForm(); {% endif %}
+        {% if show_google_step2 %}
+        showManualForm();
+        {% endif %}
+
         selectRole(activeRole);
     });
 
@@ -326,18 +513,22 @@
         const choiceScreen = document.getElementById('signupChoiceScreen');
         const manualForm = document.getElementById('manualFormContainer');
         if(choiceScreen) choiceScreen.style.display = 'none';
-        if(manualForm) manualForm.style.display = 'block';
+        if(manualForm) {
+            manualForm.style.display = 'block';
+        }
     }
 
     function hideManualForm() {
         const choiceScreen = document.getElementById('signupChoiceScreen');
         const manualForm = document.getElementById('manualFormContainer');
         if(manualForm) manualForm.style.display = 'none';
-        if(choiceScreen) choiceScreen.style.display = 'flex';
+        if(choiceScreen) {
+            choiceScreen.style.display = 'flex';
+        }
     }
 
     function selectRole(role) {
-        document.querySelectorAll('.role-selection-tile').forEach(card => card.classList.remove('active'));
+        document.querySelectorAll('.ig-role-tile').forEach(card => card.classList.remove('active'));
         
         const roleRadio = document.getElementById('role_' + role);
         const roleCard = document.getElementById('card_' + role);
@@ -375,7 +566,7 @@
             shopNameInput.setAttribute('required', 'true');
             reqInputs.forEach(input => input.setAttribute('required', 'true'));
             wageInput.removeAttribute('required');
-            addressContainer.className = "col-12";
+            addressContainer.className = "ig-input-group";
         } 
         else if (role === 'worker') {
             proFields.style.display = 'block';
@@ -385,7 +576,7 @@
             wageInput.setAttribute('required', 'true');
             reqInputs.forEach(input => input.setAttribute('required', 'true'));
             shopNameInput.removeAttribute('required');
-            addressContainer.className = "col-md-6"; 
+            addressContainer.className = "ig-input-group"; 
         }
     }
 </script>
