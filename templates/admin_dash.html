@@ -112,31 +112,12 @@
         vertical-align: middle;
     }
 
-    /* Analytics Mini Toggle */
-    .analytics-toggle .nav-link {
-        color: #6c757d;
-        background-color: transparent;
-        border-radius: 50px;
-        padding: 5px 15px;
-        font-size: 0.85rem;
-        font-weight: 600;
-    }
-    .analytics-toggle .nav-link.active {
-        color: white;
-        background-color: #0f172a;
-    }
-
-    /* =========================================
-       📱 MOBILE SPECIFIC OPTIMIZATIONS
-       (Ensures PC stays EXACTLY the same)
-    ========================================= */
     @media (max-width: 768px) {
-        /* Make Admin Tabs scrollable horizontally instead of stacking vertically */
         .admin-tabs {
             flex-wrap: nowrap !important;
             overflow-x: auto !important;
             justify-content: flex-start !important;
-            border-radius: 15px; /* Adjust border radius for scroll */
+            border-radius: 15px;
             padding-bottom: 5px;
         }
         .admin-tabs::-webkit-scrollbar {
@@ -149,32 +130,26 @@
         .admin-tabs .nav-link {
             white-space: nowrap;
         }
-
-        /* Compact Analytics Panel */
         .mobile-chart-divider {
             border-right: none !important;
             border-bottom: 1px solid #e2e8f0 !important;
             padding-bottom: 1.5rem !important;
             margin-bottom: 1.5rem !important;
         }
-        
-        /* Compact Tables for Mobile */
         .table-glass th, .table-glass td {
             padding: 0.5rem !important;
             font-size: 0.85rem !important;
         }
-        
         .stat-card h1 {
-            font-size: 2rem !important; /* Smaller numbers on mobile */
+            font-size: 2rem !important;
         }
         .stat-icon {
-            font-size: 1.8rem; /* Smaller icon on mobile */
+            font-size: 1.8rem;
         }
     }
 </style>
 
-<!-- Pre-calculate stats for Analytics -->
-{% set total_users = shop_owners|length + workers|length + customers|length %}
+{% set total_users = shop_owners|length + workers|length + customers|length + blocked_users|length %}
 {% set total_jobs = total_reqs + total_vacancies %}
 
 <!-- Top Header -->
@@ -182,7 +157,7 @@
     <div class="d-flex justify-content-between align-items-center">
         <div>
             <h4 class="fw-bold mb-1"><i class="fa-solid fa-shield-halved text-warning me-2"></i> Super Admin Portal</h4>
-            <p class="mb-0 text-light opacity-75 small">Manage users, jobs, payments, and platform settings.</p>
+            <p class="mb-0 text-light opacity-75 small">Manage users, jobs, payments, blocked users, and platform settings.</p>
         </div>
         <span class="badge bg-danger bg-opacity-25 border border-danger text-danger px-3 py-2 rounded-pill shadow-sm d-none d-md-inline-block">
             <i class="fa-solid fa-lock me-1"></i> Restricted Access
@@ -207,21 +182,26 @@
       </button>
   </li>
   <li class="nav-item">
+      <button class="nav-link text-danger fw-bold" data-bs-toggle="tab" data-bs-target="#blocked-panel">
+          <i class="fa-solid fa-user-slash me-1"></i> Blocked Users <span class="badge bg-danger ms-1">{{ blocked_users|length }}</span>
+      </button>
+  </li>
+  <li class="nav-item">
       <button class="nav-link text-success" data-bs-toggle="tab" data-bs-target="#broadcast-panel">
           <i class="fa-solid fa-bullhorn me-1"></i> Broadcast Mail
       </button>
   </li>
   <li class="nav-item">
-      <button class="nav-link text-danger" data-bs-toggle="tab" data-bs-target="#alldata">
+      <button class="nav-link text-secondary" data-bs-toggle="tab" data-bs-target="#alldata">
           <i class="fa-solid fa-database me-1"></i> Database
       </button>
   </li>
 </ul>
 
-<!-- Top Action Panels (Settings, Reported Leads & Payments) -->
+<!-- Top Action Panels (Settings & Fake Lead Reports) -->
 <div class="row g-4 mb-4">
-    <!-- Master Site Settings -->
-    <div class="col-lg-4 col-md-6">
+    <!-- MASTER SITE SETTINGS -->
+    <div class="col-md-6">
         <div class="glass-panel h-100 p-0 overflow-hidden">
             <div class="bg-primary bg-opacity-10 text-primary fw-bold p-3 border-bottom border-primary border-opacity-25">
                 <i class="fa-solid fa-gear me-2"></i> Master Site Settings
@@ -239,57 +219,14 @@
         </div>
     </div>
 
-    <!-- Reported Leads Section (Styled matching Pending Payments) -->
-    <div class="col-lg-4 col-md-6">
-        <div class="glass-panel h-100 p-0 overflow-hidden border-start border-4 border-danger">
-            <div class="bg-danger bg-opacity-10 text-danger fw-bold p-3 border-bottom border-danger border-opacity-25 d-flex justify-content-between align-items-center">
-                <span><i class="fa-solid fa-triangle-exclamation text-danger me-2"></i> Reported Leads</span>
-                <span class="badge bg-danger text-white rounded-pill">{{ reported_leads|length if reported_leads else 0 }}</span>
-            </div>
-            <div class="p-3" style="max-height: 220px; overflow-y: auto;">
-                {% if reported_leads %}
-                    {% for rep in reported_leads %}
-                    <div class="border-bottom pb-2 mb-2">
-                        <div class="d-flex justify-content-between align-items-start">
-                            <div>
-                                <span class="badge bg-danger bg-opacity-10 text-danger border border-danger rounded-pill mb-1">Req #{{ rep.requirement_id }}</span>
-                                <div class="fw-bold text-dark small">{{ rep.shop_owner.name if rep.shop_owner else 'Shop #' ~ rep.shop_owner_id }}</div>
-                                <small class="text-danger fw-semibold d-block" style="font-size: 0.8rem;">Reason: {{ rep.reason }}</small>
-                                <small class="text-muted" style="font-size: 0.7rem;"><i class="fa-regular fa-clock me-1"></i>{{ rep.created_at.strftime('%d %b %Y, %I:%M %p') if rep.created_at else 'N/A' }}</small>
-                            </div>
-                            <div class="text-nowrap ms-2">
-                                <!-- Refund Credit Action -->
-                                <form action="{{ url_for('resolve_report', report_id=rep.id, action='refund') }}" method="POST" class="d-inline" onsubmit="return confirm('Kya aap shop owner ko lead credit refund karna chahte hain?');">
-                                    <button class="btn btn-sm btn-outline-success rounded-circle shadow-sm me-1" style="width:30px; height:30px; padding:0;" title="Refund Credit"><i class="fa-solid fa-indian-rupee-sign"></i></button>
-                                </form>
-                                <!-- Block / Unblock Shop Owner Action -->
-                                <form action="{{ url_for('toggle_block_user', user_id=rep.shop_owner_id) }}" method="POST" class="d-inline">
-                                    <button type="submit" class="btn btn-sm {% if rep.shop_owner and rep.shop_owner.is_blocked %}btn-success{% else %}btn-outline-danger{% endif %} rounded-circle shadow-sm" style="width:30px; height:30px; padding:0;" title="{% if rep.shop_owner and rep.shop_owner.is_blocked %}Unblock Shop Owner{% else %}Block Shop Owner{% endif %}">
-                                        <i class="fa-solid {% if rep.shop_owner and rep.shop_owner.is_blocked %}fa-unlock{% else %}fa-ban{% endif %}"></i>
-                                    </button>
-                                </form>
-                            </div>
-                        </div>
-                    </div>
-                    {% endfor %}
-                {% else %}
-                <div class="text-center text-muted my-4">
-                    <i class="fa-solid fa-shield-check fa-2x text-danger opacity-50 mb-2"></i>
-                    <p class="mb-0 small">No reported leads found.</p>
-                </div>
-                {% endif %}
-            </div>
-        </div>
-    </div>
-
-    <!-- Pending Payment Approvals -->
-    <div class="col-lg-4 col-md-12">
-        <div class="glass-panel h-100 p-0 overflow-hidden border-start border-4 border-warning">
+    <!-- PENDING PAYMENT APPROVALS -->
+    <div class="col-md-6">
+        <div class="glass-panel h-100 p-0 overflow-hidden border-md-start border-4 border-warning">
             <div class="bg-warning bg-opacity-10 text-dark fw-bold p-3 border-bottom border-warning border-opacity-25 d-flex justify-content-between align-items-center">
-                <span><i class="fa-solid fa-clock text-warning me-2"></i> Pending Payments</span>
+                <span><i class="fa-solid fa-clock text-warning me-2"></i> Pending Payment Approvals</span>
                 <span class="badge bg-warning text-dark rounded-pill">{{ pending_requests|length }}</span>
             </div>
-            <div class="p-3" style="max-height: 220px; overflow-y: auto;">
+            <div class="p-3" style="max-height: 180px; overflow-y: auto;">
                 {% for req in pending_requests %}
                 <div class="d-flex justify-content-between align-items-center border-bottom pb-2 mb-2">
                     <div>
@@ -309,7 +246,49 @@
                 {% else %}
                 <div class="text-center text-muted my-4">
                     <i class="fa-solid fa-check-circle fa-2x text-success opacity-50 mb-2"></i>
-                    <p class="mb-0 small">All caught up! No pending requests.</p>
+                    <p class="mb-0 small">All caught up! No pending payment requests.</p>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+    <!-- REPORTED FAKE LEADS SECTION -->
+    <div class="col-12">
+        <div class="glass-panel p-0 overflow-hidden border-start border-4 border-danger">
+            <div class="bg-danger bg-opacity-10 text-danger fw-bold p-3 border-bottom border-danger border-opacity-25 d-flex justify-content-between align-items-center">
+                <span><i class="fa-solid fa-triangle-exclamation me-2"></i> Fake Lead Reports & Refund Requests</span>
+                <span class="badge bg-danger text-white rounded-pill">{{ reports_data|length }}</span>
+            </div>
+            <div class="p-3" style="max-height: 250px; overflow-y: auto;">
+                {% for item in reports_data %}
+                <div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center border-bottom pb-3 mb-3 gap-2">
+                    <div>
+                        <div class="fw-bold text-dark">
+                            <span class="badge bg-primary me-1">Shop: {{ item.shop.name if item.shop else 'N/A' }}</span>
+                            <i class="fa-solid fa-arrow-right me-1 text-muted"></i>
+                            <span class="badge bg-danger">Reported Cust: {{ item.customer.name if item.customer else 'N/A' }} ({{ item.customer.mobile if item.customer else 'N/A' }})</span>
+                        </div>
+                        <div class="small text-muted mt-1">
+                            <strong>Reason:</strong> "{{ item.report.report_reason }}" | <strong>Cost:</strong> {{ item.credit_cost }} Credits
+                        </div>
+                    </div>
+                    <div class="text-nowrap d-flex gap-2">
+                        <form action="{{ url_for('process_report', lead_id=item.report.id, action='block_and_refund') }}" method="POST" onsubmit="return confirm('Kya aap is customer ko block karke Shop Owner ko credits refund karna chahte hain?');">
+                            <button type="submit" class="btn btn-sm btn-danger rounded-pill fw-bold shadow-sm">
+                                <i class="fa-solid fa-user-slash me-1"></i> Block User & Refund {{ item.credit_cost }} Credits
+                            </button>
+                        </form>
+                        <form action="{{ url_for('process_report', lead_id=item.report.id, action='reject') }}" method="POST">
+                            <button type="submit" class="btn btn-sm btn-outline-secondary rounded-pill fw-bold">
+                                Reject
+                            </button>
+                        </form>
+                    </div>
+                </div>
+                {% else %}
+                <div class="text-center text-muted my-3">
+                    <p class="mb-0 small"><i class="fa-solid fa-shield-cat text-success me-1"></i> No fake lead reports pending.</p>
                 </div>
                 {% endfor %}
             </div>
@@ -320,100 +299,6 @@
 <div class="tab-content">
   <!-- OVERVIEW TAB -->
   <div class="tab-pane fade show active" id="overview">
-      
-      <!-- Analytics Mini Dashboard -->
-      {% if total_users > 0 or total_jobs > 0 %}
-      <div class="glass-panel p-3 p-md-4 mb-4">
-          <div class="d-flex flex-column flex-md-row justify-content-between align-items-center mb-4 border-bottom pb-3 gap-3">
-              <h6 class="fw-bold text-dark mb-0"><i class="fa-solid fa-chart-line text-primary me-2"></i>Platform Health Analytics</h6>
-              
-              <!-- Toggle Buttons -->
-              <ul class="nav nav-pills analytics-toggle bg-light p-1 rounded-pill shadow-sm flex-nowrap" id="viewToggle" role="tablist">
-                  <li class="nav-item" role="presentation">
-                      <button class="nav-link active text-nowrap" data-bs-toggle="tab" data-bs-target="#chartView" type="button">
-                          <i class="fa-solid fa-chart-pie me-1"></i> Charts
-                      </button>
-                  </li>
-                  <li class="nav-item" role="presentation">
-                      <button class="nav-link text-nowrap" data-bs-toggle="tab" data-bs-target="#barView" type="button">
-                          <i class="fa-solid fa-bars-progress me-1"></i> Bars
-                      </button>
-                  </li>
-              </ul>
-          </div>
-
-          <div class="tab-content">
-              <!-- Round Chart View (Doughnut) -->
-              <div class="tab-pane fade show active" id="chartView">
-                  <div class="row text-center align-items-center justify-content-center">
-                      <div class="col-md-6 d-flex flex-column align-items-center border-end mobile-chart-divider">
-                          <span class="small fw-bold text-dark mb-3 text-uppercase">User Demographics ({{ total_users }})</span>
-                          <div style="position: relative; height: 160px; width: 160px; margin: 0 auto;">
-                              <canvas id="userChart"></canvas>
-                          </div>
-                          <div class="d-flex flex-wrap justify-content-center gap-2 gap-md-3 small fw-bold mt-3" style="font-size: 0.75rem;">
-                              <span class="text-nowrap"><i class="fa-solid fa-circle text-primary me-1"></i> Cust ({{customers|length}})</span>
-                              <span class="text-nowrap"><i class="fa-solid fa-circle text-info me-1"></i> Shops ({{shop_owners|length}})</span>
-                              <span class="text-nowrap"><i class="fa-solid fa-circle text-warning me-1"></i> Workers ({{workers|length}})</span>
-                          </div>
-                      </div>
-                      <div class="col-md-6 d-flex flex-column align-items-center">
-                          <span class="small fw-bold text-dark mb-3 text-uppercase">Active Jobs vs Vacancies ({{ total_jobs }})</span>
-                          <div style="position: relative; height: 160px; width: 160px; margin: 0 auto;">
-                              <canvas id="jobChart"></canvas>
-                          </div>
-                          <div class="d-flex flex-wrap justify-content-center gap-2 gap-md-3 small fw-bold mt-3" style="font-size: 0.75rem;">
-                              <span class="text-nowrap"><i class="fa-solid fa-circle text-success me-1"></i> Customer Jobs ({{total_reqs}})</span>
-                              <span class="text-nowrap"><i class="fa-solid fa-circle text-warning me-1"></i> Vacancies ({{total_vacancies}})</span>
-                          </div>
-                      </div>
-                  </div>
-              </div>
-
-              <!-- Progress Bar View -->
-              <div class="tab-pane fade" id="barView">
-                  <div class="row align-items-center">
-                      <div class="col-md-6 border-end pe-md-4 mobile-chart-divider">
-                          <div class="d-flex justify-content-between small fw-bold mb-2">
-                              <span class="text-dark text-uppercase">User Demographics</span>
-                              <span class="text-muted">Total: {{ total_users }}</span>
-                          </div>
-                          <div class="progress rounded-pill shadow-sm mb-2" style="height: 14px;">
-                              {% if total_users > 0 %}
-                              <div class="progress-bar bg-primary" role="progressbar" style="width: {{ (customers|length / total_users * 100)|round }}%" title="Customers"></div>
-                              <div class="progress-bar bg-info" role="progressbar" style="width: {{ (shop_owners|length / total_users * 100)|round }}%" title="Shop Owners"></div>
-                              <div class="progress-bar bg-warning" role="progressbar" style="width: {{ (workers|length / total_users * 100)|round }}%" title="Workers"></div>
-                              {% endif %}
-                          </div>
-                          <div class="d-flex flex-wrap justify-content-between small text-muted mt-1 gap-2" style="font-size: 0.7rem;">
-                              <span class="text-nowrap"><i class="fa-solid fa-circle text-primary"></i> Cust ({{customers|length}})</span>
-                              <span class="text-nowrap"><i class="fa-solid fa-circle text-info"></i> Shops ({{shop_owners|length}})</span>
-                              <span class="text-nowrap"><i class="fa-solid fa-circle text-warning"></i> Workers ({{workers|length}})</span>
-                          </div>
-                      </div>
-                      <div class="col-md-6 ps-md-4">
-                          <div class="d-flex justify-content-between small fw-bold mb-2">
-                              <span class="text-dark text-uppercase">Jobs vs Vacancies</span>
-                              <span class="text-muted">Total: {{ total_jobs }}</span>
-                          </div>
-                          <div class="progress rounded-pill shadow-sm mb-2" style="height: 14px;">
-                              {% if total_jobs > 0 %}
-                              <div class="progress-bar bg-success" role="progressbar" style="width: {{ (total_reqs / total_jobs * 100)|round }}%" title="Customer Jobs"></div>
-                              <div class="progress-bar bg-warning" role="progressbar" style="width: {{ (total_vacancies / total_jobs * 100)|round }}%" title="Shop Vacancies"></div>
-                              {% endif %}
-                          </div>
-                          <div class="d-flex flex-wrap justify-content-between small text-muted mt-1 gap-2" style="font-size: 0.7rem;">
-                              <span class="text-nowrap"><i class="fa-solid fa-circle text-success"></i> Cust Jobs ({{total_reqs}})</span>
-                              <span class="text-nowrap"><i class="fa-solid fa-circle text-warning"></i> Vacancies ({{total_vacancies}})</span>
-                          </div>
-                      </div>
-                  </div>
-              </div>
-          </div>
-      </div>
-      {% endif %}
-
-      <!-- Clickable Stat Cards -->
       <div class="row text-center g-2 g-md-3">
           <div class="col-6 col-md-3">
               <div class="card stat-card bg-primary-soft py-3 py-md-4 h-100 rounded-4 shadow-sm border-0" onclick="document.querySelector('[data-bs-target=\'#shops\']').click()">
@@ -437,10 +322,10 @@
               </div>
           </div>
           <div class="col-6 col-md-3">
-              <div class="card stat-card bg-warning-soft py-3 py-md-4 h-100 rounded-4 shadow-sm border-0" onclick="document.querySelector('[data-bs-target=\'#alldata\']').click()">
-                  <i class="fa-solid fa-clipboard-list stat-icon"></i>
-                  <h1 class="fw-bold mb-0 display-5">{{ total_vacancies }}</h1>
-                  <small class="fw-bold text-uppercase" style="letter-spacing: 1px; font-size:0.7rem;">Vacancies</small>
+              <div class="card stat-card bg-warning-soft py-3 py-md-4 h-100 rounded-4 shadow-sm border-0" onclick="document.querySelector('[data-bs-target=\'#blocked-panel\']').click()">
+                  <i class="fa-solid fa-user-slash stat-icon"></i>
+                  <h1 class="fw-bold mb-0 display-5 text-danger">{{ blocked_users|length }}</h1>
+                  <small class="fw-bold text-uppercase text-danger" style="letter-spacing: 1px; font-size:0.7rem;">Blocked Users</small>
               </div>
           </div>
       </div>
@@ -456,33 +341,22 @@
                   <tbody>
                       {% for shop in shop_owners %}
                       <tr>
-                          <td>
-                              <span class="badge bg-secondary rounded-pill">#{{ shop.id }}</span>
-                              {% if shop.is_blocked %}
-                              <span class="badge bg-danger rounded-pill ms-1">Blocked</span>
-                              {% endif %}
-                          </td>
-                          <td class="text-nowrap">
-                              <div class="fw-bold text-dark">{{ shop.name }}</div>
-                          </td>
+                          <td><span class="badge bg-secondary rounded-pill">#{{ shop.id }}</span></td>
+                          <td class="text-nowrap"><div class="fw-bold text-dark">{{ shop.name }}</div></td>
                           <td class="text-nowrap"><i class="fa-solid fa-phone text-muted small me-1"></i>{{ shop.mobile }}</td>
                           <td class="text-nowrap">
                               {% if shop.created_at %}
                                   <div class="small fw-bold text-dark">{{ shop.created_at.strftime('%d %b %Y') }}</div>
-                                  <div class="text-muted" style="font-size: 0.75rem;"><i class="fa-regular fa-clock me-1"></i>{{ shop.created_at.strftime('%I:%M %p') }}</div>
                               {% else %}
-                                  <span class="text-muted small border rounded px-2 bg-light">Legacy User</span>
+                                  <span class="text-muted small">Legacy User</span>
                               {% endif %}
                           </td>
                           <td class="text-success fw-bold fs-6">₹{{ shop.wallet_balance }}</td>
                           <td class="text-end text-nowrap">
-                              <button class="btn btn-sm btn-outline-info rounded-circle me-1" style="width:32px; height:32px; padding:0;" data-bs-toggle="modal" data-bs-target="#viewModal{{ shop.id }}" title="View"><i class="fa-solid fa-eye"></i></button>
-                              <button class="btn btn-sm btn-outline-primary rounded-circle me-1" style="width:32px; height:32px; padding:0;" data-bs-toggle="modal" data-bs-target="#editModal{{ shop.id }}" title="Edit"><i class="fa-solid fa-pen"></i></button>
-                              <form action="{{ url_for('toggle_block_user', user_id=shop.id) }}" method="POST" class="d-inline">
-                                  <button type="submit" class="btn btn-sm {% if shop.is_blocked %}btn-success{% else %}btn-outline-warning{% endif %} rounded-circle me-1" style="width:32px; height:32px; padding:0;" title="{% if shop.is_blocked %}Unblock User{% else %}Block User{% endif %}"><i class="fa-solid {% if shop.is_blocked %}fa-unlock{% else %}fa-lock{% endif %}"></i></button>
-                              </form>
-                              <form action="{{ url_for('delete_user', user_id=shop.id) }}" method="POST" class="d-inline" onsubmit="return confirm('WARNING: This will delete ALL data related to this shop. Continue?');">
-                                  <button type="submit" class="btn btn-sm btn-outline-danger rounded-circle" style="width:32px; height:32px; padding:0;" title="Delete"><i class="fa-solid fa-trash"></i></button>
+                              <button class="btn btn-sm btn-outline-info rounded-circle me-1" style="width:32px; height:32px; padding:0;" data-bs-toggle="modal" data-bs-target="#viewModal{{ shop.id }}"><i class="fa-solid fa-eye"></i></button>
+                              <button class="btn btn-sm btn-outline-primary rounded-circle me-1" style="width:32px; height:32px; padding:0;" data-bs-toggle="modal" data-bs-target="#editModal{{ shop.id }}"><i class="fa-solid fa-pen"></i></button>
+                              <form action="{{ url_for('delete_user', user_id=shop.id) }}" method="POST" class="d-inline" onsubmit="return confirm('WARNING: Delete this shop?');">
+                                  <button type="submit" class="btn btn-sm btn-outline-danger rounded-circle" style="width:32px; height:32px; padding:0;"><i class="fa-solid fa-trash"></i></button>
                               </form>
                           </td>
                       </tr>
@@ -503,30 +377,21 @@
                   <tbody>
                       {% for worker in workers %}
                       <tr>
-                          <td>
-                              <span class="badge bg-secondary rounded-pill">#{{ worker.id }}</span>
-                              {% if worker.is_blocked %}
-                              <span class="badge bg-danger rounded-pill ms-1">Blocked</span>
-                              {% endif %}
-                          </td>
+                          <td><span class="badge bg-secondary rounded-pill">#{{ worker.id }}</span></td>
                           <td class="text-nowrap"><div class="fw-bold text-dark">{{ worker.name }}</div></td>
                           <td class="text-nowrap"><i class="fa-solid fa-phone text-muted small me-1"></i>{{ worker.mobile }}</td>
                           <td class="text-nowrap">
                               {% if worker.created_at %}
                                   <div class="small fw-bold text-dark">{{ worker.created_at.strftime('%d %b %Y') }}</div>
-                                  <div class="text-muted" style="font-size: 0.75rem;"><i class="fa-regular fa-clock me-1"></i>{{ worker.created_at.strftime('%I:%M %p') }}</div>
                               {% else %}
-                                  <span class="text-muted small border rounded px-2 bg-light">Legacy User</span>
+                                  <span class="text-muted small">Legacy User</span>
                               {% endif %}
                           </td>
                           <td class="text-end text-nowrap">
-                              <button class="btn btn-sm btn-outline-info rounded-circle me-1" style="width:32px; height:32px; padding:0;" data-bs-toggle="modal" data-bs-target="#viewModal{{ worker.id }}" title="View"><i class="fa-solid fa-eye"></i></button>
-                              <button class="btn btn-sm btn-outline-primary rounded-circle me-1" style="width:32px; height:32px; padding:0;" data-bs-toggle="modal" data-bs-target="#editWorkerModal{{ worker.id }}" title="Edit"><i class="fa-solid fa-pen"></i></button>
-                              <form action="{{ url_for('toggle_block_user', user_id=worker.id) }}" method="POST" class="d-inline">
-                                  <button type="submit" class="btn btn-sm {% if worker.is_blocked %}btn-success{% else %}btn-outline-warning{% endif %} rounded-circle me-1" style="width:32px; height:32px; padding:0;" title="{% if worker.is_blocked %}Unblock User{% else %}Block User{% endif %}"><i class="fa-solid {% if worker.is_blocked %}fa-unlock{% else %}fa-lock{% endif %}"></i></button>
-                              </form>
+                              <button class="btn btn-sm btn-outline-info rounded-circle me-1" style="width:32px; height:32px; padding:0;" data-bs-toggle="modal" data-bs-target="#viewModal{{ worker.id }}"><i class="fa-solid fa-eye"></i></button>
+                              <button class="btn btn-sm btn-outline-primary rounded-circle me-1" style="width:32px; height:32px; padding:0;" data-bs-toggle="modal" data-bs-target="#editWorkerModal{{ worker.id }}"><i class="fa-solid fa-pen"></i></button>
                               <form action="{{ url_for('delete_user', user_id=worker.id) }}" method="POST" class="d-inline" onsubmit="return confirm('Delete worker?');">
-                                  <button type="submit" class="btn btn-sm btn-outline-danger rounded-circle" style="width:32px; height:32px; padding:0;" title="Delete"><i class="fa-solid fa-trash"></i></button>
+                                  <button type="submit" class="btn btn-sm btn-outline-danger rounded-circle" style="width:32px; height:32px; padding:0;"><i class="fa-solid fa-trash"></i></button>
                               </form>
                           </td>
                       </tr>
@@ -539,8 +404,8 @@
 
   <!-- CUSTOMERS TAB -->
   <div class="tab-pane fade" id="customers-panel" role="tabpanel">
-    <div class="glass-panel p-3 p-md-4 mt-3">
-        <h5 class="fw-bold mb-4 text-dark"><i class="fa-solid fa-users text-primary me-2"></i> Manage Customers</h5>
+    <div class="glass-panel p-3 p-md-4">
+        <h5 class="fw-bold mb-4 text-dark"><i class="fa-solid fa-users text-primary me-2"></i> Active Customers</h5>
         <div class="table-responsive">
             <table class="table table-glass table-hover align-middle">
                 <thead>
@@ -548,7 +413,6 @@
                         <th>Name & Details</th>
                         <th>Mobile Number</th>
                         <th>Location</th>
-                        <th>Joined Date</th>
                         <th>Total Jobs</th>
                         <th class="text-end">Actions</th>
                     </tr>
@@ -557,24 +421,11 @@
                     {% for customer in customers %}
                     <tr>
                         <td class="text-nowrap">
-                            <div class="fw-bold text-dark">
-                                {{ customer.name }}
-                                {% if customer.is_blocked %}
-                                <span class="badge bg-danger rounded-pill ms-1">Blocked</span>
-                                {% endif %}
-                            </div>
+                            <div class="fw-bold text-dark">{{ customer.name }}</div>
                             <div class="small text-muted"><i class="fa-regular fa-envelope me-1"></i>{{ customer.email or 'No Email' }}</div>
                         </td>
                         <td class="fw-bold text-dark text-nowrap"><i class="fa-solid fa-phone text-secondary me-1 small"></i>{{ customer.mobile }}</td>
                         <td class="text-muted small text-nowrap">{{ customer.address or 'N/A' }}</td>
-                        <td class="text-nowrap">
-                            {% if customer.created_at %}
-                                <div class="small fw-bold text-dark">{{ customer.created_at.strftime('%d %b %Y') }}</div>
-                                <div class="text-muted" style="font-size: 0.75rem;"><i class="fa-regular fa-clock me-1"></i>{{ customer.created_at.strftime('%I:%M %p') }}</div>
-                            {% else %}
-                                <span class="text-muted small border rounded px-2 bg-light">Legacy</span>
-                            {% endif %}
-                        </td>
                         <td class="text-nowrap">
                             <span class="badge bg-success bg-opacity-10 text-success border border-success rounded-pill px-2 py-1 shadow-sm">
                                 <i class="fa-solid fa-briefcase me-1"></i> {{ customer_req_counts.get(customer.id, 0) }} Jobs
@@ -587,10 +438,7 @@
                             <button class="btn btn-sm btn-outline-primary rounded-circle me-1" style="width:32px; height:32px; padding:0;" data-bs-toggle="modal" data-bs-target="#editCustomerModal{{ customer.id }}">
                                 <i class="fa-solid fa-pen-to-square"></i>
                             </button>
-                            <form action="{{ url_for('toggle_block_user', user_id=customer.id) }}" method="POST" class="d-inline">
-                                <button type="submit" class="btn btn-sm {% if customer.is_blocked %}btn-success{% else %}btn-outline-warning{% endif %} rounded-circle me-1" style="width:32px; height:32px; padding:0;" title="{% if customer.is_blocked %}Unblock User{% else %}Block User{% endif %}"><i class="fa-solid {% if customer.is_blocked %}fa-unlock{% else %}fa-lock{% endif %}"></i></button>
-                            </form>
-                            <form action="{{ url_for('delete_user', user_id=customer.id) }}" method="POST" class="d-inline" onsubmit="return confirm('WARNING: Kya aap sach me is customer ko delete karna chahte hain? Iska saara data clear ho jayega.');">
+                            <form action="{{ url_for('delete_user', user_id=customer.id) }}" method="POST" class="d-inline" onsubmit="return confirm('Delete customer?');">
                                 <button type="submit" class="btn btn-sm btn-outline-danger rounded-circle" style="width:32px; height:32px; padding:0;">
                                     <i class="fa-solid fa-trash"></i>
                                 </button>
@@ -599,10 +447,7 @@
                     </tr>
                     {% else %}
                     <tr>
-                        <td colspan="6" class="text-center py-5 text-muted">
-                            <i class="fa-solid fa-folder-open fa-3x mb-3 text-light"></i>
-                            <h6>No Customers Found</h6>
-                        </td>
+                        <td colspan="5" class="text-center py-4 text-muted">No Active Customers Found</td>
                     </tr>
                     {% endfor %}
                 </tbody>
@@ -611,10 +456,57 @@
     </div>
   </div>
 
+  <!-- BLOCKED USERS TAB -->
+  <div class="tab-pane fade" id="blocked-panel">
+      <div class="glass-panel p-3 p-md-4 border-start border-4 border-danger">
+          <h5 class="fw-bold text-danger mb-4"><i class="fa-solid fa-user-slash me-2"></i> Blocked Users Directory</h5>
+          <div class="table-responsive">
+              <table class="table table-glass table-hover align-middle">
+                  <thead>
+                      <tr class="text-nowrap">
+                          <th>User ID</th>
+                          <th>Name & Mobile</th>
+                          <th>Role</th>
+                          <th>Reason for Block</th>
+                          <th class="text-end">Actions</th>
+                      </tr>
+                  </thead>
+                  <tbody>
+                      {% for buser in blocked_users %}
+                      <tr>
+                          <td><span class="badge bg-danger rounded-pill">#{{ buser.id }}</span></td>
+                          <td class="text-nowrap">
+                              <div class="fw-bold text-dark">{{ buser.name }}</div>
+                              <div class="small text-muted"><i class="fa-solid fa-phone me-1"></i>{{ buser.mobile }}</div>
+                          </td>
+                          <td><span class="badge bg-secondary text-uppercase">{{ buser.role }}</span></td>
+                          <td class="text-danger small">{{ buser.block_reason or 'Fake Lead / Fraudulent Activity' }}</td>
+                          <td class="text-end text-nowrap">
+                              <form action="{{ url_for('unblock_user', user_id=buser.id) }}" method="POST" class="d-inline" onsubmit="return confirm('Kya aap is user ko unblock karna chahte hain?');">
+                                  <button type="submit" class="btn btn-sm btn-success rounded-pill px-3 fw-bold shadow-sm">
+                                      <i class="fa-solid fa-lock-open me-1"></i> Unblock User
+                                  </button>
+                              </form>
+                          </td>
+                      </tr>
+                      {% else %}
+                      <tr>
+                          <td colspan="5" class="text-center py-4 text-muted">
+                              <i class="fa-solid fa-shield-check text-success fa-2x mb-2 d-block"></i>
+                              No blocked users currently.
+                          </td>
+                      </tr>
+                      {% endfor %}
+                  </tbody>
+              </table>
+          </div>
+      </div>
+  </div>
+
   <!-- BROADCAST MAIL TAB -->
   <div class="tab-pane fade" id="broadcast-panel">
-      <div class="glass-panel p-3 p-md-4 mt-3 border-start border-4 border-success">
-          <h5 class="fw-bold mb-4 text-dark"><i class="fa-solid fa-bullhorn text-success me-2"></i> Send Broadcast Notice / Mail with Attachments</h5>
+      <div class="glass-panel p-3 p-md-4 border-start border-4 border-success">
+          <h5 class="fw-bold mb-4 text-dark"><i class="fa-solid fa-bullhorn text-success me-2"></i> Send Broadcast Notice / Mail</h5>
           <form action="{{ url_for('admin_send_broadcast') }}" method="POST" enctype="multipart/form-data">
               <div class="row">
                   <div class="col-md-6 mb-3">
@@ -626,24 +518,19 @@
                           <option value="worker">Sirf Workers ko</option>
                       </select>
                   </div>
-                  
                   <div class="col-md-6 mb-3">
                       <label class="form-label fw-bold text-muted small text-uppercase">Email Subject</label>
                       <input type="text" name="subject" class="form-control shadow-sm border-0" placeholder="e.g. 🚀 Exciting Update on Kaamconnect" required>
                   </div>
               </div>
-              
               <div class="mb-3">
-                  <label class="form-label fw-bold text-muted small text-uppercase">Message / Notice content</label>
-                  <textarea name="message" class="form-control shadow-sm border-0" rows="6" placeholder="Yahan aap poora message, rules, offers ya notice detail mein likhein..." required></textarea>
+                  <label class="form-label fw-bold text-muted small text-uppercase">Message content</label>
+                  <textarea name="message" class="form-control shadow-sm border-0" rows="5" required></textarea>
               </div>
-
               <div class="mb-4">
                   <label class="form-label fw-bold text-muted small text-uppercase">Attach File (Optional)</label>
                   <input type="file" name="attachment" class="form-control shadow-sm border-0">
-                  <small class="text-muted"><i class="fa-solid fa-circle-info me-1 mt-2"></i>Aap koi bhi poster, banner ya PDF file attach kar sakte hain.</small>
               </div>
-              
               <button type="submit" class="btn btn-success rounded-pill px-5 py-2 w-100 fw-bold shadow">
                   <i class="fa-solid fa-paper-plane me-2"></i> Send Broadcast Mail Now
               </button>
@@ -654,44 +541,23 @@
   <!-- DATABASE TAB -->
   <div class="tab-pane fade" id="alldata">
       <div class="glass-panel p-3 p-md-4">
-          <h5 class="fw-bold text-dark mb-4"><i class="fa-solid fa-database text-danger me-2"></i> Full Database View</h5>
+          <h5 class="fw-bold text-dark mb-4"><i class="fa-solid fa-database text-secondary me-2"></i> Full Database View</h5>
           <div class="table-responsive">
               <table class="table table-sm table-glass table-hover text-center align-middle" style="font-size: 14px;">
-                  <thead><tr class="text-nowrap"><th>DB ID</th><th>Role</th><th>Name</th><th>Mobile</th><th>Joined Date</th><th>Action</th></tr></thead>
+                  <thead><tr class="text-nowrap"><th>DB ID</th><th>Role</th><th>Name</th><th>Mobile</th><th>Status</th></tr></thead>
                   <tbody>
                       {% for user in all_users %}
                       <tr>
-                          <td class="fw-bold text-muted">
-                              #{{ user.id }}
-                              {% if user.is_blocked %}
-                              <span class="badge bg-danger rounded-pill ms-1">Blocked</span>
-                              {% endif %}
-                          </td>
-                          <td class="text-nowrap">
-                              {% if user.role == 'admin' %}
-                              <span class="badge bg-danger shadow-sm">{{ user.role.upper() }}</span>
-                              {% elif user.role == 'shop_owner' %}
-                              <span class="badge bg-primary shadow-sm">{{ user.role.upper() }}</span>
-                              {% elif user.role == 'worker' %}
-                              <span class="badge bg-info shadow-sm">{{ user.role.upper() }}</span>
-                              {% else %}
-                              <span class="badge bg-success shadow-sm">{{ user.role.upper() }}</span>
-                              {% endif %}
-                          </td>
+                          <td class="fw-bold text-muted">#{{ user.id }}</td>
+                          <td class="text-nowrap"><span class="badge bg-secondary">{{ user.role.upper() }}</span></td>
                           <td class="fw-bold text-dark text-nowrap">{{ user.name }}</td>
                           <td class="text-nowrap">{{ user.mobile }}</td>
-                          <td class="small text-nowrap">
-                              {% if user.created_at %}
-                                  {{ user.created_at.strftime('%d %b %Y, %I:%M %p') }}
+                          <td>
+                              {% if user.is_blocked %}
+                              <span class="badge bg-danger">BLOCKED</span>
                               {% else %}
-                                  <span class="text-muted">Legacy Record</span>
+                              <span class="badge bg-success">ACTIVE</span>
                               {% endif %}
-                          </td>
-                          <td class="text-nowrap">
-                              <button class="btn btn-sm btn-light border rounded-circle shadow-sm me-1" style="width:30px; height:30px; padding:0;" data-bs-toggle="modal" data-bs-target="#viewModal{{ user.id }}"><i class="fa-solid fa-eye text-primary"></i></button>
-                              <form action="{{ url_for('toggle_block_user', user_id=user.id) }}" method="POST" class="d-inline">
-                                  <button type="submit" class="btn btn-sm {% if user.is_blocked %}btn-success{% else %}btn-light border{% endif %} rounded-circle shadow-sm" style="width:30px; height:30px; padding:0;" title="{% if user.is_blocked %}Unblock User{% else %}Block User{% endif %}"><i class="fa-solid {% if user.is_blocked %}fa-unlock text-success{% else %}fa-lock text-warning{% endif %}"></i></button>
-                              </form>
                           </td>
                       </tr>
                       {% endfor %}
@@ -701,268 +567,5 @@
       </div>
   </div>
 </div>
-
-<!-- ================= VIEW DETAILS MODALS (For All Users) ================= -->
-{% set all_view_users = all_users %}
-{% for user in all_view_users %}
-<div class="modal fade" id="viewModal{{ user.id }}" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content border-0 shadow-lg rounded-4">
-            <div class="modal-header bg-light border-0">
-                <h5 class="modal-title fw-bold text-dark"><i class="fa-solid fa-user-shield text-primary me-2"></i> User Profile</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-            </div>
-            <div class="modal-body p-4">
-                <div class="text-center mb-3">
-                    <span class="badge bg-primary px-3 py-2 rounded-pill text-uppercase mb-2 shadow-sm">{{ user.role }}</span>
-                    <h4 class="fw-bold text-dark mb-0">
-                        {{ user.name }}
-                        {% if user.is_blocked %}
-                        <span class="badge bg-danger fs-6">Blocked</span>
-                        {% endif %}
-                    </h4>
-                    <small class="text-muted">Database ID: #{{ user.id }}</small>
-                </div>
-                
-                <hr class="text-muted opacity-25">
-
-                <div class="row g-3">
-                    <div class="col-6">
-                        <span class="small text-muted d-block text-uppercase fw-bold" style="font-size:0.7rem;">Mobile Number</span>
-                        <strong class="text-dark"><i class="fa-solid fa-phone text-secondary me-1"></i>{{ user.mobile }}</strong>
-                    </div>
-                    <div class="col-6">
-                        <span class="small text-muted d-block text-uppercase fw-bold" style="font-size:0.7rem;">Email Address</span>
-                        <strong class="text-dark"><i class="fa-solid fa-envelope text-secondary me-1"></i>{{ user.email or 'Not Provided' }}</strong>
-                    </div>
-
-                    <div class="col-12">
-                        <span class="small text-muted d-block text-uppercase fw-bold" style="font-size:0.7rem;">Address / Location</span>
-                        <strong class="text-dark"><i class="fa-solid fa-location-dot text-secondary me-1"></i>{{ user.address or 'Not Provided' }}</strong>
-                    </div>
-
-                    {% if user.role == 'shop_owner' %}
-                    <div class="col-6">
-                        <span class="small text-muted d-block text-uppercase fw-bold" style="font-size:0.7rem;">Shop Name</span>
-                        <strong class="text-dark"><i class="fa-solid fa-shop text-secondary me-1"></i>{{ user.shop_name or 'Not Provided' }}</strong>
-                    </div>
-                    <div class="col-6">
-                        <span class="small text-muted d-block text-uppercase fw-bold" style="font-size:0.7rem;">Wallet Balance</span>
-                        <strong class="text-success"><i class="fa-solid fa-wallet me-1"></i>₹{{ user.wallet_balance }}</strong>
-                    </div>
-                    {% endif %}
-
-                    {% if user.role == 'worker' %}
-                    <div class="col-6">
-                        <span class="small text-muted d-block text-uppercase fw-bold" style="font-size:0.7rem;">Experience</span>
-                        <strong class="text-dark"><i class="fa-solid fa-briefcase text-secondary me-1"></i>{{ user.experience or 'Not Provided' }}</strong>
-                    </div>
-                    <div class="col-6">
-                        <span class="small text-muted d-block text-uppercase fw-bold" style="font-size:0.7rem;">Expertise / Skills</span>
-                        <strong class="text-dark"><i class="fa-solid fa-tools text-secondary me-1"></i>{{ user.expertise or 'Not Provided' }}</strong>
-                    </div>
-                    {% if user.per_day_amount %}
-                    <div class="col-12 mt-2">
-                        <span class="small text-muted d-block text-uppercase fw-bold" style="font-size:0.7rem;">Expected Per Day Charges</span>
-                        <strong class="text-success badge bg-success bg-opacity-10 fs-6 border border-success">₹{{ user.per_day_amount }}</strong>
-                    </div>
-                    {% endif %}
-                    {% endif %}
-
-                    <div class="col-12 mt-3 pt-3 border-top">
-                        <span class="small text-muted d-block text-uppercase fw-bold" style="font-size:0.7rem;">Signup Date & Time</span>
-                        <strong class="text-dark">
-                            {% if user.created_at %}
-                                <i class="fa-regular fa-calendar-check text-success me-1"></i> {{ user.created_at.strftime('%d %b %Y, %I:%M %p') }}
-                            {% else %}
-                                N/A (Legacy System User)
-                            {% endif %}
-                        </strong>
-                    </div>
-                </div>
-            </div>
-            <div class="modal-footer border-0 bg-light rounded-bottom-4">
-                <button type="button" class="btn btn-secondary w-100 rounded-pill px-4 fw-bold shadow-sm" data-bs-dismiss="modal">Close</button>
-            </div>
-        </div>
-    </div>
-</div>
-{% endfor %}
-
-<!-- EDIT SHOPS MODAL -->
-{% for shop in shop_owners %}
-<div class="modal fade" id="editModal{{ shop.id }}" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content border-0 shadow-lg rounded-4">
-            <div class="modal-header bg-light border-0">
-                <h5 class="modal-title fw-bold text-dark"><i class="fa-solid fa-pen-to-square text-primary me-2"></i>Edit {{ shop.name }}</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-            </div>
-            <form action="{{ url_for('edit_user', user_id=shop.id) }}" method="POST">
-                <div class="modal-body">
-                    <label class="small fw-bold text-muted text-uppercase" style="font-size:0.7rem;">Name</label>
-                    <input type="text" name="name" class="form-control mb-3 shadow-sm border-0 bg-light" value="{{ shop.name }}" required>
-                    
-                    <label class="small fw-bold text-muted text-uppercase" style="font-size:0.7rem;">Mobile Number</label>
-                    <input type="text" name="mobile" class="form-control mb-3 shadow-sm border-0 bg-light" value="{{ shop.mobile }}" required>
-                    
-                    <label class="small fw-bold text-muted text-uppercase" style="font-size:0.7rem;">Password (Optional Update)</label>
-                    <input type="password" name="password" class="form-control mb-3 shadow-sm border-0 bg-light" placeholder="New Password (leave empty to keep current)">
-                    
-                    <label class="small fw-bold text-muted text-uppercase" style="font-size:0.7rem;">Address</label>
-                    <input type="text" name="address" class="form-control mb-3 shadow-sm border-0 bg-light" value="{{ shop.address or '' }}">
-                    
-                    <label class="small fw-bold text-muted text-uppercase" style="font-size:0.7rem;">Wallet Balance (₹)</label>
-                    <input type="number" name="wallet_balance" class="form-control mb-2 shadow-sm border-0 bg-light fw-bold text-success" value="{{ shop.wallet_balance }}">
-                </div>
-                <div class="modal-footer border-0 pt-0">
-                    <button type="submit" class="btn btn-primary w-100 rounded-pill fw-bold shadow">Save Updates</button>
-                </div>
-            </form>
-        </div>
-    </div>
-</div>
-{% endfor %}
-
-<!-- EDIT WORKERS MODAL -->
-{% for worker in workers %}
-<div class="modal fade" id="editWorkerModal{{ worker.id }}" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content border-0 shadow-lg rounded-4">
-            <div class="modal-header bg-light border-0">
-                <h5 class="modal-title fw-bold text-dark"><i class="fa-solid fa-pen-to-square text-info me-2"></i>Edit Worker: {{ worker.name }}</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-            </div>
-            <form action="{{ url_for('edit_user', user_id=worker.id) }}" method="POST">
-                <div class="modal-body">
-                    <label class="small fw-bold text-muted text-uppercase" style="font-size:0.7rem;">Name</label>
-                    <input type="text" name="name" class="form-control mb-3 shadow-sm border-0 bg-light" value="{{ worker.name }}" required>
-                    
-                    <label class="small fw-bold text-muted text-uppercase" style="font-size:0.7rem;">Mobile Number</label>
-                    <input type="text" name="mobile" class="form-control mb-3 shadow-sm border-0 bg-light" value="{{ worker.mobile }}" required>
-                    
-                    <label class="small fw-bold text-muted text-uppercase" style="font-size:0.7rem;">Password (Optional Update)</label>
-                    <input type="password" name="password" class="form-control mb-2 shadow-sm border-0 bg-light" placeholder="New Password (leave empty to keep current)">
-                </div>
-                <div class="modal-footer border-0 pt-0">
-                    <button type="submit" class="btn btn-info text-white w-100 rounded-pill fw-bold shadow">Save Updates</button>
-                </div>
-            </form>
-        </div>
-    </div>
-</div>
-{% endfor %}
-
-<!-- EDIT CUSTOMERS MODAL -->
-{% for customer in customers %}
-<div class="modal fade text-start" id="editCustomerModal{{ customer.id }}" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content rounded-4 border-0 shadow-lg">
-            <div class="modal-header bg-light border-0">
-                <h5 class="modal-title fw-bold text-dark"><i class="fa-solid fa-user-pen text-primary me-2"></i>Edit Customer Details</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-            </div>
-            <form action="{{ url_for('edit_user', user_id=customer.id) }}" method="POST">
-                <div class="modal-body p-4">
-                    <div class="mb-3">
-                        <label class="form-label small fw-bold text-muted text-uppercase" style="font-size:0.7rem;">Full Name</label>
-                        <div class="input-group shadow-sm rounded">
-                            <span class="input-group-text bg-white border-0"><i class="fa-solid fa-user text-muted"></i></span>
-                            <input type="text" name="name" class="form-control border-0 bg-light" value="{{ customer.name }}" required>
-                        </div>
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label small fw-bold text-muted text-uppercase" style="font-size:0.7rem;">Mobile Number</label>
-                        <div class="input-group shadow-sm rounded">
-                            <span class="input-group-text bg-white border-0"><i class="fa-solid fa-phone text-muted"></i></span>
-                            <input type="text" name="mobile" class="form-control border-0 bg-light" value="{{ customer.mobile }}" required>
-                        </div>
-                    </div>
-                    
-                    <div class="mb-3">
-                        <label class="form-label small fw-bold text-muted text-uppercase" style="font-size:0.7rem;">Password (Optional)</label>
-                        <div class="input-group shadow-sm rounded">
-                            <span class="input-group-text bg-white border-0"><i class="fa-solid fa-lock text-muted"></i></span>
-                            <input type="password" name="password" class="form-control border-0 bg-light" placeholder="New Password (optional)">
-                        </div>
-                    </div>
-
-                    <div class="mb-3">
-                        <label class="form-label small fw-bold text-muted text-uppercase" style="font-size:0.7rem;">Email Address</label>
-                        <div class="input-group shadow-sm rounded">
-                            <span class="input-group-text bg-white border-0"><i class="fa-solid fa-envelope text-muted"></i></span>
-                            <input type="email" name="email" class="form-control border-0 bg-light" value="{{ customer.email or '' }}" placeholder="customer@example.com">
-                        </div>
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label small fw-bold text-muted text-uppercase" style="font-size:0.7rem;">Address / Location</label>
-                        <div class="input-group shadow-sm rounded">
-                            <span class="input-group-text bg-white border-0"><i class="fa-solid fa-location-dot text-muted"></i></span>
-                            <input type="text" name="address" class="form-control border-0 bg-light" value="{{ customer.address or '' }}" placeholder="Enter customer city or full address">
-                        </div>
-                    </div>
-                </div>
-                <div class="modal-footer flex-column flex-md-row border-0 pt-0 px-4 pb-4">
-                    <button type="button" class="btn btn-light rounded-pill px-4 fw-bold shadow-sm mb-2 mb-md-0 w-100" data-bs-dismiss="modal">Cancel</button>
-                    <button type="submit" class="btn btn-primary rounded-pill px-4 fw-bold shadow w-100">Save Changes</button>
-                </div>
-            </form>
-        </div>
-    </div>
-</div>
-{% endfor %}
-
-<!-- Chart.js Script Configuration -->
-<script>
-    document.addEventListener("DOMContentLoaded", function() {
-        // User Demographics Chart
-        const userCtx = document.getElementById('userChart');
-        if (userCtx) {
-            new Chart(userCtx.getContext('2d'), {
-                type: 'doughnut',
-                data: {
-                    labels: ['Customers', 'Shop Owners', 'Workers'],
-                    datasets: [{
-                        data: [{{ customers|length }}, {{ shop_owners|length }}, {{ workers|length }}],
-                        backgroundColor: ['#0d6efd', '#0dcaf0', '#ffc107'],
-                        borderWidth: 0,
-                        hoverOffset: 5
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: { legend: { display: false } },
-                    cutout: '75%',
-                    animation: { animateScale: true, animateRotate: true }
-                }
-            });
-        }
-
-        // Jobs vs Vacancies Chart
-        const jobCtx = document.getElementById('jobChart');
-        if (jobCtx) {
-            new Chart(jobCtx.getContext('2d'), {
-                type: 'doughnut',
-                data: {
-                    labels: ['Customer Jobs', 'Shop Vacancies'],
-                    datasets: [{
-                        data: [{{ total_reqs }}, {{ total_vacancies }}],
-                        backgroundColor: ['#198754', '#ffc107'],
-                        borderWidth: 0,
-                        hoverOffset: 5
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: { legend: { display: false } },
-                    cutout: '75%',
-                    animation: { animateScale: true, animateRotate: true }
-                }
-            });
-        }
-    });
-</script>
 
 {% endblock %}
