@@ -262,9 +262,11 @@
                                 <form action="{{ url_for('resolve_report', report_id=rep.id, action='refund') }}" method="POST" class="d-inline" onsubmit="return confirm('Kya aap shop owner ko lead credit refund karna chahte hain?');">
                                     <button class="btn btn-sm btn-outline-success rounded-circle shadow-sm me-1" style="width:30px; height:30px; padding:0;" title="Refund Credit"><i class="fa-solid fa-indian-rupee-sign"></i></button>
                                 </form>
-                                <!-- Block / Delete Shop Owner Action -->
-                                <form action="{{ url_for('delete_user', user_id=rep.shop_owner_id) }}" method="POST" class="d-inline" onsubmit="return confirm('WARNING: Kya aap is shop owner ko block/delete karna chahte hain?');">
-                                    <button class="btn btn-sm btn-outline-danger rounded-circle shadow-sm" style="width:30px; height:30px; padding:0;" title="Block Shop Owner"><i class="fa-solid fa-ban"></i></button>
+                                <!-- Block / Unblock Shop Owner Action -->
+                                <form action="{{ url_for('toggle_block_user', user_id=rep.shop_owner_id) }}" method="POST" class="d-inline">
+                                    <button type="submit" class="btn btn-sm {% if rep.shop_owner and rep.shop_owner.is_blocked %}btn-success{% else %}btn-outline-danger{% endif %} rounded-circle shadow-sm" style="width:30px; height:30px; padding:0;" title="{% if rep.shop_owner and rep.shop_owner.is_blocked %}Unblock Shop Owner{% else %}Block Shop Owner{% endif %}">
+                                        <i class="fa-solid {% if rep.shop_owner and rep.shop_owner.is_blocked %}fa-unlock{% else %}fa-ban{% endif %}"></i>
+                                    </button>
                                 </form>
                             </div>
                         </div>
@@ -454,7 +456,12 @@
                   <tbody>
                       {% for shop in shop_owners %}
                       <tr>
-                          <td><span class="badge bg-secondary rounded-pill">#{{ shop.id }}</span></td>
+                          <td>
+                              <span class="badge bg-secondary rounded-pill">#{{ shop.id }}</span>
+                              {% if shop.is_blocked %}
+                              <span class="badge bg-danger rounded-pill ms-1">Blocked</span>
+                              {% endif %}
+                          </td>
                           <td class="text-nowrap">
                               <div class="fw-bold text-dark">{{ shop.name }}</div>
                           </td>
@@ -471,6 +478,9 @@
                           <td class="text-end text-nowrap">
                               <button class="btn btn-sm btn-outline-info rounded-circle me-1" style="width:32px; height:32px; padding:0;" data-bs-toggle="modal" data-bs-target="#viewModal{{ shop.id }}" title="View"><i class="fa-solid fa-eye"></i></button>
                               <button class="btn btn-sm btn-outline-primary rounded-circle me-1" style="width:32px; height:32px; padding:0;" data-bs-toggle="modal" data-bs-target="#editModal{{ shop.id }}" title="Edit"><i class="fa-solid fa-pen"></i></button>
+                              <form action="{{ url_for('toggle_block_user', user_id=shop.id) }}" method="POST" class="d-inline">
+                                  <button type="submit" class="btn btn-sm {% if shop.is_blocked %}btn-success{% else %}btn-outline-warning{% endif %} rounded-circle me-1" style="width:32px; height:32px; padding:0;" title="{% if shop.is_blocked %}Unblock User{% else %}Block User{% endif %}"><i class="fa-solid {% if shop.is_blocked %}fa-unlock{% else %}fa-lock{% endif %}"></i></button>
+                              </form>
                               <form action="{{ url_for('delete_user', user_id=shop.id) }}" method="POST" class="d-inline" onsubmit="return confirm('WARNING: This will delete ALL data related to this shop. Continue?');">
                                   <button type="submit" class="btn btn-sm btn-outline-danger rounded-circle" style="width:32px; height:32px; padding:0;" title="Delete"><i class="fa-solid fa-trash"></i></button>
                               </form>
@@ -493,7 +503,12 @@
                   <tbody>
                       {% for worker in workers %}
                       <tr>
-                          <td><span class="badge bg-secondary rounded-pill">#{{ worker.id }}</span></td>
+                          <td>
+                              <span class="badge bg-secondary rounded-pill">#{{ worker.id }}</span>
+                              {% if worker.is_blocked %}
+                              <span class="badge bg-danger rounded-pill ms-1">Blocked</span>
+                              {% endif %}
+                          </td>
                           <td class="text-nowrap"><div class="fw-bold text-dark">{{ worker.name }}</div></td>
                           <td class="text-nowrap"><i class="fa-solid fa-phone text-muted small me-1"></i>{{ worker.mobile }}</td>
                           <td class="text-nowrap">
@@ -507,6 +522,9 @@
                           <td class="text-end text-nowrap">
                               <button class="btn btn-sm btn-outline-info rounded-circle me-1" style="width:32px; height:32px; padding:0;" data-bs-toggle="modal" data-bs-target="#viewModal{{ worker.id }}" title="View"><i class="fa-solid fa-eye"></i></button>
                               <button class="btn btn-sm btn-outline-primary rounded-circle me-1" style="width:32px; height:32px; padding:0;" data-bs-toggle="modal" data-bs-target="#editWorkerModal{{ worker.id }}" title="Edit"><i class="fa-solid fa-pen"></i></button>
+                              <form action="{{ url_for('toggle_block_user', user_id=worker.id) }}" method="POST" class="d-inline">
+                                  <button type="submit" class="btn btn-sm {% if worker.is_blocked %}btn-success{% else %}btn-outline-warning{% endif %} rounded-circle me-1" style="width:32px; height:32px; padding:0;" title="{% if worker.is_blocked %}Unblock User{% else %}Block User{% endif %}"><i class="fa-solid {% if worker.is_blocked %}fa-unlock{% else %}fa-lock{% endif %}"></i></button>
+                              </form>
                               <form action="{{ url_for('delete_user', user_id=worker.id) }}" method="POST" class="d-inline" onsubmit="return confirm('Delete worker?');">
                                   <button type="submit" class="btn btn-sm btn-outline-danger rounded-circle" style="width:32px; height:32px; padding:0;" title="Delete"><i class="fa-solid fa-trash"></i></button>
                               </form>
@@ -539,7 +557,12 @@
                     {% for customer in customers %}
                     <tr>
                         <td class="text-nowrap">
-                            <div class="fw-bold text-dark">{{ customer.name }}</div>
+                            <div class="fw-bold text-dark">
+                                {{ customer.name }}
+                                {% if customer.is_blocked %}
+                                <span class="badge bg-danger rounded-pill ms-1">Blocked</span>
+                                {% endif %}
+                            </div>
                             <div class="small text-muted"><i class="fa-regular fa-envelope me-1"></i>{{ customer.email or 'No Email' }}</div>
                         </td>
                         <td class="fw-bold text-dark text-nowrap"><i class="fa-solid fa-phone text-secondary me-1 small"></i>{{ customer.mobile }}</td>
@@ -564,7 +587,9 @@
                             <button class="btn btn-sm btn-outline-primary rounded-circle me-1" style="width:32px; height:32px; padding:0;" data-bs-toggle="modal" data-bs-target="#editCustomerModal{{ customer.id }}">
                                 <i class="fa-solid fa-pen-to-square"></i>
                             </button>
-                            
+                            <form action="{{ url_for('toggle_block_user', user_id=customer.id) }}" method="POST" class="d-inline">
+                                <button type="submit" class="btn btn-sm {% if customer.is_blocked %}btn-success{% else %}btn-outline-warning{% endif %} rounded-circle me-1" style="width:32px; height:32px; padding:0;" title="{% if customer.is_blocked %}Unblock User{% else %}Block User{% endif %}"><i class="fa-solid {% if customer.is_blocked %}fa-unlock{% else %}fa-lock{% endif %}"></i></button>
+                            </form>
                             <form action="{{ url_for('delete_user', user_id=customer.id) }}" method="POST" class="d-inline" onsubmit="return confirm('WARNING: Kya aap sach me is customer ko delete karna chahte hain? Iska saara data clear ho jayega.');">
                                 <button type="submit" class="btn btn-sm btn-outline-danger rounded-circle" style="width:32px; height:32px; padding:0;">
                                     <i class="fa-solid fa-trash"></i>
@@ -636,7 +661,12 @@
                   <tbody>
                       {% for user in all_users %}
                       <tr>
-                          <td class="fw-bold text-muted">#{{ user.id }}</td>
+                          <td class="fw-bold text-muted">
+                              #{{ user.id }}
+                              {% if user.is_blocked %}
+                              <span class="badge bg-danger rounded-pill ms-1">Blocked</span>
+                              {% endif %}
+                          </td>
                           <td class="text-nowrap">
                               {% if user.role == 'admin' %}
                               <span class="badge bg-danger shadow-sm">{{ user.role.upper() }}</span>
@@ -657,8 +687,11 @@
                                   <span class="text-muted">Legacy Record</span>
                               {% endif %}
                           </td>
-                          <td>
-                              <button class="btn btn-sm btn-light border rounded-circle shadow-sm" style="width:30px; height:30px; padding:0;" data-bs-toggle="modal" data-bs-target="#viewModal{{ user.id }}"><i class="fa-solid fa-eye text-primary"></i></button>
+                          <td class="text-nowrap">
+                              <button class="btn btn-sm btn-light border rounded-circle shadow-sm me-1" style="width:30px; height:30px; padding:0;" data-bs-toggle="modal" data-bs-target="#viewModal{{ user.id }}"><i class="fa-solid fa-eye text-primary"></i></button>
+                              <form action="{{ url_for('toggle_block_user', user_id=user.id) }}" method="POST" class="d-inline">
+                                  <button type="submit" class="btn btn-sm {% if user.is_blocked %}btn-success{% else %}btn-light border{% endif %} rounded-circle shadow-sm" style="width:30px; height:30px; padding:0;" title="{% if user.is_blocked %}Unblock User{% else %}Block User{% endif %}"><i class="fa-solid {% if user.is_blocked %}fa-unlock text-success{% else %}fa-lock text-warning{% endif %}"></i></button>
+                              </form>
                           </td>
                       </tr>
                       {% endfor %}
@@ -682,7 +715,12 @@
             <div class="modal-body p-4">
                 <div class="text-center mb-3">
                     <span class="badge bg-primary px-3 py-2 rounded-pill text-uppercase mb-2 shadow-sm">{{ user.role }}</span>
-                    <h4 class="fw-bold text-dark mb-0">{{ user.name }}</h4>
+                    <h4 class="fw-bold text-dark mb-0">
+                        {{ user.name }}
+                        {% if user.is_blocked %}
+                        <span class="badge bg-danger fs-6">Blocked</span>
+                        {% endif %}
+                    </h4>
                     <small class="text-muted">Database ID: #{{ user.id }}</small>
                 </div>
                 
