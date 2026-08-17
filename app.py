@@ -410,6 +410,11 @@ def google_step2():
 def index():
     return render_template('index.html')
 
+@app.route('/shops')
+def registered_shops():
+    shops = User.query.filter_by(role='shop_owner').all()
+    return render_template('shops.html', shops=shops)
+
 @app.route('/admin/toggle_block/<int:user_id>', methods=['POST'])
 @login_required
 def toggle_block_user(user_id):
