@@ -406,6 +406,29 @@ def google_step2():
 def index():
     return render_template('index.html')
 
+@app.route('/admin/resolve_report/<int:report_id>/<action>', methods=['POST'])
+@login_required
+def resolve_report(report_id, action):
+    if current_user.role != 'admin':
+        return "Unauthorized", 403
+        
+    report = LeadReport.query.get_or_404(report_id)
+    
+    if action == 'refund':
+        # Shop owner ke wallet mein credit refund karein (e.g. ₹50 ya jitna unlock charge ho)
+        shop = report.shop_owner
+        if shop:
+            # Aap apne hisaab se amount set kar sakte hain, jaise default ₹50
+            refund_amount = 50.0 
+            shop.wallet_balance = (shop.wallet_balance or 0.0) + refund_amount
+            report.status = 'Resolved & Refunded'
+            db.session.commit()
+            flash(f'Credit refunded successfully to {shop.name}!', 'success')
+        else:
+            flash('Shop owner not found.', 'danger')
+            
+    return redirect(url_for('admin_dash'))
+
 @app.route('/report_lead/<int:req_id>', methods=['POST'])
 @login_required
 def report_lead(req_id):
