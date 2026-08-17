@@ -2,7 +2,7 @@ from flask import Flask, render_template, request, redirect, url_for, flash, ses
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
-from werkzeug.middleware.proxy_fix import ProxyFix
+from werkzeug.middleware.proxy_fix import ProxyFix   # <--- 1. Yeh import add karein
 from datetime import timedelta, datetime
 from zoneinfo import ZoneInfo
 import os
@@ -14,13 +14,13 @@ from authlib.integrations.flask_client import OAuth
 
 app = Flask(__name__)
 
-# --- RENDER PROXY FIX & URL SCHEME CONFIGURATION ---
+# --- 2. RENDER PROXY FIX & URL SCHEME CONFIGURATION ---
 app.wsgi_app = ProxyFix(
     app.wsgi_app, x_for=1, x_proto=1, x_host=1, x_prefix=1
 )
 app.config['PREFERRED_URL_SCHEME'] = 'https'
 
-# --- SECURE SECRET KEY ---
+# --- 3. SECURE SECRET KEY ---
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'super_secret_key_for_local_kaamconnect')
 app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(days=30)
 app.config['REMEMBER_COOKIE_DURATION'] = timedelta(days=30)
@@ -42,7 +42,7 @@ login_manager = LoginManager()
 login_manager.init_app(app)
 login_manager.login_view = 'login'
 
-# ================= OAUTH CONFIGURATION (GOOGLE) =================
+# ================= 4. OAUTH CONFIGURATION (GOOGLE) =================
 oauth = OAuth(app)
 google = oauth.register(
     name='google',
@@ -71,7 +71,6 @@ class User(UserMixin, db.Model):
     is_plan_active = db.Column(db.Boolean, default=True)
     shop_name = db.Column(db.String(150), nullable=True)
     created_at = db.Column(db.DateTime, nullable=True)
-    is_blocked = db.Column(db.Boolean, default=False)  # NEW: Block User Tracking
 
     requirements = db.relationship('Requirement', backref='customer_user', cascade='all, delete-orphan')
     vacancies = db.relationship('Vacancy', backref='shop_owner_user', cascade='all, delete-orphan')
@@ -98,17 +97,6 @@ class UnlockedLead(db.Model):
     deadline = db.Column(db.String(100), nullable=True)
     notes = db.Column(db.Text, nullable=True)
     status = db.Column(db.String(50), default='Pending')
-
-class RefundRequest(db.Model):  # NEW: Report & Refund Model
-    __tablename__ = 'refund_request'
-    id = db.Column(db.Integer, primary_key=True)
-    shop_owner_id = db.Column(db.Integer, db.ForeignKey('users.id'))
-    customer_id = db.Column(db.Integer, db.ForeignKey('users.id'))
-    requirement_id = db.Column(db.Integer, db.ForeignKey('requirement.id'))
-    reason = db.Column(db.Text, nullable=False)
-    credits_used = db.Column(db.Integer, nullable=False)
-    status = db.Column(db.String(20), default='Pending')
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
 class SiteSettings(db.Model):
     __tablename__ = 'site_settings'
@@ -166,7 +154,9 @@ def get_unlock_cost(budget_str):
         return 50
 
 def send_otp_email(target_email, otp, context="Security Verification"):
-    if not target_email: return
+    if not target_email:
+        print("OTP Email Error: Target email is empty or None.")
+        return
     try:
         api_key = os.environ.get('BREVO_API_KEY')
         sender_email = os.environ.get('MAIL_USERNAME', 'no-reply@kaamconnect.com')
@@ -187,38 +177,17 @@ def send_otp_email(target_email, otp, context="Security Verification"):
                 </div>
                 """
             }
-            headers = {"accept": "application/json", "api-key": api_key, "content-type": "application/json"}
+            headers = {
+                "accept": "application/json",
+                "api-key": api_key,
+                "content-type": "application/json"
+            }
             req_data = json.dumps(payload).encode('utf-8')
             req_obj = urllib.request.Request(url, data=req_data, headers=headers, method='POST')
-            with urllib.request.urlopen(req_obj, timeout=5): pass
-    except Exception as e: print(f"OTP Email Error: {e}")
-
-# NEW HELPER: For sending general platform notifications smoothly
-def send_simple_email(to_email, subject, body):
-    api_key = os.environ.get('BREVO_API_KEY')
-    sender_email = os.environ.get('MAIL_USERNAME', 'no-reply@kaamconnect.com')
-    if not api_key or not sender_email or not to_email: return
-    try:
-        import urllib.request, json
-        url = "https://api.brevo.com/v3/smtp/email"
-        payload = {
-            "sender": {"name": "Kaamconnect Admin", "email": sender_email},
-            "to": [{"email": to_email}],
-            "subject": subject,
-            "htmlContent": f"""
-            <div style="font-family: Arial, sans-serif; padding: 20px; border: 1px solid #ddd; border-radius: 8px;">
-                <h3 style="color: #0275d8;">Kaamconnect Notification</h3>
-                <p style="font-size: 15px; color: #333; line-height: 1.5;">{body}</p>
-                <hr style="border: none; border-top: 1px solid #eee; margin: 20px 0;">
-                <p style="font-size: 12px; color: #777;">Yeh ek automated message hai.</p>
-            </div>
-            """
-        }
-        headers = {"accept": "application/json", "api-key": api_key, "content-type": "application/json"}
-        req_data = json.dumps(payload).encode('utf-8')
-        req_obj = urllib.request.Request(url, data=req_data, headers=headers, method='POST')
-        with urllib.request.urlopen(req_obj, timeout=5): pass
-    except Exception as e: print("Email error:", e)
+            with urllib.request.urlopen(req_obj, timeout=5) as response:
+                pass
+    except Exception as e:
+        print(f"OTP Email Error: {e}")
 
 # ================= ADMIN NOTIFICATION FUNCTION =================
 def notify_admin_new_user(user):
@@ -260,11 +229,17 @@ def notify_admin_new_user(user):
                 </html>
                 """
             }
-            headers = {"accept": "application/json", "api-key": api_key, "content-type": "application/json"}
+            headers = {
+                "accept": "application/json",
+                "api-key": api_key,
+                "content-type": "application/json"
+            }
             req_data = json.dumps(payload).encode('utf-8')
             req_obj = urllib.request.Request(url, data=req_data, headers=headers, method='POST')
-            with urllib.request.urlopen(req_obj, timeout=5): pass
-    except Exception as e: print(f"Admin notification mail error: {e}")
+            with urllib.request.urlopen(req_obj, timeout=5) as response:
+                print("Admin notification mail sent.")
+    except Exception as e:
+        print(f"Admin notification mail error: {e}")
 
 # ================= GOOGLE AUTH ROUTES =================
 @app.route('/login/google')
@@ -283,10 +258,6 @@ def authorize_google():
     
     user = User.query.filter_by(email=email).first()
     if user:
-        if getattr(user, 'is_blocked', False):
-            flash('Aapka account block kar diya gaya hai. Kripya Admin se sampark karein.', 'danger')
-            return redirect(url_for('login'))
-            
         if user.role == 'admin':
             otp = str(random.randint(100000, 999999))
             session['admin_login_id'] = user.id
@@ -309,7 +280,8 @@ def authorize_google():
 
 @app.route('/google_step2', methods=['GET', 'POST'])
 def google_step2():
-    if 'google_signup' not in session: return redirect(url_for('signup'))
+    if 'google_signup' not in session:
+        return redirect(url_for('signup'))
         
     if request.method == 'POST':
         role = request.form.get('role', 'customer').strip()
@@ -488,11 +460,6 @@ def login():
             user = User.query.filter_by(mobile=raw_mobile).first()
         
         if user and check_password_hash(user.password, password):
-            # Check if user is blocked
-            if getattr(user, 'is_blocked', False):
-                flash('Aapka account Platform rules todne ki wajah se block kar diya gaya hai. Kripya Admin se sampark karein.', 'danger')
-                return redirect(url_for('login'))
-
             if user.role == 'admin':
                 if not user.email:
                     user.email = os.environ.get('ADMIN_EMAIL') or os.environ.get('MAIL_USERNAME') or 'kaamconnect7@gmail.com'
@@ -613,12 +580,16 @@ def customer_dash():
                         </html>
                         """
                     }
-                    headers = {"accept": "application/json", "api-key": api_key, "content-type": "application/json"}
+                    headers = {
+                        "accept": "application/json",
+                        "api-key": api_key,
+                        "content-type": "application/json"
+                    }
                     
                     req_data = json.dumps(payload).encode('utf-8')
                     req_obj = urllib.request.Request(url, data=req_data, headers=headers, method='POST')
                     with urllib.request.urlopen(req_obj, timeout=5) as response:
-                        pass
+                        print("Email sent successfully via Brevo HTTP API")
         except Exception as e:
             print(f"Email bhejne me error: {e}")
 
@@ -683,27 +654,17 @@ def shop_dash():
             flash('Job Vacancy Published Successfully!', 'success')
         return redirect(url_for('shop_dash'))
 
-    # SIRF UN CUSTOMERS KI LEADS DIKHAYEIN JO BLOCK NAHI HAIN
-    requirements = Requirement.query.join(User).filter(User.is_blocked == False).order_by(Requirement.id.desc()).all()
+    requirements = Requirement.query.order_by(Requirement.id.desc()).all()
     customers = {u.id: u for u in User.query.filter_by(role='customer').all()} 
     unlocked_leads = [lead.requirement_id for lead in UnlockedLead.query.filter_by(shop_owner_id=current_user.id).all()]
-    
-    # Track leads already reported for refund so we don't show button again
-    reported_leads = [r.requirement_id for r in RefundRequest.query.filter_by(shop_owner_id=current_user.id).all()]
-
-    workers = User.query.filter_by(role='worker', is_available=True, is_blocked=False).all()
+    workers = User.query.filter_by(role='worker', is_available=True).all()
     my_vacancies = Vacancy.query.filter_by(shop_owner_id=current_user.id).order_by(Vacancy.id.desc()).all()
     my_requests = PaymentRequest.query.filter_by(shop_owner_id=current_user.id).order_by(PaymentRequest.id.desc()).all()
     
-    return render_template('shop_dash.html', 
-                           requirements=requirements, 
-                           customers=customers, 
-                           unlocked_leads=unlocked_leads, 
-                           reported_leads=reported_leads,
-                           workers=workers, 
+    return render_template('shop_dash.html', requirements=requirements, customers=customers, 
+                           unlocked_leads=unlocked_leads, workers=workers, 
                            get_unlock_cost=get_unlock_cost,
-                           my_vacancies=my_vacancies, 
-                           my_requests=my_requests)
+                           my_vacancies=my_vacancies, my_requests=my_requests)
 
 @app.route('/unlock_lead/<int:req_id>', methods=['POST'])
 @login_required
@@ -712,7 +673,18 @@ def unlock_lead(req_id):
         return "Unauthorized", 403
         
     req = Requirement.query.get_or_404(req_id)
-    credit_cost = get_unlock_cost(req.budget)
+    
+    try:
+        budget_num = int(''.join(filter(str.isdigit, str(req.budget)))) if req.budget else 0
+    except ValueError:
+        budget_num = 0
+
+    if budget_num <= 2000: credit_cost = 50
+    elif budget_num <= 5000: credit_cost = 70
+    elif budget_num <= 10000: credit_cost = 90
+    elif budget_num <= 20000: credit_cost = 120
+    elif budget_num <= 35000: credit_cost = 140
+    else: credit_cost = 200
         
     already_unlocked = UnlockedLead.query.filter_by(shop_owner_id=current_user.id, requirement_id=req.id).first()
     if already_unlocked:
@@ -741,40 +713,6 @@ def unlock_lead(req_id):
     else:
         flash('Aapke wallet me sufficient credits nahi hain. Please recharge karein.', 'danger')
         
-    return redirect(url_for('shop_dash'))
-
-# NEW ROUTE: SHOP OWNER REPORTS FAKE LEAD
-@app.route('/report_fake_lead/<int:req_id>', methods=['POST'])
-@login_required
-def report_fake_lead(req_id):
-    if current_user.role != 'shop_owner': return "Unauthorized", 403
-    
-    req = Requirement.query.get_or_404(req_id)
-    reason = request.form.get('reason')
-    cost = get_unlock_cost(req.budget)
-    
-    # Check if already requested
-    existing = RefundRequest.query.filter_by(shop_owner_id=current_user.id, requirement_id=req_id).first()
-    if existing:
-        flash('Aap is lead ke liye pehle hi report kar chuke hain.', 'warning')
-        return redirect(url_for('shop_dash'))
-        
-    new_req = RefundRequest(
-        shop_owner_id=current_user.id,
-        customer_id=req.customer_id,
-        requirement_id=req.id,
-        reason=reason,
-        credits_used=cost
-    )
-    db.session.add(new_req)
-    db.session.commit()
-    
-    # Notify admin via email
-    admin_email = os.environ.get('ADMIN_EMAIL') or os.environ.get('MAIL_USERNAME') or 'kaamconnect7@gmail.com'
-    admin_body = f"Shop Owner <b>{current_user.name}</b> ne ek fake lead report ki hai.<br><b>Reason:</b> {reason}<br>Kripya Admin Dashboard par jaakar review karein."
-    send_simple_email(admin_email, "🚨 Fake Lead Reported by Shop Owner", admin_body)
-    
-    flash('Lead report ho gayi hai. Admin verify karke jaldi aapke credits refund kar denge.', 'success')
     return redirect(url_for('shop_dash'))
 
 @app.route('/buy_credits_page')
@@ -823,7 +761,7 @@ def worker_dash():
         flash('Profile Updated Successfully!', 'success')
         return redirect(url_for('worker_dash'))
 
-    vacancies = Vacancy.query.join(User).filter(User.is_blocked == False).order_by(Vacancy.id.desc()).all()
+    vacancies = Vacancy.query.order_by(Vacancy.id.desc()).all()
     shop_owners = {u.id: u for u in User.query.filter_by(role='shop_owner').all()}
     return render_template('worker_dash.html', vacancies=vacancies, shop_owners=shop_owners)
 
@@ -834,11 +772,7 @@ def admin_dash():
     
     shop_owners = User.query.filter_by(role='shop_owner').all()
     workers = User.query.filter_by(role='worker').all()
-    
-    # Filter active and blocked users
-    customers = User.query.filter_by(role='customer', is_blocked=False).order_by(User.id.desc()).all()
-    blocked_users = User.query.filter_by(is_blocked=True).all()
-    refund_requests = RefundRequest.query.filter_by(status='Pending').all()
+    customers = User.query.filter_by(role='customer').order_by(User.id.desc()).all()
     
     all_users = User.query.all()
     total_reqs = Requirement.query.count()
@@ -857,63 +791,12 @@ def admin_dash():
                            shop_owners=shop_owners, 
                            workers=workers, 
                            customers=customers, 
-                           blocked_users=blocked_users,
-                           refund_requests=refund_requests,
                            customer_req_counts=customer_req_counts,
                            all_users=all_users, 
                            total_reqs=total_reqs, 
                            total_vacancies=total_vacancies, 
                            pending_requests=pending_requests, 
-                           User=User,
                            admin_upi=admin_upi)
-
-# NEW ROUTE: ADMIN APPROVES REFUND & BLOCKS USER
-@app.route('/admin/block_and_refund/<int:request_id>', methods=['POST'])
-@login_required
-def block_and_refund(request_id):
-    if current_user.role != 'admin': return "Unauthorized", 403
-    
-    refund_req = RefundRequest.query.get_or_404(request_id)
-    if refund_req.status != 'Pending':
-        flash('Yeh request pehle hi process ho chuki hai.', 'info')
-        return redirect(url_for('admin_dash'))
-        
-    customer = User.query.get(refund_req.customer_id)
-    shop_owner = User.query.get(refund_req.shop_owner_id)
-    
-    # 1. Block Customer
-    if customer:
-        customer.is_blocked = True
-        
-    # 2. Refund Shop Owner
-    if shop_owner:
-        shop_owner.wallet_balance += refund_req.credits_used
-        
-    refund_req.status = 'Approved'
-    db.session.commit()
-    
-    # 3. Send Emails
-    if shop_owner and shop_owner.email:
-        send_simple_email(shop_owner.email, "✅ Refund Approved - Kaamconnect", 
-            f"Aapki refund request approve ho gayi hai. <b>{refund_req.credits_used} Credits</b> aapke wallet me wapas add kar diye gaye hain.")
-            
-    if customer and customer.email:
-        send_simple_email(customer.email, "🚫 Account Blocked - Kaamconnect", 
-            f"Aapka account Kaamconnect platform par block kar diya gaya hai. Reason: <i>{refund_req.reason}</i>. Jyada jankari ke liye support se sampark karein.")
-            
-    flash(f'Action Successful! User blocked and {refund_req.credits_used} credits refunded to Shop Owner.', 'success')
-    return redirect(url_for('admin_dash'))
-
-# NEW ROUTE: ADMIN UNBLOCKS USER
-@app.route('/admin/unblock_user/<int:user_id>', methods=['POST'])
-@login_required
-def unblock_user(user_id):
-    if current_user.role != 'admin': return "Unauthorized", 403
-    user = User.query.get_or_404(user_id)
-    user.is_blocked = False
-    db.session.commit()
-    flash(f'User {user.name} ko successfully unblock kar diya gaya hai.', 'success')
-    return redirect(url_for('admin_dash'))
 
 @app.route('/admin/delete_user/<int:user_id>', methods=['POST'])
 @login_required
@@ -925,6 +808,7 @@ def delete_user(user_id):
         return redirect(url_for('admin_dash'))
 
     user = User.query.get(user_id)
+    
     if user:
         try:
             Quotation.query.filter(Quotation.shop_owner_id == user.id).delete(synchronize_session=False)
@@ -934,14 +818,12 @@ def delete_user(user_id):
                 for req in user_reqs:
                     UnlockedLead.query.filter_by(requirement_id=req.id).delete(synchronize_session=False)
                     Quotation.query.filter_by(requirement_id=req.id).delete(synchronize_session=False)
-                    RefundRequest.query.filter_by(requirement_id=req.id).delete(synchronize_session=False)
                 Requirement.query.filter_by(customer_id=user.id).delete(synchronize_session=False)
             
             elif user.role == 'shop_owner':
                 UnlockedLead.query.filter_by(shop_owner_id=user.id).delete(synchronize_session=False)
                 Vacancy.query.filter_by(shop_owner_id=user.id).delete(synchronize_session=False)
                 PaymentRequest.query.filter_by(shop_owner_id=user.id).delete(synchronize_session=False)
-                RefundRequest.query.filter_by(shop_owner_id=user.id).delete(synchronize_session=False)
                 
             db.session.delete(user)
             db.session.commit()
@@ -958,20 +840,28 @@ def delete_user(user_id):
 @login_required
 def edit_user(user_id):
     if current_user.role != 'admin': return "Unauthorized", 403
+    
     user = User.query.get(user_id)
+    
     if user and request.method == 'POST':
-        if request.form.get('name'): user.name = request.form.get('name').strip()
-        if request.form.get('mobile'): user.mobile = request.form.get('mobile').strip()
-        if request.form.get('email'): user.email = request.form.get('email').strip()
-        if request.form.get('address'): user.address = request.form.get('address').strip()
+        if request.form.get('name'):
+            user.name = request.form.get('name').strip()
+        if request.form.get('mobile'):
+            user.mobile = request.form.get('mobile').strip()
+        if request.form.get('email'):
+            user.email = request.form.get('email').strip()
+        if request.form.get('address'):
+            user.address = request.form.get('address').strip()
             
         new_password = request.form.get('password')
         if new_password and new_password.strip():
             user.password = generate_password_hash(new_password.strip(), method='scrypt')
             
         if user.role == 'shop_owner' and 'wallet_balance' in request.form:
-            try: user.wallet_balance = int(request.form.get('wallet_balance', user.wallet_balance))
-            except ValueError: pass
+            try:
+                user.wallet_balance = int(request.form.get('wallet_balance', user.wallet_balance))
+            except ValueError:
+                pass
             
         db.session.commit()
         flash(f'{user.name} ki details successfully update ho gayi hain.', 'success')
@@ -1004,7 +894,8 @@ def approve_payment(req_id, action):
     shop_owner = User.query.get(req.shop_owner_id)
     
     if action == 'approve':
-        if shop_owner: shop_owner.wallet_balance += req.amount
+        if shop_owner:
+            shop_owner.wallet_balance += req.amount
         req.status = 'Approved'
         flash(f'Payment Approved. ₹{req.amount} added to Shop Owner.', 'success')
     else:
@@ -1031,10 +922,11 @@ def create_admin():
         admin.email = admin_email
         admin.password = generate_password_hash(admin_password, method='scrypt')
         db.session.commit()
-        return "Admin account already exists! Password & Email updated successfully."
+        return "Admin account already exists! Password & Email updated from environment variables successfully."
 
 @app.route('/reset_db_danger_123')
-def reset_db_safely(): return "Database reset feature is locked for production security.", 403
+def reset_db_safely():
+    return "Database reset feature is locked for production security.", 403
 
 # ================= EDIT & DELETE FUNCTIONALITIES =================
 @app.route('/delete_requirement/<int:req_id>', methods=['POST'])
@@ -1052,10 +944,12 @@ def delete_requirement(req_id):
 def edit_requirement(req_id):
     if current_user.role != 'customer': return "Unauthorized", 403
     req = Requirement.query.filter_by(id=req_id, customer_id=current_user.id).first_or_404()
+    
     req.category = request.form.get('category')
     req.budget = request.form.get('budget')
     req.deadline = request.form.get('deadline')
     req.description = request.form.get('description')
+    
     db.session.commit()
     flash('Aapki requirement successfully update ho gayi hai!', 'success')
     return redirect(url_for('customer_dash'))
@@ -1074,6 +968,7 @@ def delete_vacancy(vac_id):
 @login_required
 def worker_hide_profile():
     if current_user.role != 'worker': return "Unauthorized", 403
+    
     current_user.is_available = False
     db.session.commit()
     flash('Aapki availability marketplace se hata di gayi hai!', 'success')
@@ -1083,12 +978,14 @@ def worker_hide_profile():
 @login_required
 def update_worker_profile():
     if current_user.role != 'worker': return "Unauthorized", 403
+        
     current_user.name = request.form.get('name')
     current_user.address = request.form.get('address')
     current_user.experience = request.form.get('experience')
     current_user.expertise = request.form.get('expertise')
     current_user.per_day_amount = request.form.get('per_day_amount')
     current_user.is_available = True 
+    
     db.session.commit()
     flash('Aapka profile successfully update aur activate ho gaya hai.', 'success')
     return redirect(url_for('worker_dash'))
@@ -1096,34 +993,54 @@ def update_worker_profile():
 @app.route('/submit_quotation/<int:worker_id>', methods=['POST'])
 @login_required
 def submit_quotation(worker_id):
-    if current_user.role != 'shop_owner': return redirect(url_for('shop_dash'))
-    try: amount = float(request.form.get('amount', 0))
-    except ValueError: amount = 0.0
+    if current_user.role != 'shop_owner':
+        flash("Sirf Shop Owners hi quotation bhej sakte hain.", "danger")
+        return redirect(url_for('shop_dash'))
+
+    try:
+        amount = float(request.form.get('amount', 0))
+    except ValueError:
+        amount = 0.0
+
     deadline = request.form.get('deadline')
     notes = request.form.get('notes')
-    new_quote = Quotation(shop_owner_id=current_user.id, worker_id=worker_id, amount=amount, deadline=deadline, notes=notes)
+
+    new_quote = Quotation(
+        shop_owner_id=current_user.id,
+        worker_id=worker_id,
+        amount=amount,
+        deadline=deadline,
+        notes=notes
+    )
     db.session.add(new_quote)
     db.session.commit()
+
     flash("Quotation successfully submit ho gaya hai!", "success")
     return redirect(url_for('shop_dash'))
 
 @app.route('/update_quote_status/<int:req_id>/<string:status_value>', methods=['POST', 'GET'])
 @login_required
 def update_quote_status(req_id, status_value):
-    if current_user.role.lower() != 'shop_owner': return "Unauthorized", 403
+    if current_user.role.lower() != 'shop_owner':
+        return "Unauthorized", 403
+
     unlocked_lead = UnlockedLead.query.filter_by(requirement_id=req_id, shop_owner_id=current_user.id).first()
+    
     if unlocked_lead:
         if status_value in ['Interested', 'Not Interested']:
             unlocked_lead.status = status_value
             db.session.commit()
             flash(f"Response successfully updated to: {status_value}!", "success")
-    else: flash("Lead ka koi record nahi mila!", "danger")
+    else:
+        flash("Lead ka koi record nahi mila!", "danger")
+        
     return redirect(url_for('shop_dash'))
 
 @app.route('/admin/send_broadcast', methods=['POST'])
 @login_required
 def admin_send_broadcast():
-    if current_user.role != 'admin': return "Unauthorized", 403
+    if current_user.role != 'admin':
+        return "Unauthorized", 403
         
     target_role = request.form.get('target_role')
     subject = request.form.get('subject')
@@ -1135,10 +1052,15 @@ def admin_send_broadcast():
     if uploaded_file and uploaded_file.filename:
         file_bytes = uploaded_file.read()
         encoded_file = base64.b64encode(file_bytes).decode('utf-8')
-        attachments_list.append({"content": encoded_file, "name": uploaded_file.filename})
+        attachments_list.append({
+            "content": encoded_file,
+            "name": uploaded_file.filename
+        })
 
-    if target_role == 'all': users = User.query.filter(User.email != None).all()
-    else: users = User.query.filter_by(role=target_role).filter(User.email != None).all()
+    if target_role == 'all':
+        users = User.query.filter(User.email != None).all()
+    else:
+        users = User.query.filter_by(role=target_role).filter(User.email != None).all()
         
     recipient_emails = [u.email for u in users if u.email]
     
@@ -1146,34 +1068,54 @@ def admin_send_broadcast():
         try:
             api_key = os.environ.get('BREVO_API_KEY')
             sender_email = os.environ.get('MAIL_USERNAME', 'no-reply@kaamconnect.com')
+            
             if api_key and sender_email:
-                import urllib.request, json
+                import urllib.request
+                import json
+
                 url = "https://api.brevo.com/v3/smtp/email"
                 payload = {
                     "sender": {"name": "Kaamconnect Admin", "email": sender_email},
                     "to": [{"email": email} for email in recipient_emails],
                     "subject": subject,
                     "htmlContent": f"""
-                    <html><body><div style="font-family: Arial, sans-serif; padding: 20px; border: 1px solid #ddd; border-radius: 5px;">
+                    <html>
+                        <body>
+                            <div style="font-family: Arial, sans-serif; padding: 20px; border: 1px solid #ddd; border-radius: 5px;">
                                 <h2 style="color: #0275d8;">🎯 Important Notice from Kaamconnect</h2>
                                 <p>{message_body.replace(chr(10), '<br>')}</p>
                                 <hr style="border: none; border-top: 1px solid #eee; margin: 20px 0;">
                                 <p style="font-size: 12px; color: #777;">Aapko yeh email Kaamconnect Admin ki taraf se bheja gaya hai.</p>
-                            </div></body></html>
+                            </div>
+                        </body>
+                    </html>
                     """
                 }
-                if attachments_list: payload["attachment"] = attachments_list
-                headers = {"accept": "application/json", "api-key": api_key, "content-type": "application/json"}
+                
+                if attachments_list:
+                    payload["attachment"] = attachments_list
+
+                headers = {
+                    "accept": "application/json",
+                    "api-key": api_key,
+                    "content-type": "application/json"
+                }
+                
                 req_data = json.dumps(payload).encode('utf-8')
                 req_obj = urllib.request.Request(url, data=req_data, headers=headers, method='POST')
+                
                 with urllib.request.urlopen(req_obj, timeout=15) as response:
                     flash(f'Broadcast email successfully {len(recipient_emails)} logo ko bhej di gayi hai!', 'success')
-        except Exception as e: flash(f'Email bhejne mein error aaya: {e}', 'danger')
-    else: flash('Is category mein koi valid email address nahi mila.', 'warning')
+        except Exception as e:
+            flash(f'Email bhejne mein error aaya: {e}', 'danger')
+    else:
+        flash('Is category mein koi valid email address nahi mila.', 'warning')
+        
     return redirect(url_for('admin_dash'))
 
 @app.route('/terms')
-def terms(): return render_template('terms.html')
+def terms():
+    return render_template('terms.html')
 
 @app.route('/shops')
 def registered_shops():
@@ -1186,8 +1128,11 @@ def shop_detail(shop_id):
     return render_template('shop_detail.html', shop=shop)
 
 @app.before_request
-def make_session_permanent(): session.permanent = True
+def make_session_permanent():
+    session.permanent = True
 
-with app.app_context(): db.create_all()
+with app.app_context():
+    db.create_all()
 
-if __name__ == '__main__': app.run(debug=False)
+if __name__ == '__main__':
+    app.run(debug=False)
