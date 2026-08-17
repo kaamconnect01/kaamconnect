@@ -508,9 +508,9 @@ def verify_admin_otp():
                     <i class="fa-solid fa-shield-halved fa-3x text-primary mb-3"></i>
                     <h3 class="fw-bold mb-2 text-dark">Admin Verification</h3>
                     <p class="text-muted small mb-4">Please enter the 6-digit OTP sent to your registered admin email.</p>
-                    <form method="POST">
+                    <form method="POST" onsubmit="document.getElementById('adminOtpBtn').disabled = true; document.getElementById('adminOtpBtn').innerText = 'Please wait...';">
                         <input type="text" name="otp" class="form-control text-center fw-bold fs-4 mb-4 shadow-sm" placeholder="• • • • • •" required maxlength="6" style="letter-spacing: 5px; border-radius: 12px; height: 60px;">
-                        <button type="submit" class="btn btn-primary w-100 py-3 fw-bold shadow" style="border-radius: 12px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border: none;">
+                        <button type="submit" id="adminOtpBtn" class="btn btn-primary w-100 py-3 fw-bold shadow" style="border-radius: 12px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border: none;">
                             Verify & Login Securely
                         </button>
                     </form>
