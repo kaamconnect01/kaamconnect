@@ -218,9 +218,10 @@
   </li>
 </ul>
 
-<!-- Top Action Panels (Settings & Payments) -->
+<!-- Top Action Panels (Settings, Reported Leads & Payments) -->
 <div class="row g-4 mb-4">
-    <div class="col-md-6">
+    <!-- Master Site Settings -->
+    <div class="col-lg-4 col-md-6">
         <div class="glass-panel h-100 p-0 overflow-hidden">
             <div class="bg-primary bg-opacity-10 text-primary fw-bold p-3 border-bottom border-primary border-opacity-25">
                 <i class="fa-solid fa-gear me-2"></i> Master Site Settings
@@ -237,57 +238,56 @@
             </div>
         </div>
     </div>
-    <!-- REPORTED LEADS SECTION -->
-    <div class="card shadow-sm mb-4 border-0">
-        <div class="card-header bg-danger text-white fw-bold">
-            <i class="fa-solid fa-triangle-exclamation me-2"></i> Reported Leads / Requirements ({% if reported_leads %}{{ reported_leads|length }}{% else %}0{% endif %})
-        </div>
-        <div class="card-body table-responsive">
-            {% if reported_leads %}
-            <table class="table table-hover align-middle">
-                <thead class="table-light">
-                    <tr>
-                        <th>ID</th>
-                        <th>Shop Owner</th>
-                        <th>Requirement ID</th>
-                        <th>Reason / Issue</th>
-                        <th>Date</th>
-                        <th>Status</th>
-                    </tr>
-                </thead>
-                <tbody>
+
+    <!-- Reported Leads Section (Styled matching Pending Payments) -->
+    <div class="col-lg-4 col-md-6">
+        <div class="glass-panel h-100 p-0 overflow-hidden border-start border-4 border-danger">
+            <div class="bg-danger bg-opacity-10 text-danger fw-bold p-3 border-bottom border-danger border-opacity-25 d-flex justify-content-between align-items-center">
+                <span><i class="fa-solid fa-triangle-exclamation text-danger me-2"></i> Reported Leads</span>
+                <span class="badge bg-danger text-white rounded-pill">{{ reported_leads|length if reported_leads else 0 }}</span>
+            </div>
+            <div class="p-3" style="max-height: 220px; overflow-y: auto;">
+                {% if reported_leads %}
                     {% for rep in reported_leads %}
-                    <tr>
-                        <td>#{{ rep.id }}</td>
-                        <td>
-                            <b>{{ rep.shop_owner.name if rep.shop_owner else 'N/A' }}</b><br>
-                            <small class="text-muted">{{ rep.shop_owner.mobile if rep.shop_owner else '' }}</small>
-                        </td>
-                        <td>
-                            <a href="#" data-bs-toggle="modal" data-bs-target="#reqModal{{ rep.requirement_id }}">
-                                Req #{{ rep.requirement_id }}
-                            </a>
-                        </td>
-                        <td class="text-danger fw-semibold">{{ rep.reason }}</td>
-                        <td><small>{{ rep.created_at.strftime('%d-%m-%Y %H:%M') if rep.created_at else 'N/A' }}</small></td>
-                        <td><span class="badge bg-warning text-dark">{{ rep.status }}</span></td>
-                    </tr>
+                    <div class="border-bottom pb-2 mb-2">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div>
+                                <span class="badge bg-danger bg-opacity-10 text-danger border border-danger rounded-pill mb-1">Req #{{ rep.requirement_id }}</span>
+                                <div class="fw-bold text-dark small">{{ rep.shop_owner.name if rep.shop_owner else 'Shop #' ~ rep.shop_owner_id }}</div>
+                                <small class="text-danger fw-semibold d-block" style="font-size: 0.8rem;">Reason: {{ rep.reason }}</small>
+                                <small class="text-muted" style="font-size: 0.7rem;"><i class="fa-regular fa-clock me-1"></i>{{ rep.created_at.strftime('%d %b %Y, %I:%M %p') if rep.created_at else 'N/A' }}</small>
+                            </div>
+                            <div class="text-nowrap ms-2">
+                                <!-- Refund Credit Action -->
+                                <form action="{{ url_for('resolve_report', report_id=rep.id, action='refund') }}" method="POST" class="d-inline" onsubmit="return confirm('Kya aap shop owner ko lead credit refund karna chahte hain?');">
+                                    <button class="btn btn-sm btn-outline-success rounded-circle shadow-sm me-1" style="width:30px; height:30px; padding:0;" title="Refund Credit"><i class="fa-solid fa-indian-rupee-sign"></i></button>
+                                </form>
+                                <!-- Block / Delete Shop Owner Action -->
+                                <form action="{{ url_for('delete_user', user_id=rep.shop_owner_id) }}" method="POST" class="d-inline" onsubmit="return confirm('WARNING: Kya aap is shop owner ko block/delete karna chahte hain?');">
+                                    <button class="btn btn-sm btn-outline-danger rounded-circle shadow-sm" style="width:30px; height:30px; padding:0;" title="Block Shop Owner"><i class="fa-solid fa-ban"></i></button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
                     {% endfor %}
-                </tbody>
-            </table>
-            {% else %}
-            <p class="text-muted text-center my-3">Koi bhi lead report nahi ki gayi hai.</p>
-            {% endif %}
+                {% else %}
+                <div class="text-center text-muted my-4">
+                    <i class="fa-solid fa-shield-check fa-2x text-danger opacity-50 mb-2"></i>
+                    <p class="mb-0 small">No reported leads found.</p>
+                </div>
+                {% endif %}
+            </div>
         </div>
     </div>
-    
-    <div class="col-md-6">
-        <div class="glass-panel h-100 p-0 overflow-hidden border-md-start border-4 border-warning">
+
+    <!-- Pending Payment Approvals -->
+    <div class="col-lg-4 col-md-12">
+        <div class="glass-panel h-100 p-0 overflow-hidden border-start border-4 border-warning">
             <div class="bg-warning bg-opacity-10 text-dark fw-bold p-3 border-bottom border-warning border-opacity-25 d-flex justify-content-between align-items-center">
-                <span><i class="fa-solid fa-clock text-warning me-2"></i> Pending Payment Approvals</span>
+                <span><i class="fa-solid fa-clock text-warning me-2"></i> Pending Payments</span>
                 <span class="badge bg-warning text-dark rounded-pill">{{ pending_requests|length }}</span>
             </div>
-            <div class="p-3" style="max-height: 180px; overflow-y: auto;">
+            <div class="p-3" style="max-height: 220px; overflow-y: auto;">
                 {% for req in pending_requests %}
                 <div class="d-flex justify-content-between align-items-center border-bottom pb-2 mb-2">
                     <div>
