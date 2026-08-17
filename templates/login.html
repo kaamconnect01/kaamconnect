@@ -158,12 +158,58 @@
         font-weight: 600;
         text-decoration: none;
     }
+
+    /* Instagram Style OTP Icon Box */
+    .ig-otp-icon-ring {
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        border: 2px solid #262626;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 1rem auto;
+        font-size: 1.5rem;
+        color: #262626;
+    }
 </style>
 
 <div class="ig-login-wrapper">
     
     <div class="ig-card">
         <div class="ig-logo">Kaamconnect</div>
+
+        <!-- ================= OTP VERIFICATION SCREEN ================= -->
+        {% if show_otp %}
+        <div class="text-center mt-2">
+            <div class="ig-otp-icon-ring">
+                <i class="fa-solid fa-lock"></i>
+            </div>
+            <h6 class="fw-bold text-dark mb-1" style="font-size: 0.95rem;">Enter Confirmation Code</h6>
+            <p class="ig-subtext mb-3" style="font-size: 0.8rem;">
+                Enter the 6-digit code sent to<br>
+                <b>{{ mobile if mobile else email }}</b>
+            </p>
+        </div>
+
+        <form method="POST" action="{% if url_for('verify_login_otp', _external=False) %}{{ url_for('verify_login_otp') }}{% endif %}">
+            <div class="ig-input-wrapper mb-3">
+                <input type="text" name="otp" class="ig-input text-center fw-bold fs-4 py-2" required placeholder="• • • • • •" maxlength="6" style="letter-spacing: 6px;">
+            </div>
+
+            <button type="submit" class="ig-btn-primary py-2.5">
+                Confirm Code
+            </button>
+
+            <div class="text-center mt-3">
+                <a href="{{ url_for('login') }}" class="text-decoration-none text-muted small">
+                    <i class="fa-solid fa-arrow-left me-1"></i> Back to Login
+                </a>
+            </div>
+        </form>
+
+        <!-- ================= STANDARD LOGIN SCREEN ================= -->
+        {% else %}
         <p class="ig-subtext">Sign in to manage your account</p>
 
         <!-- GOOGLE BUTTON AT TOP -->
@@ -192,12 +238,15 @@
                 Log in
             </button>
         </form>
+        {% endif %}
     </div>
 
     <!-- Bottom Footer Card -->
+    {% if not show_otp %}
     <div class="ig-footer-box">
         Don't have an account? <a href="{{ url_for('signup') }}">Sign up</a>
     </div>
+    {% endif %}
 
 </div>
 
@@ -206,11 +255,11 @@
         const passwordInput = document.getElementById('passwordInput');
         const toggleIcon = document.getElementById('toggleIcon');
         
-        if (passwordInput.type === 'password') {
+        if (passwordInput && passwordInput.type === 'password') {
             passwordInput.type = 'text';
             toggleIcon.classList.remove('fa-eye');
             toggleIcon.classList.add('fa-eye-slash');
-        } else {
+        } else if (passwordInput) {
             passwordInput.type = 'password';
             toggleIcon.classList.remove('fa-eye-slash');
             toggleIcon.classList.add('fa-eye');
