@@ -1,161 +1,204 @@
 {% extends 'base.html' %}
 {% block content %}
 <style>
-    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Grand+Hotel&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap');
 
     body {
-        background-color: #f8f9fa !important;
-        font-family: 'Plus Jakarta Sans', sans-serif;
+        background-color: #fafafa !important;
+        font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        color: #262626;
     }
 
-    .auth-wrapper {
+    .ig-login-wrapper {
         min-height: 85vh;
         display: flex;
+        flex-direction: column;
         align-items: center;
         justify-content: center;
         padding: 2rem 1rem;
     }
 
-    .auth-card {
+    .ig-card {
         background: #ffffff;
-        border-radius: 16px;
-        border: 1px solid #e4e4e7;
-        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.04);
+        border: 1px solid #dbdbdb;
+        border-radius: 12px;
         width: 100%;
-        max-width: 450px;
-        padding: 2.5rem;
+        max-width: 380px;
+        padding: 2.5rem 2rem 1.75rem 2rem;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
     }
 
-    .btn-google {
-        background: #ffffff;
-        border: 1px solid #e4e4e7;
-        color: #18181b;
-        border-radius: 10px;
-        padding: 0.75rem;
+    .ig-logo {
+        font-family: 'Grand Hotel', cursive;
+        font-size: 3.2rem;
+        color: #262626;
+        text-align: center;
+        margin-bottom: 0.5rem;
+    }
+
+    .ig-subtext {
+        color: #737373;
+        font-size: 0.85rem;
+        text-align: center;
+        margin-bottom: 1.5rem;
+        font-weight: 500;
+    }
+
+    .ig-btn-google {
+        background-color: #ffffff;
+        border: 1px solid #dbdbdb;
+        color: #262626;
+        border-radius: 8px;
+        padding: 0.6rem;
         font-weight: 600;
+        font-size: 0.88rem;
         display: flex;
         align-items: center;
         justify-content: center;
-        gap: 10px;
+        gap: 8px;
         text-decoration: none;
-        transition: background 0.2s;
+        transition: background 0.2s ease;
     }
 
-    .btn-google:hover {
-        background: #f4f4f5;
-        color: #18181b;
+    .ig-btn-google:hover {
+        background-color: #fafafa;
+        color: #262626;
     }
 
-    .form-label {
+    .ig-divider {
+        display: flex;
+        align-items: center;
+        text-align: center;
+        margin: 1.25rem 0;
+        color: #8e8e8e;
+        font-size: 0.75rem;
+        font-weight: 600;
+    }
+
+    .ig-divider::before, .ig-divider::after {
+        content: '';
+        flex: 1;
+        border-bottom: 1px solid #dbdbdb;
+    }
+
+    .ig-divider span {
+        padding: 0 0.75rem;
+    }
+
+    .ig-input-wrapper {
+        position: relative;
+        margin-bottom: 0.6rem;
+    }
+
+    .ig-input {
+        width: 100%;
+        background: #fafafa;
+        border: 1px solid #dbdbdb;
+        border-radius: 6px;
+        padding: 0.65rem 0.75rem;
         font-size: 0.85rem;
-        font-weight: 600;
-        color: #3f3f46;
-        margin-bottom: 0.4rem;
+        color: #262626;
+        outline: none;
+        transition: border-color 0.2s ease;
     }
 
-    .form-control {
-        padding: 0.75rem 1rem;
-        border-radius: 10px;
-        border: 1px solid #e4e4e7;
-        font-size: 0.95rem;
+    .ig-input:focus {
+        border-color: #a8a8a8;
+        background: #ffffff;
     }
 
-    .form-control:focus {
-        border-color: #f59e0b;
-        box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.15);
-    }
-
-    .btn-primary-custom {
-        background-color: #f59e0b;
+    .ig-eye-btn {
+        position: absolute;
+        right: 0.75rem;
+        top: 50%;
+        transform: translateY(-50%);
+        background: none;
         border: none;
-        color: #ffffff;
-        border-radius: 10px;
-        padding: 0.8rem;
-        font-weight: 600;
-        font-size: 1rem;
-        transition: background 0.2s;
+        color: #8e8e8e;
+        cursor: pointer;
+        font-size: 0.85rem;
     }
 
-    .btn-primary-custom:hover {
-        background-color: #d97706;
+    .ig-eye-btn:hover {
+        color: #262626;
+    }
+
+    .ig-btn-primary {
+        background-color: #0095f6;
         color: #ffffff;
+        border: none;
+        border-radius: 8px;
+        font-weight: 600;
+        font-size: 0.88rem;
+        padding: 0.65rem;
+        width: 100%;
+        margin-top: 0.6rem;
+        cursor: pointer;
+        transition: background 0.2s ease;
+    }
+
+    .ig-btn-primary:hover {
+        background-color: #1877f2;
+    }
+
+    .ig-footer-box {
+        background: #ffffff;
+        border: 1px solid #dbdbdb;
+        border-radius: 12px;
+        width: 100%;
+        max-width: 380px;
+        padding: 1.25rem;
+        text-align: center;
+        margin-top: 0.75rem;
+        font-size: 0.88rem;
+    }
+
+    .ig-footer-box a {
+        color: #0095f6;
+        font-weight: 600;
+        text-decoration: none;
     }
 </style>
 
-<div class="container auth-wrapper">
-    <div class="auth-card">
-        
-        <div class="text-center mb-4">
-            <h3 class="fw-bold mb-1">Kaamconnect</h3>
-            <p class="text-muted small">Welcome back! Please enter your details.</p>
-        </div>
+<div class="ig-login-wrapper">
+    
+    <div class="ig-card">
+        <div class="ig-logo">Kaamconnect</div>
+        <p class="ig-subtext">Sign in to manage your account</p>
 
-        {% if show_otp %}
-        
-        <div class="alert alert-success text-center mb-4" style="font-size: 0.85rem;">
-            A secure 6-digit OTP has been sent to your registered mobile number.
-        </div>
-        
-        <form method="POST" onsubmit="document.getElementById('otpLoginBtn').disabled = true; document.getElementById('otpLoginBtn').innerText = 'Verifying...';">
-            <input type="hidden" name="mobile" value="{{ request.form.get('mobile') or mobile }}">
-            
-            <div class="mb-4">
-                <label class="form-label text-center w-100">Enter OTP to Login</label>
-                <input type="text" name="otp" class="form-control text-center fw-bold fs-4" required placeholder="• • • • • •" maxlength="6" style="letter-spacing: 6px;">
-            </div>
-            
-            <button type="submit" id="otpLoginBtn" class="btn btn-primary-custom w-100 mb-3">
-                Verify OTP & Login
-            </button>
-            
-            <div class="text-center">
-                <a href="{{ url_for('login') }}" class="text-decoration-none text-muted small"><i class="fa-solid fa-arrow-left me-1"></i> Back to Login</a>
-            </div>
-        </form>
-
-        {% else %}
-        
-        <a href="{{ url_for('login_google') }}" class="btn-google w-100 mb-4">
-            <img src="https://www.svgrepo.com/show/475656/google-color.svg" alt="Google" style="width: 20px; height: 20px;">
+        <!-- GOOGLE BUTTON AT TOP -->
+        <a href="{{ url_for('login_google') }}" class="ig-btn-google">
+            <img src="https://www.svgrepo.com/show/475656/google-color.svg" alt="Google" style="width: 18px; height: 18px;">
             Continue with Google
         </a>
 
-        <div class="d-flex align-items-center mb-4">
-            <hr class="flex-grow-1" style="border-color: #e4e4e7;">
-            <span class="mx-3 text-muted" style="font-size: 0.8rem; font-weight: 600;">OR</span>
-            <hr class="flex-grow-1" style="border-color: #e4e4e7;">
+        <div class="ig-divider">
+            <span>OR</span>
         </div>
 
-        <form method="POST" onsubmit="document.getElementById('loginBtn').disabled = true; document.getElementById('loginBtn').innerText = 'Please wait...';">
-            <div class="mb-3">
-                <label class="form-label">Registered Mobile Number</label>
-                <input type="tel" name="mobile" class="form-control" required placeholder="e.g. 9876543210" pattern="[0-9]{10}" maxlength="10">
+        <form method="POST">
+            <div class="ig-input-wrapper">
+                <input type="tel" name="mobile" class="ig-input" required placeholder="Mobile Number" pattern="[0-9]{10}" maxlength="10">
             </div>
             
-            <div class="mb-4">
-                <label class="form-label">Password</label>
-                <div class="input-group">
-                    <input type="password" id="passwordInput" name="password" class="form-control" required placeholder="Enter your password">
-                    <button type="button" class="btn btn-outline-secondary" style="border-color: #e4e4e7;" onclick="togglePasswordVisibility()">
-                        <i class="fa-regular fa-eye" id="toggleIcon"></i>
-                    </button>
-                </div>
+            <div class="ig-input-wrapper">
+                <input type="password" id="passwordInput" name="password" class="ig-input" required placeholder="Password">
+                <button type="button" class="ig-eye-btn" onclick="togglePasswordVisibility()" aria-label="Toggle password visibility">
+                    <i class="fa-regular fa-eye" id="toggleIcon"></i>
+                </button>
             </div>
 
-            <button type="submit" id="loginBtn" class="btn btn-primary-custom w-100 mb-4">
-                Sign In
+            <button type="submit" class="ig-btn-primary">
+                Log in
             </button>
-            
-            <div class="text-center">
-                <p class="text-muted small mb-0">
-                    Don't have an account? 
-                    <a href="{{ url_for('signup') }}" class="fw-bold text-decoration-none ms-1" style="color: #d97706;">Sign up here</a>
-                </p>
-            </div>
         </form>
-        {% endif %}
-        
     </div>
+
+    <!-- Bottom Footer Card -->
+    <div class="ig-footer-box">
+        Don't have an account? <a href="{{ url_for('signup') }}">Sign up</a>
+    </div>
+
 </div>
 
 <script>
