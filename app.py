@@ -469,7 +469,7 @@ def login():
                 session['admin_login_id'] = user.id
                 session['admin_login_otp'] = otp
                 send_otp_email(user.email, otp, context="Admin Login")
-                flash(f'Admin Security Alert: Ek OTP aapke registered email ({user.email}) par bheja gaya hai.', 'info')
+                flash(f'OTP sent to n******ka***nn**t@**il.com.', 'info')
                 return redirect(url_for('verify_admin_otp'))
             
             session.permanent = True
