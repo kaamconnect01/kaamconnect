@@ -485,10 +485,26 @@ def verify_admin_otp():
     if 'admin_login_id' not in session:
         return redirect(url_for('login'))
         
+    # Get user to fetch and mask the email
+    user = User.query.get(session['admin_login_id'])
+    if not user:
+        return redirect(url_for('login'))
+        
+    # Email Masking Logic (e.g., admin@gmail.com -> ad***@gmail.com)
+    email = user.email if user.email else ""
+    masked_email = ""
+    if email and "@" in email:
+        parts = email.split("@")
+        username = parts[0]
+        domain = parts[1]
+        if len(username) > 2:
+            masked_email = f"{username[:2]}***@{domain}"
+        else:
+            masked_email = f"{username[0]}***@{domain}"
+
     if request.method == 'POST':
         entered_otp = request.form.get('otp', '').strip()
         if entered_otp == session.get('admin_login_otp'):
-            user = User.query.get(session['admin_login_id'])
             session.permanent = True
             login_user(user)
             session.pop('admin_login_otp', None)
@@ -501,26 +517,126 @@ def verify_admin_otp():
     html = """
     {% extends 'base.html' %}
     {% block content %}
-    <div class="container py-5 mt-5">
-        <div class="row justify-content-center">
-            <div class="col-md-5">
-                <div class="card shadow-lg border-0 p-5 text-center" style="border-radius: 20px; background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(10px);">
-                    <i class="fa-solid fa-shield-halved fa-3x text-primary mb-3"></i>
-                    <h3 class="fw-bold mb-2 text-dark">Admin Verification</h3>
-                    <p class="text-muted small mb-4">Please enter the 6-digit OTP sent to your registered admin email.</p>
-                    <form method="POST">
-                        <input type="text" name="otp" class="form-control text-center fw-bold fs-4 mb-4 shadow-sm" placeholder="• • • • • •" required maxlength="6" style="letter-spacing: 5px; border-radius: 12px; height: 60px;">
-                        <button type="submit" class="btn btn-primary w-100 py-3 fw-bold shadow" style="border-radius: 12px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border: none;">
-                            Verify & Login Securely
-                        </button>
-                    </form>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap');
+
+        body {
+            background-color: #fafafa !important;
+            font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            color: #262626;
+        }
+
+        .ig-login-wrapper {
+            min-height: 85vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem 1rem;
+        }
+
+        .ig-card {
+            background: #ffffff;
+            border: 1px solid #dbdbdb;
+            border-radius: 12px;
+            width: 100%;
+            max-width: 380px;
+            padding: 2.5rem 2rem 2.5rem 2rem;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+        }
+
+        .ig-subtext {
+            color: #737373;
+            font-size: 0.85rem;
+            text-align: center;
+            margin-bottom: 1.5rem;
+            font-weight: 500;
+        }
+
+        .ig-input-wrapper {
+            position: relative;
+            margin-bottom: 0.6rem;
+        }
+
+        .ig-input {
+            width: 100%;
+            background: #fafafa;
+            border: 1px solid #dbdbdb;
+            border-radius: 6px;
+            padding: 0.65rem 0.75rem;
+            font-size: 0.85rem;
+            color: #262626;
+            outline: none;
+            transition: border-color 0.2s ease;
+        }
+
+        .ig-input:focus {
+            border-color: #a8a8a8;
+            background: #ffffff;
+        }
+
+        .ig-btn-primary {
+            background-color: #0095f6;
+            color: #ffffff;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 0.88rem;
+            padding: 0.65rem;
+            width: 100%;
+            margin-top: 0.6rem;
+            cursor: pointer;
+            transition: background 0.2s ease;
+        }
+
+        .ig-btn-primary:hover {
+            background-color: #1877f2;
+        }
+
+        /* Instagram Style Secure Icon Box */
+        .ig-otp-icon-ring {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            border: 2px solid #262626;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1rem auto;
+            font-size: 1.5rem;
+            color: #262626;
+        }
+    </style>
+
+    <div class="ig-login-wrapper">
+        <div class="ig-card">
+            
+            <div class="text-center mt-2">
+                <div class="ig-otp-icon-ring">
+                    <i class="fa-solid fa-shield-halved"></i>
                 </div>
+                <h6 class="fw-bold text-dark mb-1" style="font-size: 0.95rem;">Admin Verification</h6>
+                <p class="ig-subtext mb-3" style="font-size: 0.8rem;">
+                    Enter the 6-digit code sent to<br>
+                    <b>{{ masked_email }}</b>
+                </p>
             </div>
+
+            <form method="POST">
+                <div class="ig-input-wrapper mb-3">
+                    <input type="text" name="otp" class="ig-input text-center fw-bold fs-4 py-2" required placeholder="• • • • • •" maxlength="6" style="letter-spacing: 6px;">
+                </div>
+
+                <button type="submit" class="ig-btn-primary py-2.5">
+                    Verify Securely
+                </button>
+            </form>
+            
         </div>
     </div>
     {% endblock %}
     """
-    return render_template_string(html)
+    return render_template_string(html, masked_email=masked_email)
 
 @app.route('/logout')
 @login_required
