@@ -756,6 +756,12 @@ def customer_dash():
 
     return render_template('customer_dash.html', my_reqs=my_reqs)
 
+@app.route('/admin/send_broadcast', methods=['POST'])
+def admin_send_broadcast():
+    # Apni broadcast ki logic yahan likhein jo form se data legi
+    # Kaam poora hone ke baad wapas admin dashboard par redirect kar dein
+    return redirect(url_for('admin_dash'))
+
 @app.route('/shop/dashboard', methods=['GET', 'POST'])
 @login_required
 def shop_dash():
