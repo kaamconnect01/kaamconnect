@@ -8,6 +8,7 @@ from zoneinfo import ZoneInfo
 import os
 import re
 import random
+import base64
 
 # IMPORT OAUTH FOR GOOGLE LOGIN
 from authlib.integrations.flask_client import OAuth
@@ -757,9 +758,87 @@ def customer_dash():
     return render_template('customer_dash.html', my_reqs=my_reqs)
 
 @app.route('/admin/send_broadcast', methods=['POST'])
+@login_required
 def admin_send_broadcast():
-    # Apni broadcast ki logic yahan likhein jo form se data legi
-    # Kaam poora hone ke baad wapas admin dashboard par redirect kar dein
+    if current_user.role != 'admin':
+        return "Unauthorized", 403
+        
+    target_role = request.form.get('target_role', 'all')
+    subject = request.form.get('subject', '').strip()
+    message = request.form.get('message', '').strip()
+    attachment_file = request.files.get('attachment')
+    
+    if not subject or not message:
+        flash('Subject aur Message bharna anivarya hai.', 'danger')
+        return redirect(url_for('admin_dash'))
+        
+    if target_role == 'all':
+        users = User.query.filter(User.email != '').all()
+    else:
+        users = User.query.filter_by(role=target_role).all()
+        
+    recipient_emails = [u.email for u in users if u.email]
+    
+    if not recipient_emails:
+        flash('Target audience ke liye koi valid email wale users nahi mile.', 'warning')
+        return redirect(url_for('admin_dash'))
+        
+    try:
+        api_key = os.environ.get('BREVO_API_KEY')
+        sender_email = os.environ.get('MAIL_USERNAME', 'no-reply@kaamconnect.com')
+        
+        if api_key and sender_email:
+            import urllib.request
+            import json
+            
+            url = "https://api.brevo.com/v3/smtp/email"
+            
+            attachments_list = []
+            if attachment_file and attachment_file.filename:
+                file_bytes = attachment_file.read()
+                encoded_content = base64.b64encode(file_bytes).decode('utf-8')
+                attachments_list.append({
+                    "content": encoded_content,
+                    "name": attachment_file.filename
+                })
+            
+            for email in recipient_emails:
+                payload = {
+                    "sender": {"name": "Kaamconnect Admin", "email": sender_email},
+                    "to": [{"email": email}],
+                    "subject": subject,
+                    "htmlContent": f"""
+                    <div style="font-family: Arial, sans-serif; padding: 20px; border: 1px solid #ddd; border-radius: 8px;">
+                        <h2 style="color: #2b6cb0;">📢 Kaamconnect Notice / Update</h2>
+                        <p style="font-size: 15px; white-space: pre-line;">{message}</p>
+                        <hr style="border: none; border-top: 1px solid #eee; margin: 20px 0;">
+                        <p style="color: #718096; font-size: 12px;">Yeh message Kaamconnect Admin dwara bheja gaya hai.</p>
+                    </div>
+                    """
+                }
+                if attachments_list:
+                    payload["attachment"] = attachments_list
+                    
+                headers = {
+                    "accept": "application/json",
+                    "api-key": api_key,
+                    "content-type": "application/json"
+                }
+                req_data = json.dumps(payload).encode('utf-8')
+                req_obj = urllib.request.Request(url, data=req_data, headers=headers, method='POST')
+                try:
+                    with urllib.request.urlopen(req_obj, timeout=5) as response:
+                        pass
+                except Exception as ex:
+                    print(f"Failed to send broadcast to {email}: {ex}")
+                    
+            flash(f'Broadcast mail successfully {len(recipient_emails)} users ko bhej diya gaya hai!', 'success')
+        else:
+            flash('Email service configuration missing (BREVO_API_KEY).', 'danger')
+    except Exception as e:
+        print(f"Broadcast error: {e}")
+        flash('Broadcast bhejte samay error aaya.', 'danger')
+        
     return redirect(url_for('admin_dash'))
 
 @app.route('/shop/dashboard', methods=['GET', 'POST'])
@@ -1160,7 +1239,7 @@ def update_worker_profile():
 @login_required
 def submit_quotation(worker_id):
     if current_user.role != 'shop_owner':
-        flash("Sirf Shop Owners hi quotation bhej sakte hain.", "danger")
+        flash("Sirf Shop Owners hi quotation bhej sakte ہیں.", "danger")
         return redirect(url_for('shop_dash'))
 
     try:
