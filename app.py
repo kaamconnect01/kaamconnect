@@ -349,6 +349,18 @@ def google_step2():
 def index():
     return render_template('index.html')
 
+@app.route('/report_lead/<int:req_id>', methods=['POST'])
+@login_required
+def report_lead(req_id):
+    if current_user.role.lower() != 'shop_owner':
+        return "Unauthorized", 403
+        
+    reason = request.form.get('reason', 'No reason provided')
+    
+    # Aap yahan report database mein save kar sakte hain ya admin ko notify kar sakte hain
+    flash('Lead successfully report ho gayi hai. Admin iski jaanch karega.', 'success')
+    return redirect(url_for('shop_dash'))
+
 @app.route('/signup', methods=['GET', 'POST'])
 def signup():
     if request.method == 'POST':
