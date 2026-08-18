@@ -162,6 +162,16 @@
         padding: 1.25rem;
         margin-bottom: 1rem;
     }
+    
+    .countdown-badge {
+        background-color: #fef2f2;
+        color: #ef4444;
+        border: 1px solid #fecaca;
+        padding: 0.4rem 0.8rem;
+        border-radius: 50px;
+        font-size: 0.75rem;
+        font-weight: 700;
+    }
 
     @media (max-width: 768px) {
         .premium-card { padding: 1.5rem; }
@@ -301,7 +311,7 @@
                         <div>
                             <span class="badge bg-primary bg-opacity-10 text-primary mb-2 rounded-pill px-3 py-1">{{ req.category }}</span>
                             <h5 class="fw-bold text-dark mb-1">Budget: <span class="text-success">₹{{ req.budget }}</span></h5>
-                            <small class="text-muted"><i class="fa-regular fa-clock me-1 text-danger"></i> Deadline: <b>{{ req.deadline }}</b></small>
+                            <small class="text-muted"><i class="fa-regular fa-calendar text-danger me-1"></i> Deadline: <b>{{ req.deadline }}</b></small>
                         </div>
                         <div class="d-flex gap-2 mt-2 mt-md-0">
                             <button class="btn btn-sm btn-light border fw-bold text-primary px-3 rounded-pill shadow-sm" data-bs-toggle="modal" data-bs-target="#editReqModal{{ req.id }}">
@@ -313,6 +323,12 @@
                                 </button>
                             </form>
                         </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <span class="countdown-badge d-inline-block" data-deadline="{{ req.deadline }}">
+                            <i class="fa-solid fa-spinner fa-spin me-1"></i> Calculating Time Left...
+                        </span>
                     </div>
 
                     <div class="p-3 bg-light rounded-3 mb-4 border text-dark small" style="white-space: pre-line; line-height: 1.5;">{{ req.description }}</div>
@@ -479,6 +495,38 @@
         if(firstCategoryPill) {
             firstCategoryPill.click();
         }
+
+        // Live Countdown Logic
+        function updateCountdowns() {
+            const badges = document.querySelectorAll('.countdown-badge');
+            badges.forEach(badge => {
+                const deadlineStr = badge.getAttribute('data-deadline');
+                if (!deadlineStr) return;
+
+                const deadlineDate = new Date(deadlineStr + "T23:59:59");
+                const now = new Date();
+                const diffTime = deadlineDate - now;
+
+                if (diffTime <= 0) {
+                    badge.className = "badge bg-secondary text-white px-3 py-2 rounded-pill fw-bold countdown-badge";
+                    badge.innerHTML = `<i class="fa-solid fa-clock me-1"></i> Expired`;
+                } else {
+                    const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+                    const diffHours = Math.floor((diffTime % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                    const diffMins = Math.floor((diffTime % (1000 * 60 * 60)) / (1000 * 60));
+
+                    if (diffDays > 0) {
+                        badge.innerHTML = `<i class="fa-solid fa-stopwatch me-1"></i> ${diffDays}d ${diffHours}h left`;
+                    } else {
+                        badge.innerHTML = `<i class="fa-solid fa-stopwatch me-1"></i> ${diffHours}h ${diffMins}m left`;
+                    }
+                    badge.className = "badge bg-danger bg-opacity-10 text-danger border border-danger px-3 py-2 rounded-pill fw-bold countdown-badge d-inline-block";
+                }
+            });
+        }
+
+        updateCountdowns();
+        setInterval(updateCountdowns, 60000); // Update every minute
     });
 
     // Two-way syncing of Budget Slider and Number Input
