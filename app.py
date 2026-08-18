@@ -944,7 +944,7 @@ def delete_user(user_id):
                 except Exception as e:
                     print(f"LeadReport cleanup warning: {e}")
 
-                # (B) NEW FIX: Requirement se judi Refund Request entries delete karein
+                # (B) Requirement se judi Refund Request entries delete karein
                 try:
                     for rid in req_ids:
                         db.session.execute(text("DELETE FROM refund_request WHERE requirement_id = :rid"), {"rid": rid})
@@ -960,10 +960,10 @@ def delete_user(user_id):
                 # (E) Now safely delete Customer's Requirements
                 Requirement.query.filter_by(customer_id=user.id).delete(synchronize_session=False)
 
-            # 2. User se judi saari Quotations clear karein
-            Quotation.query.filter((Quotation.shop_owner_id == user.id) | (Quotation.worker_id == user.id)).delete(synchronize_session=False)
+            # 2. FIXED: Quotation table me worker_id column nahi hai, isliye sirf shop_owner_id check karenge
+            Quotation.query.filter_by(shop_owner_id=user.id).delete(synchronize_session=False)
 
-            # 3. NEW FIX: Agar delete hone wala user 'shop_owner' hai, toh uski banayi refund requests bhi delete karein
+            # 3. Agar delete hone wala user 'shop_owner' hai, toh uski banayi refund requests bhi delete karein
             try:
                 db.session.execute(text("DELETE FROM refund_request WHERE shop_owner_id = :uid"), {"uid": user.id})
             except Exception as e:
@@ -983,7 +983,7 @@ def delete_user(user_id):
         except Exception as e:
             db.session.rollback() 
             print(f"Delete Error aaya hai: {e}") 
-            flash(f'Error: Data delete nahi ho paya. ({e})', 'danger')
+            flash(f'Error: Data delete nahi ho paya. System Error.', 'danger')
             
     return redirect(url_for('admin_dash'))
 
