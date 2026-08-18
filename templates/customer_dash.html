@@ -72,6 +72,41 @@
         outline: none;
     }
 
+    /* Tap-to-Select Pill Grid System */
+    .tap-selector-group {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+    }
+
+    .tap-pill {
+        border: 1.5px solid #e2e8f0;
+        background: #f8fafc;
+        border-radius: 12px;
+        padding: 0.65rem 1rem;
+        font-size: 0.85rem;
+        font-weight: 600;
+        color: #475569;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        user-select: none;
+        flex: 1 1 auto;
+        text-align: center;
+    }
+
+    .tap-pill:hover {
+        border-color: #cbd5e1;
+        background: #f1f5f9;
+        color: #1e293b;
+    }
+
+    .tap-pill.active {
+        background: #0f172a !important;
+        color: #ffffff !important;
+        border-color: #0f172a !important;
+        box-shadow: 0 4px 12px rgba(15, 23, 42, 0.2);
+    }
+
     /* Range Slider */
     .custom-range::-webkit-slider-thumb {
         background: #0f172a;
@@ -186,43 +221,44 @@
 
                     <h6 class="fw-bold text-dark mb-3 mt-4 border-bottom pb-2">🛠️ Work Specifications</h6>
                     <div class="row g-3 mb-4">
-                        <div class="col-md-6">
+                        <div class="col-md-12">
                             <label class="clean-label">Job Category <span class="text-danger">*</span></label>
-                            <select name="category" class="form-select clean-input" required>
-                                <option value="" disabled selected>Select Work Category...</option>
-                                <option value="Modular Kitchen">Modular Kitchen</option>
-                                <option value="Home Interior (Full)">Home Interior (Full)</option>
-                                <option value="Bedroom Setup">Bedroom Setup</option>
-                                <option value="Sofa & Seating">Sofa & Seating</option>
-                                <option value="Office Furniture">Office Furniture</option>
-                                <option value="Repair / Polish">Repair / Polish</option>
-                            </select>
+                            <input type="hidden" name="category" id="selectedCategory" required>
+                            <div class="tap-selector-group" id="categoryGroup">
+                                <div class="tap-pill" onclick="selectTapOption('categoryGroup', this, 'selectedCategory', 'Modular Kitchen')">Modular Kitchen</div>
+                                <div class="tap-pill" onclick="selectTapOption('categoryGroup', this, 'selectedCategory', 'Home Interior (Full)')">Home Interior</div>
+                                <div class="tap-pill" onclick="selectTapOption('categoryGroup', this, 'selectedCategory', 'Bedroom Setup')">Bedroom Setup</div>
+                                <div class="tap-pill" onclick="selectTapOption('categoryGroup', this, 'selectedCategory', 'Sofa & Seating')">Sofa & Seating</div>
+                                <div class="tap-pill" onclick="selectTapOption('categoryGroup', this, 'selectedCategory', 'Office Furniture')">Office Furniture</div>
+                                <div class="tap-pill" onclick="selectTapOption('categoryGroup', this, 'selectedCategory', 'Repair / Polish')">Repair / Polish</div>
+                            </div>
                         </div>
                         
-                        <div class="col-md-6">
+                        <div class="col-md-6 mt-3">
                             <label class="clean-label">Expected Delivery Date <span class="text-danger">*</span></label>
                             <input type="date" name="deadline" class="form-control clean-input" required>
                         </div>
 
-                        <div class="col-md-6">
+                        <div class="col-md-6 mt-3">
                             <label class="clean-label">Property Type <span class="text-muted text-lowercase fw-normal">(Optional)</span></label>
-                            <select id="propType" class="form-select clean-input">
-                                <option value="Not Specified">Select Property...</option>
-                                <option value="Flat / Apartment">Flat / Apartment</option>
-                                <option value="Villa / House">Villa / House</option>
-                                <option value="Commercial / Shop">Commercial / Shop</option>
-                            </select>
+                            <input type="hidden" id="propType" value="Not Specified">
+                            <div class="tap-selector-group" id="propGroup">
+                                <div class="tap-pill active" onclick="selectTapOption('propGroup', this, 'propType', 'Flat / Apartment')">Flat / Apt</div>
+                                <div class="tap-pill" onclick="selectTapOption('propGroup', this, 'propType', 'Villa / House')">Villa / House</div>
+                                <div class="tap-pill" onclick="selectTapOption('propGroup', this, 'propType', 'Commercial / Shop')">Commercial</div>
+                            </div>
                         </div>
 
-                        <div class="col-md-6">
-                            <label class="clean-label">Preferred Material <span class="text-muted text-lowercase fw-normal">(Optional)</span></label>
-                            <select id="matType" class="form-select clean-input">
-                                <option value="Expert Recommendation">Expert Suggestion</option>
-                                <option value="Teak Wood (Sagwan)">Teak Wood (Sagwan)</option>
-                                <option value="Plywood + Laminate">Plywood + Laminate</option>
-                                <option value="MDF / Particle Board">MDF / Particle Board</option>
-                                <option value="Metal / Glass">Metal / Glass</option>
-                            </select>
+                        <div class="col-12 mt-3">
+                            <label class="clean-label">Preferred Material Quality <span class="text-muted text-lowercase fw-normal">(Optional)</span></label>
+                            <input type="hidden" id="matType" value="Expert Recommendation">
+                            <div class="tap-selector-group" id="matGroup">
+                                <div class="tap-pill active" onclick="selectTapOption('matGroup', this, 'matType', 'Expert Recommendation')">Expert Suggestion</div>
+                                <div class="tap-pill" onclick="selectTapOption('matGroup', this, 'matType', 'Teak Wood (Sagwan)')">Teak Wood</div>
+                                <div class="tap-pill" onclick="selectTapOption('matGroup', this, 'matType', 'Plywood + Laminate')">Plywood + Lam</div>
+                                <div class="tap-pill" onclick="selectTapOption('matGroup', this, 'matType', 'HDHMR + Acrylic')">HDHMR + Acrylic</div>
+                                <div class="tap-pill" onclick="selectTapOption('matGroup', this, 'matType', 'MDF / Particle Board')">MDF / Board</div>
+                            </div>
                         </div>
 
                         <div class="col-12 mt-3">
@@ -241,8 +277,8 @@
                         </div>
 
                         <div class="col-12 mt-3">
-                            <label class="clean-label">Complete Work Details <span class="text-danger">*</span></label>
-                            <textarea id="rawDescription" class="form-control clean-input" rows="4" placeholder="Kripya kaam ki puri detail likhein. Eg: Muje living room ke liye 3-seater sofa aur ek TV unit banwana hai..." required></textarea>
+                            <label class="clean-label">Complete Work Details / Dimensions <span class="text-danger">*</span></label>
+                            <textarea id="rawDescription" class="form-control clean-input" rows="4" placeholder="Kripya size ya specific requirement likhein. Eg: 10x8 feet modular kitchen, L-shape, soft-close hardware..." required></textarea>
                             <input type="hidden" name="description" id="finalDescription">
                         </div>
                     </div>
@@ -429,6 +465,22 @@
 </div>
 
 <script>
+    // Tap-to-select pills handler
+    function selectTapOption(groupId, element, inputId, value) {
+        const group = document.getElementById(groupId);
+        group.querySelectorAll('.tap-pill').forEach(pill => pill.classList.remove('active'));
+        element.classList.add('active');
+        document.getElementById(inputId).value = value;
+    }
+
+    // Auto-select first category by default on load
+    document.addEventListener("DOMContentLoaded", function() {
+        const firstCategoryPill = document.querySelector('#categoryGroup .tap-pill');
+        if(firstCategoryPill) {
+            firstCategoryPill.click();
+        }
+    });
+
     // Two-way syncing of Budget Slider and Number Input
     const budgetSlider = document.getElementById('budgetRange');
     const budgetInput = document.getElementById('budgetInput');
@@ -438,7 +490,7 @@
 
     // Step 1: Prevent Default Submit & Show Confirmation Popup
     function triggerConfirmation(e) {
-        e.preventDefault(); // Roko form ko
+        e.preventDefault(); 
         var myModal = new bootstrap.Modal(document.getElementById('confirmPostModal'));
         myModal.show();
         return false;
@@ -446,20 +498,17 @@
 
     // Step 2: Merge Data & Actually Submit Form
     function executeSubmit() {
-        // Merge Location fields into single hidden address
         let adr = document.getElementById('ui_address').value;
         let lnd = document.getElementById('ui_landmark').value;
         let cty = document.getElementById('ui_city').value;
         let pin = document.getElementById('ui_pincode').value;
         document.getElementById('finalAddress').value = `${adr}, Near: ${lnd}, ${cty} - Pincode: ${pin}`;
 
-        // Merge Description fields into single hidden description
         const prop = document.getElementById('propType').value;
         const mat = document.getElementById('matType').value;
         const rawDesc = document.getElementById('rawDescription').value;
-        document.getElementById('finalDescription').value = `[Property: ${prop} | Material Preference: ${mat}]\n\nDetails: ${rawDesc}`;
+        document.getElementById('finalDescription').value = `[Property: ${prop} | Material: ${mat}]\n\nDetails: ${rawDesc}`;
 
-        // Finally submit the form
         document.getElementById('jobForm').submit();
     }
 </script>
