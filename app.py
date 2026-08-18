@@ -937,31 +937,44 @@ def delete_user(user_id):
             req_ids = [r.id for r in user_reqs]
 
             if req_ids:
-                # (A) Requirement se judi LeadReport entries delete karein (PostgreSQL FK Error Fix)
+                # (A) Requirement se judi LeadReport entries delete karein
                 try:
                     for rid in req_ids:
                         db.session.execute(text("DELETE FROM lead_report WHERE requirement_id = :rid"), {"rid": rid})
                 except Exception as e:
                     print(f"LeadReport cleanup warning: {e}")
 
-                # (B) Requirement se jude Unlocked Leads delete karein
+                # (B) NEW FIX: Requirement se judi Refund Request entries delete karein
+                try:
+                    for rid in req_ids:
+                        db.session.execute(text("DELETE FROM refund_request WHERE requirement_id = :rid"), {"rid": rid})
+                except Exception as e:
+                    print(f"RefundRequest cleanup warning: {e}")
+
+                # (C) Requirement se jude Unlocked Leads delete karein
                 UnlockedLead.query.filter(UnlockedLead.requirement_id.in_(req_ids)).delete(synchronize_session=False)
 
-                # (C) Requirement se judi Quotations delete karein
+                # (D) Requirement se judi Quotations delete karein
                 Quotation.query.filter(Quotation.requirement_id.in_(req_ids)).delete(synchronize_session=False)
 
-                # (D) Now safely delete Customer's Requirements
+                # (E) Now safely delete Customer's Requirements
                 Requirement.query.filter_by(customer_id=user.id).delete(synchronize_session=False)
 
-            # 2. User se judi saari Quotations clear karein (chahe user Shop Owner ho ya Worker)
+            # 2. User se judi saari Quotations clear karein
             Quotation.query.filter((Quotation.shop_owner_id == user.id) | (Quotation.worker_id == user.id)).delete(synchronize_session=False)
 
-            # 3. User se judi Unlocked Leads, Vacancies & Payment Requests delete karein
+            # 3. NEW FIX: Agar delete hone wala user 'shop_owner' hai, toh uski banayi refund requests bhi delete karein
+            try:
+                db.session.execute(text("DELETE FROM refund_request WHERE shop_owner_id = :uid"), {"uid": user.id})
+            except Exception as e:
+                print(f"Shop Owner RefundRequest cleanup warning: {e}")
+
+            # 4. User se judi Unlocked Leads, Vacancies & Payment Requests delete karein
             UnlockedLead.query.filter_by(shop_owner_id=user.id).delete(synchronize_session=False)
             Vacancy.query.filter_by(shop_owner_id=user.id).delete(synchronize_session=False)
             PaymentRequest.query.filter_by(shop_owner_id=user.id).delete(synchronize_session=False)
 
-            # 4. User ko delete karein
+            # 5. Finally, User ko delete karein
             db.session.delete(user)
             db.session.commit()
             
