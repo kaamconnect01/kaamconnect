@@ -107,9 +107,20 @@
                         <span class="badge bg-primary bg-opacity-10 text-primary px-3 py-2 rounded-pill fw-bold">{{ req.category }}</span>
                         <span class="text-success fw-bold fs-4">₹{{ req.budget }}</span>
                     </div>
-                    
-                    <!-- Message / Description -->
-                    <p class="text-dark mb-3" style="line-height: 1.6;">{{ req.description }}</p>
+
+                    <!-- Clear Parameter Tags for Shop Owner Quick View -->
+                    {% if req.description.startswith('[Property:') %}
+                        {% set parts = req.description.split(']\n\nDetails: ') %}
+                        {% set meta_part = parts[0].replace('[', '') %}
+                        <div class="d-flex flex-wrap gap-2 mb-3">
+                            {% for tag in meta_part.split(' | ') %}
+                                <span class="badge bg-light text-secondary border px-2 py-1 small fw-semibold"><i class="fa-solid fa-tag text-primary me-1"></i>{{ tag }}</span>
+                            {% endfor %}
+                        </div>
+                        <p class="text-dark mb-3 small" style="line-height: 1.6;">{{ parts[1] if parts|length > 1 else req.description }}</p>
+                    {% else %}
+                        <p class="text-dark mb-3" style="line-height: 1.6;">{{ req.description }}</p>
+                    {% endif %}
                     
                     <!-- Location & Deadline Meta -->
                     <div class="d-flex flex-wrap gap-3 text-muted small mb-4 pt-2 border-top">
@@ -215,7 +226,7 @@
                     </div>
                 </div>
 
-                <!-- POPUP 2: NEW QUOTATION & CONFIRMATION MODAL -->
+                <!-- POPUP 2: NEW QUOTATION & CONFIRMATION MODAL WITH PRE-FILLED BUDGET -->
                 <div class="modal fade" id="confirmModal{{ req.id }}" tabindex="-1" aria-hidden="true">
                     <div class="modal-dialog modal-dialog-centered">
                         <div class="modal-content border-0 shadow-lg rounded-4 overflow-hidden">
@@ -235,21 +246,22 @@
                                         <label class="form-label small fw-bold text-secondary">Aapka Estimate Budget (₹) <span class="text-danger">*</span></label>
                                         <div class="input-group">
                                             <span class="input-group-text bg-white border-end-0"><i class="fa-solid fa-indian-rupee-sign text-muted small"></i></span>
-                                            <input type="number" name="amount" class="form-control glass-input border-start-0" placeholder="e.g. 1500" required>
+                                            <input type="number" name="amount" class="form-control glass-input border-start-0" value="{{ req.budget }}" placeholder="e.g. 1500" required>
                                         </div>
+                                        <small class="text-muted" style="font-size: 0.72rem;">* Customer ne yeh budget dala hai, ise adjust kar sakte hain.</small>
                                     </div>
 
                                     <div class="mb-3 text-start">
                                         <label class="form-label small fw-bold text-secondary">Kitne din me kaam khatam hoga? <span class="text-danger">*</span></label>
                                         <div class="input-group">
                                             <span class="input-group-text bg-white border-end-0"><i class="fa-solid fa-clock text-muted small"></i></span>
-                                            <input type="text" name="deadline" class="form-control glass-input border-start-0" placeholder="e.g. 2 Days / 24 Hours" required>
+                                            <input type="text" name="deadline" class="form-control glass-input border-start-0" value="{{ req.deadline }}" placeholder="e.g. 2 Days / 24 Hours" required>
                                         </div>
                                     </div>
 
                                     <div class="mb-0 text-start">
                                         <label class="form-label small fw-bold text-secondary">Extra Notes / Baatein (Optional)</label>
-                                        <textarea name="notes" class="form-control glass-input" rows="3" placeholder="Kaam ke baare mein kuch alag se likhna chahein..."></textarea>
+                                        <textarea name="notes" class="form-control glass-input" rows="3" placeholder="Jaise: Material grade best quality use hoga, fitting included hai..."></textarea>
                                     </div>
                                 </div>
                                 
