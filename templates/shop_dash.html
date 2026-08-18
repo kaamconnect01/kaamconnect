@@ -1,7 +1,6 @@
 {% extends 'base.html' %}
 {% block content %}
 
-<!-- Custom Styling for Premium Shop Dashboard -->
 <style>
     body {
         background-color: #f8fafc;
@@ -24,15 +23,16 @@
         box-shadow: 0 4px 12px rgba(37, 99, 235, 0.25);
     }
     .lead-card {
-        border: none;
-        border-radius: 1rem;
+        border: 1px solid #e2e8f0;
+        border-radius: 1.25rem;
         background: #ffffff;
         box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
         transition: transform 0.2s ease, box-shadow 0.2s ease;
     }
     .lead-card:hover {
         transform: translateY(-3px);
-        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.06);
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+        border-color: #cbd5e1;
     }
     .glass-input {
         background-color: #f8fafc;
@@ -51,9 +51,17 @@
         background: #ffffff;
         box-shadow: 0 4px 15px rgba(0, 0, 0, 0.03);
     }
+    .countdown-badge {
+        background-color: #fef2f2;
+        color: #ef4444;
+        border: 1px solid #fecaca;
+        padding: 0.4rem 0.8rem;
+        border-radius: 50px;
+        font-size: 0.75rem;
+        font-weight: 700;
+    }
 </style>
 
-<!-- HERO BANNER -->
 <div class="hero-banner text-white p-4 p-md-5 mb-4">
     <div class="d-flex flex-column flex-md-row justify-content-between align-items-center gap-3">
         <div class="text-center text-md-start">
@@ -73,7 +81,6 @@
     </div>
 </div>
 
-<!-- NAVIGATION TABS -->
 <ul class="nav nav-pills nav-fill bg-white shadow-sm rounded-pill p-2 mb-4 gap-2" id="myTab" role="tablist">
   <li class="nav-item" role="presentation">
       <button class="nav-link active rounded-pill fw-bold py-2 px-4" data-bs-toggle="tab" data-bs-target="#leads" type="button">
@@ -94,41 +101,45 @@
 
 <div class="tab-content" id="myTabContent">
   
-  <!-- LEADS TAB -->
   <div class="tab-pane fade show active" id="leads">
     <div class="row g-4">
         {% for req in requirements %}
         <div class="col-md-6">
-            <div class="card lead-card h-100 p-3 p-md-4">
-                <div class="card-body p-0">
-                    
-                    <!-- Header: Category & Budget -->
-                    <div class="d-flex justify-content-between align-items-center mb-3">
-                        <span class="badge bg-primary bg-opacity-10 text-primary px-3 py-2 rounded-pill fw-bold">{{ req.category }}</span>
-                        <span class="text-success fw-bold fs-4">₹{{ req.budget }}</span>
+            <div class="card lead-card h-100 p-0 overflow-hidden">
+                
+                <div class="bg-light p-3 border-bottom d-flex justify-content-between align-items-center">
+                    <span class="badge bg-primary px-3 py-2 rounded-pill fw-bold shadow-sm" style="font-size: 0.85rem;">{{ req.category }}</span>
+                    <div class="text-end">
+                        <span class="d-block small text-muted fw-bold text-uppercase" style="font-size: 0.65rem; letter-spacing: 0.5px;">Est. Budget</span>
+                        <span class="text-success fw-bold fs-5">₹{{ req.budget }}</span>
+                    </div>
+                </div>
+
+                <div class="p-4">
+                    <div class="mb-3">
+                        <span class="countdown-badge d-inline-block" data-deadline="{{ req.deadline }}">
+                            <i class="fa-solid fa-spinner fa-spin me-1"></i> Calculating Time Left...
+                        </span>
                     </div>
 
-                    <!-- Clear Parameter Tags for Shop Owner Quick View -->
                     {% if req.description.startswith('[Property:') %}
                         {% set parts = req.description.split(']\n\nDetails: ') %}
                         {% set meta_part = parts[0].replace('[', '') %}
-                        <div class="d-flex flex-wrap gap-2 mb-3">
+                        <div class="d-flex flex-wrap gap-2 mb-3 bg-light p-2 rounded-3 border border-dashed">
                             {% for tag in meta_part.split(' | ') %}
-                                <span class="badge bg-light text-secondary border px-2 py-1 small fw-semibold"><i class="fa-solid fa-tag text-primary me-1"></i>{{ tag }}</span>
+                                <span class="badge bg-white text-dark border px-2 py-1 small fw-semibold"><i class="fa-solid fa-circle-check text-primary me-1"></i>{{ tag }}</span>
                             {% endfor %}
                         </div>
-                        <p class="text-dark mb-3 small" style="line-height: 1.6;">{{ parts[1] if parts|length > 1 else req.description }}</p>
+                        <p class="text-secondary small mb-3" style="line-height: 1.6;"><strong><i class="fa-solid fa-align-left me-1"></i> Client Requirements:</strong><br>{{ parts[1] if parts|length > 1 else req.description }}</p>
                     {% else %}
-                        <p class="text-dark mb-3" style="line-height: 1.6;">{{ req.description }}</p>
+                        <p class="text-secondary small mb-3" style="line-height: 1.6;">{{ req.description }}</p>
                     {% endif %}
                     
-                    <!-- Location & Deadline Meta -->
-                    <div class="d-flex flex-wrap gap-3 text-muted small mb-4 pt-2 border-top">
-                        <div><i class="fa-regular fa-calendar text-danger me-1"></i> Deadline: <strong class="text-dark">{{ req.deadline }}</strong></div>
-                        {% if customers[req.customer_id].address %}
-                        <div><i class="fa-solid fa-location-dot text-primary me-1"></i> Location: <strong class="text-dark">{{ customers[req.customer_id].address }}</strong></div>
-                        {% endif %}
+                    {% if customers[req.customer_id].address %}
+                    <div class="small text-muted mb-4 pb-3 border-bottom">
+                        <i class="fa-solid fa-location-dot text-danger me-1"></i> <strong>Location:</strong> {{ customers[req.customer_id].address }}
                     </div>
+                    {% endif %}
                     
                     {# =======================================================
                        🔥 DYNAMIC BUDGET COST LOGIC FOR CREDITS (Aapki Ranges)
@@ -153,14 +164,13 @@
                        CHECK IF ALREADY UNLOCKED
                        ======================================================= #}
                     {% if req.id in unlocked_leads %}
-                        <div class="bg-success bg-opacity-10 p-4 rounded-4 mt-3 border border-success border-opacity-25">
+                        <div class="bg-success bg-opacity-10 p-3 rounded-4 mt-3 border border-success border-opacity-25">
                             <h6 class="text-success fw-bold mb-3 d-flex align-items-center">
-                                <i class="fa-solid fa-unlock-keyhole me-2"></i> Customer Contact Details Unlocked
+                                <i class="fa-solid fa-unlock-keyhole me-2"></i> Client Details Unlocked
                             </h6>
                             <div class="small d-flex flex-column gap-2 text-dark">
                                 <div><i class="fa-solid fa-user text-success me-2"></i><strong>{{ customers[req.customer_id].name }}</strong></div>
                                 <div><i class="fa-solid fa-phone text-success me-2"></i><a href="tel:{{ customers[req.customer_id].mobile }}" class="fw-bold text-success text-decoration-none">{{ customers[req.customer_id].mobile }}</a></div>
-                                <div><i class="fa-solid fa-location-dot text-success me-2"></i>{{ customers[req.customer_id].address }}</div>
                             </div>
                         </div>
                     {% else %}
@@ -182,11 +192,11 @@
                             </div>
                         {% else %}
                             {% if current_user.wallet_balance < cost %}
-                                <button type="button" class="btn btn-outline-warning text-dark w-100 fw-bold py-3 rounded-pill border-2 mt-3 shadow-sm" data-bs-toggle="modal" data-bs-target="#insufficientModal{{ req.id }}">
+                                <button type="button" class="btn btn-outline-warning text-dark w-100 fw-bold py-3 rounded-pill border-2 shadow-sm" data-bs-toggle="modal" data-bs-target="#insufficientModal{{ req.id }}">
                                     <i class="fa-solid fa-lock me-2 text-warning"></i> Unlock for {{ cost }} Credits
                                 </button>
                             {% else %}
-                                <button type="button" class="btn w-100 fw-bold py-3 rounded-pill border-0 mt-3 shadow-sm text-dark" style="background: linear-gradient(135deg, #fbbf24 0%, #d97706 100%); color: #fff !important;" data-bs-toggle="modal" data-bs-target="#confirmModal{{ req.id }}">
+                                <button type="button" class="btn w-100 fw-bold py-3 rounded-pill border-0 shadow-sm text-dark" style="background: linear-gradient(135deg, #fbbf24 0%, #d97706 100%); color: #fff !important;" data-bs-toggle="modal" data-bs-target="#confirmModal{{ req.id }}">
                                     <i class="fa-solid fa-lock-open me-2"></i> Unlock & Send Quote ({{ cost }} Credits)
                                 </button>
                             {% endif %}
@@ -201,7 +211,6 @@
                ======================================================= #}
             {% if req.id not in unlocked_leads and not req.is_unlocked %}
                 
-                <!-- POPUP 1: INSUFFICIENT BALANCE MODAL -->
                 <div class="modal fade" id="insufficientModal{{ req.id }}" tabindex="-1" aria-hidden="true">
                     <div class="modal-dialog modal-dialog-centered">
                         <div class="modal-content text-center p-4 rounded-4 border-0 shadow-lg">
@@ -226,7 +235,6 @@
                     </div>
                 </div>
 
-                <!-- POPUP 2: NEW QUOTATION & CONFIRMATION MODAL WITH PRE-FILLED BUDGET -->
                 <div class="modal fade" id="confirmModal{{ req.id }}" tabindex="-1" aria-hidden="true">
                     <div class="modal-dialog modal-dialog-centered">
                         <div class="modal-content border-0 shadow-lg rounded-4 overflow-hidden">
@@ -287,9 +295,8 @@
         </div>
         {% endfor %}
     </div>
-</div>
+  </div>
 
-  <!-- WORKERS TAB -->
   <div class="tab-pane fade" id="workers">
       <div class="row g-4">
           {% for worker in workers %}
@@ -321,10 +328,8 @@
       </div>
   </div>
 
-  <!-- VACANCY TAB -->
   <div class="tab-pane fade" id="vacancy">
       <div class="row g-4">
-          <!-- Create Vacancy Form -->
           <div class="col-md-6">
               <div class="card vacancy-card p-4 h-100 shadow-sm">
                   <h5 class="fw-bold text-primary mb-3 d-flex align-items-center">
@@ -353,7 +358,6 @@
               </div>
           </div>
           
-          <!-- My Posted Vacancies List -->
           <div class="col-md-6">
               <h5 class="fw-bold text-dark mb-3"><i class="fa-solid fa-list-check text-success me-2"></i> My Posted Vacancies</h5>
               <div class="d-flex flex-column gap-3">
@@ -382,7 +386,6 @@
   </div>
 </div>
 
-<!-- MODALS FOR WELCOME, EXPIRY, AND REACTIVATION -->
 {% if session.pop('show_welcome_popup', None) and current_user.is_plan_active %}
 <div class="modal fade" id="welcomeShopModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
@@ -488,4 +491,40 @@
     });
 </script>
 {% endif %}
+
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        function updateCountdowns() {
+            const badges = document.querySelectorAll('.countdown-badge');
+            badges.forEach(badge => {
+                const deadlineStr = badge.getAttribute('data-deadline');
+                if (!deadlineStr) return;
+
+                const deadlineDate = new Date(deadlineStr + "T23:59:59");
+                const now = new Date();
+                const diffTime = deadlineDate - now;
+
+                if (diffTime <= 0) {
+                    badge.className = "badge bg-secondary text-white px-3 py-2 rounded-pill fw-bold countdown-badge";
+                    badge.innerHTML = `<i class="fa-solid fa-clock me-1"></i> Expired`;
+                } else {
+                    const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+                    const diffHours = Math.floor((diffTime % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                    const diffMins = Math.floor((diffTime % (1000 * 60 * 60)) / (1000 * 60));
+
+                    if (diffDays > 0) {
+                        badge.innerHTML = `<i class="fa-solid fa-stopwatch me-1"></i> ${diffDays}d ${diffHours}h left`;
+                    } else {
+                        badge.innerHTML = `<i class="fa-solid fa-stopwatch me-1"></i> ${diffHours}h ${diffMins}m left`;
+                    }
+                    badge.className = "badge bg-danger bg-opacity-10 text-danger border border-danger px-3 py-2 rounded-pill fw-bold countdown-badge d-inline-block";
+                }
+            });
+        }
+
+        updateCountdowns();
+        setInterval(updateCountdowns, 60000); // Update every minute
+    });
+</script>
+
 {% endblock %}
