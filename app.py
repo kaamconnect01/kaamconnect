@@ -2,7 +2,7 @@ from flask import Flask, render_template, request, redirect, url_for, flash, ses
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
-from werkzeug.middleware.proxy_fix import ProxyFix   # <--- 1. Yeh import add karein
+from werkzeug.middleware.proxy_fix import ProxyFix
 from datetime import timedelta, datetime
 from zoneinfo import ZoneInfo
 import os
@@ -14,13 +14,13 @@ from authlib.integrations.flask_client import OAuth
 
 app = Flask(__name__)
 
-# --- 2. RENDER PROXY FIX & URL SCHEME CONFIGURATION ---
+# --- RENDER PROXY FIX & URL SCHEME CONFIGURATION ---
 app.wsgi_app = ProxyFix(
     app.wsgi_app, x_for=1, x_proto=1, x_host=1, x_prefix=1
 )
 app.config['PREFERRED_URL_SCHEME'] = 'https'
 
-# --- 3. SECURE SECRET KEY ---
+# --- SECURE SECRET KEY ---
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'super_secret_key_for_local_kaamconnect')
 app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(days=30)
 app.config['REMEMBER_COOKIE_DURATION'] = timedelta(days=30)
@@ -42,7 +42,7 @@ login_manager = LoginManager()
 login_manager.init_app(app)
 login_manager.login_view = 'login'
 
-# ================= 4. OAUTH CONFIGURATION (GOOGLE) =================
+# ================= OAUTH CONFIGURATION (GOOGLE) =================
 oauth = OAuth(app)
 google = oauth.register(
     name='google',
@@ -485,12 +485,10 @@ def verify_admin_otp():
     if 'admin_login_id' not in session:
         return redirect(url_for('login'))
         
-    # Get user to fetch and mask the email
     user = User.query.get(session['admin_login_id'])
     if not user:
         return redirect(url_for('login'))
         
-    # Email Masking Logic (e.g., admin@gmail.com -> ad***@gmail.com)
     email = user.email if user.email else ""
     masked_email = ""
     if email and "@" in email:
@@ -593,7 +591,6 @@ def verify_admin_otp():
             background-color: #1877f2;
         }
 
-        /* Instagram Style Secure Icon Box */
         .ig-otp-icon-ring {
             width: 60px;
             height: 60px;
@@ -712,7 +709,9 @@ def customer_dash():
         flash('Requirement published successfully!', 'success')
         return redirect(url_for('customer_dash'))
         
-    my_reqs = Requirement.query.filter_by(customer_id=current_user.id).order_by(Requirement.id.desc()).all()
+    # DEADLINE AUTO-HIDE FILTER ADDED HERE
+    today_str = datetime.now(ZoneInfo("Asia/Kolkata")).date().isoformat()
+    my_reqs = Requirement.query.filter(Requirement.customer_id == current_user.id, Requirement.deadline >= today_str).order_by(Requirement.id.desc()).all()
     
     for req in my_reqs:
         if hasattr(req, 'unlocked_by_shops') and req.unlocked_by_shops:
@@ -770,7 +769,10 @@ def shop_dash():
             flash('Job Vacancy Published Successfully!', 'success')
         return redirect(url_for('shop_dash'))
 
-    requirements = Requirement.query.order_by(Requirement.id.desc()).all()
+    # DEADLINE AUTO-HIDE FILTER ADDED HERE
+    today_str = datetime.now(ZoneInfo("Asia/Kolkata")).date().isoformat()
+    requirements = Requirement.query.filter(Requirement.deadline >= today_str).order_by(Requirement.id.desc()).all()
+    
     customers = {u.id: u for u in User.query.filter_by(role='customer').all()} 
     unlocked_leads = [lead.requirement_id for lead in UnlockedLead.query.filter_by(shop_owner_id=current_user.id).all()]
     workers = User.query.filter_by(role='worker', is_available=True).all()
