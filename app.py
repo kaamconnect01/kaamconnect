@@ -916,10 +916,13 @@ def admin_dash():
                            pending_requests=pending_requests, 
                            admin_upi=admin_upi)
 
+from sqlalchemy import text
+
 @app.route('/admin/delete_user/<int:user_id>', methods=['POST'])
 @login_required
 def delete_user(user_id):
-    if current_user.role != 'admin': return "Unauthorized", 403
+    if current_user.role != 'admin': 
+        return "Unauthorized", 403
     
     if user_id == current_user.id:
         flash('Aap apne khud ke Admin account ko delete nahi kar sakte!', 'danger')
@@ -929,28 +932,45 @@ def delete_user(user_id):
     
     if user:
         try:
-            Quotation.query.filter(Quotation.shop_owner_id == user.id).delete(synchronize_session=False)
+            # 1. Customer ki saari Requirements aur unse juda data pehle clear karein
+            user_reqs = Requirement.query.filter_by(customer_id=user.id).all()
+            req_ids = [r.id for r in user_reqs]
 
-            if user.role == 'customer':
-                user_reqs = Requirement.query.filter_by(customer_id=user.id).all()
-                for req in user_reqs:
-                    UnlockedLead.query.filter_by(requirement_id=req.id).delete(synchronize_session=False)
-                    Quotation.query.filter_by(requirement_id=req.id).delete(synchronize_session=False)
+            if req_ids:
+                # (A) Requirement se judi LeadReport entries delete karein (PostgreSQL FK Error Fix)
+                try:
+                    for rid in req_ids:
+                        db.session.execute(text("DELETE FROM lead_report WHERE requirement_id = :rid"), {"rid": rid})
+                except Exception as e:
+                    print(f"LeadReport cleanup warning: {e}")
+
+                # (B) Requirement se jude Unlocked Leads delete karein
+                UnlockedLead.query.filter(UnlockedLead.requirement_id.in_(req_ids)).delete(synchronize_session=False)
+
+                # (C) Requirement se judi Quotations delete karein
+                Quotation.query.filter(Quotation.requirement_id.in_(req_ids)).delete(synchronize_session=False)
+
+                # (D) Now safely delete Customer's Requirements
                 Requirement.query.filter_by(customer_id=user.id).delete(synchronize_session=False)
-            
-            elif user.role == 'shop_owner':
-                UnlockedLead.query.filter_by(shop_owner_id=user.id).delete(synchronize_session=False)
-                Vacancy.query.filter_by(shop_owner_id=user.id).delete(synchronize_session=False)
-                PaymentRequest.query.filter_by(shop_owner_id=user.id).delete(synchronize_session=False)
-                
+
+            # 2. User se judi saari Quotations clear karein (chahe user Shop Owner ho ya Worker)
+            Quotation.query.filter((Quotation.shop_owner_id == user.id) | (Quotation.worker_id == user.id)).delete(synchronize_session=False)
+
+            # 3. User se judi Unlocked Leads, Vacancies & Payment Requests delete karein
+            UnlockedLead.query.filter_by(shop_owner_id=user.id).delete(synchronize_session=False)
+            Vacancy.query.filter_by(shop_owner_id=user.id).delete(synchronize_session=False)
+            PaymentRequest.query.filter_by(shop_owner_id=user.id).delete(synchronize_session=False)
+
+            # 4. User ko delete karein
             db.session.delete(user)
             db.session.commit()
+            
             flash('User aur usse juda saara data successfully delete ho gaya.', 'success')
             
         except Exception as e:
             db.session.rollback() 
             print(f"Delete Error aaya hai: {e}") 
-            flash('Error: Data delete nahi ho paya. System Error aaya hai.', 'danger')
+            flash(f'Error: Data delete nahi ho paya. ({e})', 'danger')
             
     return redirect(url_for('admin_dash'))
 
